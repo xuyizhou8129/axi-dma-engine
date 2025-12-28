@@ -97,7 +97,9 @@ Core to system robustness and performance:
 - **Performance**: Burst transfers maximize AXI bus efficiency
 - **Flexibility**: Configurable direction (memory-to-SRAM or SRAM-to-memory) via direction control
 
+## DMA Architecture
 
+```mermaid
 flowchart LR
   CPU[CPU / Driver] -->|AXI4-Lite (CSRs)| CSR[CSR Block<br/>start/stop, ring base, irq enables]
   CSR --> IRQ[Interrupt Controller<br/>done/error]
@@ -128,4 +130,3 @@ flowchart LR
   WR <-->|AXI4 MM| MEM
   DF <-->|AXI4 MM| MEM
   SRAM <-->|SRAM IF| ONCHIP[(On-chip SRAM)]
-
