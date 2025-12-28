@@ -130,3 +130,4 @@ flowchart LR
   WR <-->|AXI4 MM| MEM
   DF <-->|AXI4 MM| MEM
   SRAM <-->|SRAM IF| ONCHIP[(On-chip SRAM)]
+```
