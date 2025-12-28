@@ -96,4 +96,3 @@ Core to system robustness and performance:
 - **Error Handling**: AXI error responses are captured and reported via status registers and error interrupts
 - **Performance**: Burst transfers maximize AXI bus efficiency
 - **Flexibility**: Configurable direction (memory-to-SRAM or SRAM-to-memory) via direction control
-
