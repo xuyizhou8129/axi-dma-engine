@@ -96,3 +96,36 @@ Core to system robustness and performance:
 - **Error Handling**: AXI error responses are captured and reported via status registers and error interrupts
 - **Performance**: Burst transfers maximize AXI bus efficiency
 - **Flexibility**: Configurable direction (memory-to-SRAM or SRAM-to-memory) via direction control
+
+
+flowchart LR
+  CPU[CPU / Driver] -->|AXI4-Lite (CSRs)| CSR[CSR Block<br/>start/stop, ring base, irq enables]
+  CSR --> IRQ[Interrupt Controller<br/>done/error]
+
+  subgraph DMA["DMA Engine"]
+    direction LR
+
+    subgraph F["Front-end: Descriptor Handling"]
+      RM[Ring Manager<br/>(head/tail, indexing)] --> DF[Descriptor Fetch<br/>(AXI4 read)]
+      DF --> DQ[Descriptor Queue / FIFO]
+    end
+
+    subgraph D["Data Path: Move Data"]
+      DQ --> SCHED[Scheduler / Control FSM]
+      SCHED --> RD[AXI4 Master Read<br/>(src)]
+      RD --> RFIFO[Read Data FIFO]
+      RFIFO --> PACK[Width / align / pack-unpack<br/>(optional)]
+      PACK --> SRAM[SRAM/BRAM Controller<br/>(writes to on-chip SRAM)]
+    end
+
+    subgraph WB["Completion / Status Writeback"]
+      SCHED --> WFIFO[Writeback Queue]
+      WFIFO --> WR[AXI4 Master Write<br/>(status + tail/head update)]
+    end
+  end
+
+  RD <-->|AXI4 MM| MEM[(System Memory<br/>Descriptors + Payload)]
+  WR <-->|AXI4 MM| MEM
+  DF <-->|AXI4 MM| MEM
+  SRAM <-->|SRAM IF| ONCHIP[(On-chip SRAM)]
+
