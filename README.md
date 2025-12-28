@@ -101,33 +101,33 @@ Core to system robustness and performance:
 
 ```mermaid
 flowchart LR
-  CPU[CPU / Driver] -->|AXI4-Lite (CSRs)| CSR[CSR Block<br/>start/stop, ring base, irq enables]
-  CSR --> IRQ[Interrupt Controller<br/>done/error]
+  CPU["CPU / Driver"] -->|AXI4-Lite CSRs| CSR["CSR Block<br/>start/stop, ring base, irq enables"]
+  CSR --> IRQ["Interrupt Controller<br/>done/error"]
 
   subgraph DMA["DMA Engine"]
     direction LR
 
     subgraph F["Front-end: Descriptor Handling"]
-      RM[Ring Manager<br/>(head/tail, indexing)] --> DF[Descriptor Fetch<br/>(AXI4 read)]
-      DF --> DQ[Descriptor Queue / FIFO]
+      RM["Ring Manager<br/>head/tail, indexing"] --> DF["Descriptor Fetch<br/>AXI4 read"]
+      DF --> DQ["Descriptor Queue / FIFO"]
     end
 
     subgraph D["Data Path: Move Data"]
-      DQ --> SCHED[Scheduler / Control FSM]
-      SCHED --> RD[AXI4 Master Read<br/>(src)]
-      RD --> RFIFO[Read Data FIFO]
-      RFIFO --> PACK[Width / align / pack-unpack<br/>(optional)]
-      PACK --> SRAM[SRAM/BRAM Controller<br/>(writes to on-chip SRAM)]
+      DQ --> SCHED["Scheduler / Control FSM"]
+      SCHED --> RD["AXI4 Master Read<br/>src"]
+      RD --> RFIFO["Read Data FIFO"]
+      RFIFO --> PACK["Width / align / pack-unpack<br/>optional"]
+      PACK --> SRAM["SRAM/BRAM Controller<br/>writes to on-chip SRAM"]
     end
 
     subgraph WB["Completion / Status Writeback"]
-      SCHED --> WFIFO[Writeback Queue]
-      WFIFO --> WR[AXI4 Master Write<br/>(status + tail/head update)]
+      SCHED --> WFIFO["Writeback Queue"]
+      WFIFO --> WR["AXI4 Master Write<br/>status + tail/head update"]
     end
   end
 
-  RD <-->|AXI4 MM| MEM[(System Memory<br/>Descriptors + Payload)]
+  RD <-->|AXI4 MM| MEM[("System Memory<br/>Descriptors + Payload")]
   WR <-->|AXI4 MM| MEM
   DF <-->|AXI4 MM| MEM
-  SRAM <-->|SRAM IF| ONCHIP[(On-chip SRAM)]
+  SRAM <-->|SRAM IF| ONCHIP[("On-chip SRAM")]
 ```
