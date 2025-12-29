@@ -1,133 +1,134 @@
-# AXI DMA Engine
+# Scatter–Gather AXI DMA Engine (Descriptor-Ring Based)
 
-A memory-mapped Direct Memory Access (DMA) block that enables efficient data transfers between system memory (AXI4 memory-mapped) and on-chip SRAM/BRAM. The CPU configures transfer operations via control registers, and the DMA autonomously executes the transfers, notifying the CPU via interrupts upon completion or error.
+A memory-mapped DMA subsystem that performs autonomous scatter–gather transfers between system memory (AXI4 memory-mapped) and on-chip SRAM/BRAM using a descriptor ring stored in system memory. The CPU configures the DMA by writing ring base/size and control flags through CSRs, then the DMA independently fetches descriptors over AXI4, executes the copy operations, writes status back to memory, and notifies the CPU via interrupts.
 
 ## Overview
 
-The AXI DMA Engine provides a hardware-accelerated data transfer mechanism where:
-- **CPU** writes "copy job" configuration into Control and Status Registers (CSRs)
-- **DMA** autonomously moves data over AXI bursts between system memory and on-chip SRAM/BRAM
-- **DMA** sets status flags and raises interrupts (done/error) to notify the CPU
+This DMA separates control, scheduling, and data movement:
 
-This design separates the control plane (CPU configuration) from the data plane (high-speed data movement), enabling efficient bulk data transfers without CPU intervention.
+**CPU (control plane):**
+- Programs CSRs with where the descriptor rings live in system memory (base address, size, head/tail policy, enables)
+- Optionally "kicks" the engine (doorbell/start), and handles interrupts
+
+**DMA (autonomous engine):**
+- Reads descriptors from system memory via the AXI4 master
+- Executes each descriptor: move payload data between system memory and on-chip SRAM/BRAM
+- Performs status writeback (descriptor completion/error codes, updated head pointer, optional counters) back into system memory via AXI4 writes
+- Raises done/error interrupts for software visibility
+
+This enables high-throughput transfers with minimal CPU involvement: the CPU posts work into rings, and the DMA streams through it.
 
 ## Features
 
-- **Memory-mapped Control Interface**: AXI4-Lite slave interface for CPU configuration
-- **High-speed Data Transfer**: AXI4 master interface for burst transfers to/from system memory
-- **On-chip Memory Support**: Direct interface to SRAM/BRAM with configurable port architecture
-- **Interrupt-driven Operation**: Hardware interrupts for transfer completion and error notification
-- **Robust Data Handling**: FIFO-based decoupling buffers for reliable operation under backpressure
-- **Error Detection**: Captures and reports AXI error responses (RRESP/BRESP)
+### Scatter–Gather via Descriptor Rings in Memory
+- Descriptors stored in DRAM; DMA fetches them via AXI4 and processes continuously
+- Supports chained transfers without per-transfer CPU programming
+
+### AXI4-Lite Control/Status Interface
+- CSRs for ring base, ring size, enable/irq control, and engine status
+- Optional doorbell register to trigger fetch/scheduling
+
+### AXI4 Master Memory Interface
+- Used for both descriptor fetch + payload reads/writes + status writeback
+- Burst-based transfers with full valid/ready backpressure handling
+- Error capture from RRESP/BRESP
+
+### On-chip SRAM/BRAM Interface
+- SRAM controller handles addressing, write masking, and timing
+- Configurable for single-port or dual-port SRAM integration
+
+### FIFO-based Decoupling
+- Descriptor queue FIFO between fetch and execution
+- Read-data FIFO for AXI burst absorption
+- Writeback/status FIFO to decouple completion reporting from the datapath
+
+### Interrupt-driven Completion
+- Level/sticky done/error events with clear/enable controls
+- Optional interrupt on "ring empty" or "threshold" events
 
 ## Architecture
 
-The DMA engine is organized into two main planes:
+The DMA engine is organized into four main subsystems:
 
 ### 1. Control Plane (CPU ↔ DMA)
 
-#### AXI4-Lite Slave (CSR Block)
-- Exposes memory-mapped registers for DMA configuration:
-  - **SRC**: Source address (system memory or SRAM)
-  - **DST**: Destination address (system memory or SRAM)
-  - **LEN**: Transfer length (number of bytes/words)
-  - **START**: Command register to initiate transfer
-  - **STATUS**: Current transfer status and error flags
-  - **IRQ enable/clear**: Interrupt control registers
-- CPU uses standard load/store operations to configure and monitor the DMA
-- Produces clean internal command signals (`cmd_valid`, `src`, `dst`, `len`, `dir`) to start transfers
+#### AXI4-Lite CSR Block
 
-#### Interrupt Logic
-- DMA sets sticky status bits for done/error conditions
-- Generates `irq_done` and `irq_error` signals (typically level-triggered) to the SoC interrupt controller
-- CPU Interrupt Service Routine (ISR) reads status registers and clears pending interrupt bits
+**Ring configuration:**
+- **RING_BASE**: Descriptor ring base address (system memory)
+- **RING_SIZE/STRIDE**: Ring capacity and descriptor size/stride
+- **HEAD/TAIL** (optional): Software-visible producer/consumer pointers
 
-### 2. Data Plane (DMA ↔ Memory/SRAM)
+**Engine control:**
+- **ENABLE/START** (doorbell)
+- **IRQ_ENABLE/IRQ_CLEAR**
+- **STATUS/ERROR** (sticky bits, error code, debug counters)
 
-#### AXI4 Master (Memory Side)
-- DMA acts as a bus master, issuing burst read/write operations to system DRAM
-- Implements all AXI4 channels:
-  - **AR/R**: Address Read and Read Data channels
-  - **AW/W/B**: Address Write, Write Data, and Write Response channels
-- Handles AXI handshaking correctly (`valid`/`ready` signals) with proper backpressure support
-- Captures and processes AXI error responses (`RRESP`/`BRESP`)
+#### Interrupt Controller
+- Generates `irq_done` / `irq_error` (and optional ring events)
+- CPU ISR reads CSR + (optional) memory writeback status, then clears interrupts
 
-#### SRAM/BRAM Interface (On-chip Side)
-- Simple SRAM port interface:
-  - `addr`: Address bus
-  - `wdata`: Write data bus
-  - `rdata`: Read data bus
-  - `we`: Write enable
-  - `wmask`: Write byte mask
-  - `enable`: Memory enable signal
-- Supports single-port or dual-port configurations:
-  - **Single-port**: Requires scheduling/arbitration for read/write operations
-  - **Dual-port**: Enables more parallel operation
+### 2. Descriptor Front-End (DMA ↔ System Memory)
 
-#### FIFOs (Decoupling Buffers)
-Core to system robustness and performance:
-- **Memory-to-SRAM path**: FIFO absorbs data when memory is fast but SRAM stalls
-- **SRAM-to-Memory path**: FIFO prevents bubbles when SRAM is fast but memory stalls
-- Simplifies burst handling: read in bursts from AXI, write out at SRAM pace (or vice versa)
-- Provides elasticity to handle timing mismatches between different clock domains or data rates
+#### Ring Manager
+- Tracks current descriptor index (consumer head)
+- Computes descriptor address: `desc_addr = ring_base + head * stride`
+- Handles wraparound and ring-empty conditions (based on head/tail policy)
 
-## Optional Features
+#### Descriptor Fetch (AXI4 Read)
+- Issues AXI reads to pull descriptors into the DMA
+- Pushes parsed descriptors into a Descriptor FIFO/Queue
 
-### Descriptor Ring (Medium Scope Upgrade)
-- CPU posts multiple copy jobs in a descriptor ring structure in memory
-- DMA autonomously fetches and executes descriptors in a loop
-- Enables continuous operation with minimal CPU intervention
-- Supports chained transfers and advanced scheduling
+### 3. Data Mover (DMA ↔ Memory/SRAM)
 
-## Usage Flow
+#### Scheduler / Control FSM
+- Pops a descriptor, validates it, and orchestrates the transaction sequence
+- Selects direction (mem→SRAM, SRAM→mem) and sets up burst parameters
 
-1. **Configuration**: CPU writes transfer parameters (SRC, DST, LEN) to CSR registers
-2. **Start Transfer**: CPU writes to START register, triggering DMA operation
-3. **Data Transfer**: DMA autonomously:
-   - Reads data from source (AXI4 or SRAM)
-   - Buffers data through FIFOs
-   - Writes data to destination (AXI4 or SRAM)
-4. **Completion**: DMA sets status flags and raises interrupt
-5. **CPU Response**: CPU ISR reads status, handles completion/error, and clears interrupt flags
+#### AXI4 Master Read/Write (Payload)
+- Performs burst reads/writes to system memory for payload
+- Works with FIFOs to tolerate backpressure and latency
+
+#### Read/Write Data FIFOs + (Optional) Packing/Alignment
+- Read FIFO absorbs AXI bursts even if SRAM stalls
+- Optional width/align unit if AXI data width ≠ SRAM data width
+
+#### SRAM Controller
+- Converts stream data into SRAM write/read cycles
+- Applies byte masks and handles SRAM timing/port constraints
+
+### 4. Completion / Status Writeback (DMA → System Memory)
+
+#### Writeback Queue
+- Collects completion records: descriptor ID, bytes transferred, done/error code
+
+#### AXI4 Master Write (Status)
+- Writes status back into system memory (e.g., descriptor status field, updated head pointer, counters)
+- Ensures software can poll memory state even without interrupts
+
+## Usage Flow (Typical)
+
+1. **Software sets up ring in memory**
+   - Allocates descriptor ring + status fields in DRAM
+   - Fills descriptors (src, dst, len, flags, status_ptr or in-place status)
+
+2. **CPU configures DMA CSRs**
+   - Writes RING_BASE, RING_SIZE, enables IRQs
+   - Writes START/DOORBELL to begin
+
+3. **DMA runs autonomously**
+   - Ring manager computes next descriptor address
+   - Descriptor fetch reads descriptor over AXI4
+   - Scheduler executes payload move (AXI4 ↔ SRAM controller)
+   - DMA writes completion/status back to DRAM
+
+4. **Completion signaling**
+   - DMA raises done/error interrupt (or ring event)
+   - CPU ISR reads CSR and/or status writeback in memory, then clears IRQ
 
 ## Design Considerations
 
-- **Backpressure Handling**: FIFOs and proper AXI handshaking ensure reliable operation under various load conditions
-- **Error Handling**: AXI error responses are captured and reported via status registers and error interrupts
-- **Performance**: Burst transfers maximize AXI bus efficiency
-- **Flexibility**: Configurable direction (memory-to-SRAM or SRAM-to-memory) via direction control
-
-## DMA Architecture
-
-```mermaid
-flowchart LR
-  CPU["CPU / Driver"] -->|AXI4-Lite CSRs| CSR["CSR Block<br/>start/stop, ring base, irq enables"]
-  CSR --> IRQ["Interrupt Controller<br/>done/error"]
-
-  subgraph DMA["DMA Engine"]
-    direction LR
-
-    subgraph F["Front-end: Descriptor Handling"]
-      RM["Ring Manager<br/>head/tail, indexing"] --> DF["Descriptor Fetch<br/>AXI4 read"]
-      DF --> DQ["Descriptor Queue / FIFO"]
-    end
-
-    subgraph D["Data Path: Move Data"]
-      DQ --> SCHED["Scheduler / Control FSM"]
-      SCHED --> RD["AXI4 Master Read<br/>src"]
-      RD --> RFIFO["Read Data FIFO"]
-      RFIFO --> PACK["Width / align / pack-unpack<br/>optional"]
-      PACK --> SRAM["SRAM/BRAM Controller<br/>writes to on-chip SRAM"]
-    end
-
-    subgraph WB["Completion / Status Writeback"]
-      SCHED --> WFIFO["Writeback Queue"]
-      WFIFO --> WR["AXI4 Master Write<br/>status + tail/head update"]
-    end
-  end
-
-  RD <-->|AXI4 MM| MEM[("System Memory<br/>Descriptors + Payload")]
-  WR <-->|AXI4 MM| MEM
-  DF <-->|AXI4 MM| MEM
-  SRAM <-->|SRAM IF| ONCHIP[("On-chip SRAM")]
-```
+- **Correctness under backpressure**: FIFOs isolate AXI burst timing from SRAM timing
+- **AXI robustness**: Handles valid/ready on all channels; captures RRESP/BRESP
+- **Throughput**: Bursts + pipelined descriptor fetch (prefetching) improve sustained bandwidth
+- **Software/hardware contract**: Clear ring ownership rules (producer/consumer head/tail) and status writeback format
