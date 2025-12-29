@@ -18,35 +18,9 @@ This DMA separates control, scheduling, and data movement:
 
 This enables high-throughput transfers with minimal CPU involvement: the CPU posts work into rings, and the DMA streams through it.
 
-## Features
-
-### Scatter–Gather via Descriptor Rings in Memory
-- Descriptors stored in DRAM; DMA fetches them via AXI4 and processes continuously
-- Supports chained transfers without per-transfer CPU programming
-
-### AXI4-Lite Control/Status Interface
-- CSRs for ring base, ring size, enable/irq control, and engine status
-- Optional doorbell register to trigger fetch/scheduling
-
-### AXI4 Master Memory Interface
-- Used for both descriptor fetch + payload reads/writes + status writeback
-- Burst-based transfers with full valid/ready backpressure handling
-- Error capture from RRESP/BRESP
-
-### On-chip SRAM/BRAM Interface
-- SRAM controller handles addressing, write masking, and timing
-- Configurable for single-port or dual-port SRAM integration
-
-### FIFO-based Decoupling
-- Descriptor queue FIFO between fetch and execution
-- Read-data FIFO for AXI burst absorption
-- Writeback/status FIFO to decouple completion reporting from the datapath
-
-### Interrupt-driven Completion
-- Level/sticky done/error events with clear/enable controls
-- Optional interrupt on "ring empty" or "threshold" events
-
 ## Architecture
+
+![DMA Architecture](pic/DMA.png)
 
 The DMA engine is organized into four main subsystems:
 
@@ -125,10 +99,3 @@ The DMA engine is organized into four main subsystems:
 4. **Completion signaling**
    - DMA raises done/error interrupt (or ring event)
    - CPU ISR reads CSR and/or status writeback in memory, then clears IRQ
-
-## Design Considerations
-
-- **Correctness under backpressure**: FIFOs isolate AXI burst timing from SRAM timing
-- **AXI robustness**: Handles valid/ready on all channels; captures RRESP/BRESP
-- **Throughput**: Bursts + pipelined descriptor fetch (prefetching) improve sustained bandwidth
-- **Software/hardware contract**: Clear ring ownership rules (producer/consumer head/tail) and status writeback format
