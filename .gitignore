@@ -1,0 +1,27 @@
+# Xcelium simulation files
+xcelium.d/
+xrun.log
+xrun.history
+waves.shm/
+*.shm/
+*.dsn
+*.vcd
+*.fsdb
+*.vpd
+
+# Output files
+output.txt
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# NFS lock files
+.nfs*
+
+# Editor backup files
+*.swp
+*.swo
+*~
+
