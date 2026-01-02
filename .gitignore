@@ -2,12 +2,22 @@
 xcelium.d/
 xrun.log
 xrun.history
+xrun.key
 waves.shm/
 *.shm/
 *.dsn
 *.vcd
 *.fsdb
 *.vpd
+
+# SimVision files
+.simvision/
+simvision.*
+*.simvision
+
+# bpad files
+*.bpad
+bpad.*
 
 # Output files
 output.txt
