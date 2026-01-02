@@ -16,6 +16,8 @@ simvision.*
 *.simvision
 
 # bpad files
+.bpad/
+.bpad
 *.bpad
 bpad.*
 
