@@ -99,3 +99,7 @@ The DMA engine is organized into four main subsystems:
 4. **Completion signaling**
    - DMA raises done/error interrupt (or ring event)
    - CPU ISR reads CSR and/or status writeback in memory, then clears IRQ
+
+## Additional Notes
+   - Either Data Mover or CSR writes error into IRQ
+   - How IRQ signals to CPU: irq_done wire is connected to CPU interrupt pin
