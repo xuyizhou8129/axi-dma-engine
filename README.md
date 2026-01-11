@@ -20,7 +20,7 @@ This enables high-throughput transfers with minimal CPU involvement: the CPU pos
 
 ## Architecture
 
-![DMA Architecture](pic/DMA.png)
+![DMA Architecture](pic/DMA.drawio.png)
 
 The DMA engine is organized into four main subsystems:
 

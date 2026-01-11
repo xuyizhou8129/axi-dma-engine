@@ -37,3 +37,7 @@ output.txt
 *.swo
 *~
 
+# macOS system files
+.DS_Store
+pic/.DS_Store
+pic/**/.DS_Store
