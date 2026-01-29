@@ -16,13 +16,13 @@ xrun \
     -sv \
     -access +rw \
     -timescale 1ns/1ps \
-    -incdir rtl \
-    -incdir tb/sv \
-    rtl/axi_lite_if.sv \
-    rtl/dma_top.sv \
-    tb/sv/axi_lite_bfm.sv \
-    tb/sv/tb_top.sv \
-    tb/tests/t_reg_smoke.sv \
+    -incdir ../rtl \
+    -incdir ../tb/sv \
+    ../rtl/axi_lite_if.sv \
+    ../rtl/dma_top.sv \
+    ../tb/sv/axi_lite_bfm.sv \
+    ../tb/sv/tb_top.sv \
+    ../tb/tests/t_reg_smoke.sv \
     -top tb_top \
     -gui \
     >& output.txt
