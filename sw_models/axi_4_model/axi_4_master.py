@@ -1,4 +1,5 @@
 import memory
+from memory import SystemMemory
 
 class AXI4Master:
     #/*Key questions: How close are we to hardware?*/
@@ -8,20 +9,20 @@ class AXI4Master:
         self.write_buffer = []
         
     def read_memory(self, start_addr, burst_length, datasize):
-        total_num_bytes = burst_length*datasize
+        total_num_bytes = burst_length * datasize
         end_addr = start_addr + total_num_bytes
 
-        if start_addr < 0 or end_addr > self.memory.size:
-            raise ValueError("AXI read out of bounds")
+        if start_addr < 0 or end_addr > self.memory.size: # out of bounds check
+            raise ValueError("AXI read out of b33unds")
 
-        for i in range(start_addr, end_addr):
+        for i in range(start_addr, end_addr): # byte by byte we read form data 
             self.read_buffer.append(self.memory.mem[i])
-        
+
     def read_a_byte(self, addr):
         if addr < 0 or addr >= self.memory.size:
             raise ValueError("AXI read out of bounds")
         return self.memory.mem[addr]
-    
+
     def write_memory(self, start_addr, burst_length, datasize, write_buffer):
         total_num_bytes = burst_length * datasize
         end_addr = start_addr + total_num_bytes
@@ -34,9 +35,8 @@ class AXI4Master:
         for i in range(total_num_bytes):
             self.memory.mem[start_addr + i] = write_buffer[i]
 
-    def write_a_byte(self, start_addr, value):
+    def write_a_byte(self, addr, value):
         if addr < 0 or addr >= self.memory.size:
             raise ValueError("AXI write out of bounds")
 
         self.memory.mem[addr] = value
-
