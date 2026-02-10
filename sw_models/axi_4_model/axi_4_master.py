@@ -7,6 +7,10 @@ class AXI4Master:
         self.memory = memory
         self.read_buffer = []
         self.write_buffer = []
+
+    # add fifo data structure
+    # fixed size read/write buffer
+    # reset the buffers
         
     def read_memory(self, start_addr, burst_length, datasize):
         total_num_bytes = burst_length * datasize
