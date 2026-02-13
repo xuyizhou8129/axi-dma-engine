@@ -11,10 +11,6 @@ class AXI4Master:
         self.df_write_fifo = df_write_fifo
         self.dm_read_fifo = dm_read_fifo
         self.dm_write_fifo = dm_write_fifo
-
-    # add fifo data structure
-    # fixed size read/write buffer
-    # reset the buffers
         
     def read_memory(self, start_addr, burst_length, datasize, target_fifo: FIFOQueue):
         total_num_bytes = burst_length * datasize
