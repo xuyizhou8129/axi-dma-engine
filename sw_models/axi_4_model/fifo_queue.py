@@ -15,12 +15,12 @@ class FIFOQueue:
 
     def enqueue(self, value):
         if self.is_full():
-            raise RuntimeError(self.id "FIFO overflow")
+            raise RuntimeError(f"{self.id} FIFO overflow")
         self.buffer.append(value)
 
     def dequeue(self):
         if self.is_empty():
-            raise RuntimeError(self.id "FIFO underflow")
+            raise RuntimeError(f"{self.id} FIFO empty")
         return self.buffer.pop(0)
 
     def clear(self):
