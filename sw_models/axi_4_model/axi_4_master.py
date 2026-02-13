@@ -3,10 +3,8 @@ from memory import SystemMemory
 
 class AXI4Master:
     #/*Key questions: How close are we to hardware?*/
-    def __init__(self, memory: SystemMemory):
+    def __init__(self, memory: SystemMemory, ):
         self.memory = memory
-        self.read_buffer = []
-        self.write_buffer = []
 
     # add fifo data structure
     # fixed size read/write buffer
@@ -45,3 +43,5 @@ class AXI4Master:
         if addr < 0 or addr >= self.memory.size:
             raise ValueError("AXI read out of bounds")
         return self.memory.mem[addr]
+
+
