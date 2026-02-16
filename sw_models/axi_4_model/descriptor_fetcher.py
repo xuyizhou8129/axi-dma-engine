@@ -1,4 +1,5 @@
 import axi_4_model
+from axi_4_master import AXI4Master
 from descriptor import descriptor
 
 """
@@ -13,28 +14,34 @@ from descriptor import descriptor
 """
 
 class descriptor_fetcher:
-    def __init__(self, AXI4Master):
+    def __init__(self, axi4: AXI4Master):
 
-        self.axi4 = AXI4Master # connnection to the AXI4 Master
+        self.axi4 = axi4 # connnection to the AXI4 Master
         
     # df_read(self, rm_address)
     # rm_address: Starting index in SystemMemory provided by ring manager
-    def df_read(self, rm_address):
-        # assuming each index holds one 32-bit word
-        # assuming each field (start_address, burst_length, datasize) is a 32-bit word
-        raw_words = self.axi4.memory[rm_address : rm_address + 3]
+    def df_read(self):
+        # each index holds one 32-bit word
+        # each field (start_address, burst_length, datasize) is a 32-bit word
 
-        word_start_address = raw_words[0]
-        word_burst_length = raw_words[1]
-        word_datasize = raw_words[2]
+        word_start_address = self.axi4.df_write_fifo.dequeue()
+        word_burst_length = self.axi4.df_write_fifo.dequeue()
+        word_datasize = self.axi4.df_write_fifo.dequeue()
 
         new_descriptor = descriptor(
             start_address = word_start_address,
             burst_length = word_burst_length,
             datasize = word_datasize
         )
-
         return new_descriptor
+    
+    def df_write(self, rm_address):
+
+        self.axi4.df_read_fifo.enqueue(rm_address)
+
+
+
+        
         
 
     
