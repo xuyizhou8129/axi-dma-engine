@@ -1,6 +1,7 @@
-import axi_4_model
 from axi_4_master import AXI4Master
 from descriptor import descriptor
+from fifo_queue import FIFOQueue
+
 
 """
     Description: The Descriptor Fetcher acts as the bridge between the Ring Manager
@@ -13,10 +14,11 @@ from descriptor import descriptor
     - Output: A Descriptor object containing start_addr, burst_len, and data_size.
 """
 
-class descriptor_fetcher:
-    def __init__(self, axi4: AXI4Master):
+class DescriptorFetcher:
+    def __init__(self, axi4: AXI4Master, df_write_fifo: FIFOQueue):
 
         self.axi4 = axi4 # connnection to the AXI4 Master
+        self.df_write_fifo = df_write_fifo
         
     # df_read(self, rm_address)
     # rm_address: Starting index in SystemMemory provided by ring manager
@@ -37,7 +39,7 @@ class descriptor_fetcher:
     
     def df_write(self, rm_address):
 
-        self.axi4.df_read_fifo.enqueue(rm_address)
+        self.df_write_fifo.enqueue(rm_address)
 
 
 
