@@ -41,3 +41,7 @@ output.txt
 .DS_Store
 pic/.DS_Store
 pic/**/.DS_Store
+
+# Python cache files
+__pycache__/
+*.pyc
