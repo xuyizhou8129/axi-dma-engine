@@ -1,11 +1,8 @@
-import memory
 from memory import SystemMemory
-import fifo_queue
 from fifo_queue import FIFOQueue
-import data_mover
 from data_mover import DataMover
-import descriptor_fetcher
 from descriptor_fetcher import DescriptorFetcher
+
 class AXI4Master:
     #/*Key questions: How close are we to hardware?*/
     def __init__(self, memory: SystemMemory, fifo_to_df: FIFOQueue, fifo_to_dm: FIFOQueue, dm: DataMover, df: DescriptorFetcher):
@@ -15,7 +12,8 @@ class AXI4Master:
         # self.dm = dm
         # self.df = df
         #self.fifo_from_dm = dm.data_fifo
-        self.fifo_from_df = df.df_write_fifo
+        self.fifo_from_dm = dm.fifo_to_axi
+        self.fifo_from_df = df.fifo_to_axi # fifo from df to AXI
 
     def read_memory(self, start_addr, burst_length, datasize, target_fifo: FIFOQueue = None, target="dm"):
         total_num_bytes = burst_length * datasize
