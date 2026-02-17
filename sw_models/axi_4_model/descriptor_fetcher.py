@@ -15,20 +15,21 @@ from fifo_queue import FIFOQueue
 """
 
 class DescriptorFetcher:
-    def __init__(self, axi4: AXI4Master, df_write_fifo: FIFOQueue):
+    def __init__(self, axi4: AXI4Master, df_fifo_to_axi: FIFOQueue):
 
         self.axi4 = axi4 # connnection to the AXI4 Master
-        self.df_write_fifo = df_write_fifo
+        self.df_fifo_to_axi = df_fifo_to_axi
         
     # df_read(self, rm_address)
     # rm_address: Starting index in SystemMemory provided by ring manager
+
     def df_read(self):
         # each index holds one 32-bit word
         # each field (start_address, burst_length, datasize) is a 32-bit word
 
-        word_start_address = self.axi4.df_write_fifo.dequeue()
-        word_burst_length = self.axi4.df_write_fifo.dequeue()
-        word_datasize = self.axi4.df_write_fifo.dequeue()
+        word_start_address = self.axi4.fifo_to_df.dequeue()
+        word_burst_length = self.axi4.fifo_to_df.dequeue()
+        word_datasize = self.axi4.fifo_to_df.dequeue()
 
         new_descriptor = descriptor(
             start_address = word_start_address,
@@ -38,8 +39,7 @@ class DescriptorFetcher:
         return new_descriptor
     
     def df_write(self, rm_address):
-
-        self.df_write_fifo.enqueue(rm_address)
+        self.df_fifo_to_axi.enqueue(rm_address)
 
 
 
