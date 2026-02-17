@@ -24,17 +24,21 @@ class DescriptorFetcher:
     # rm_address: Starting index in SystemMemory provided by ring manager
 
     def df_read(self):
-        # each index holds one 32-bit word
-        # each field (start_address, burst_length, datasize) is a 32-bit word
+        # each index holds 43-bits
+        # bits[31:0]: start_address
+        # bits[39:32]: burst_length
+        # bits[42:40]: datasize
 
-        word_start_address = self.axi4.fifo_to_df.dequeue()
-        word_burst_length = self.axi4.fifo_to_df.dequeue()
-        word_datasize = self.axi4.fifo_to_df.dequeue()
+        raw_bits = self.axi4.fifo_to_df.dequeue()
+
+        descrip_start_address = raw_bits & 0xFFFFFFFF
+        descrip_burst_length = (raw_bits >> 32) & 0xFF
+        descrip_datasize = (raw_bits >> 40) & 0x7
 
         new_descriptor = descriptor(
-            start_address = word_start_address,
-            burst_length = word_burst_length,
-            datasize = word_datasize
+            start_address = descrip_start_address,
+            burst_length = descrip_burst_length,
+            datasize = descrip_datasize
         )
         return new_descriptor
     
