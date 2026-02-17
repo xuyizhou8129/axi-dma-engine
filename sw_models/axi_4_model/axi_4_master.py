@@ -12,8 +12,8 @@ class AXI4Master:
         # self.dm = dm
         # self.df = df
         #self.fifo_from_dm = dm.data_fifo
-        self.fifo_from_dm = dm.fifo_to_axi
-        self.fifo_from_df = df.fifo_to_axi # fifo from df to AXI
+        self.fifo_from_dm = dm.dm_fifo_to_axi
+        self.fifo_from_df = df.df_fifo_to_axi # fifo from df to AXI
 
     def read_memory(self, start_addr, burst_length, datasize, target_fifo: FIFOQueue = None, target="dm"):
         total_num_bytes = burst_length * datasize
