@@ -19,7 +19,7 @@ output: flag (int for now)
 """
 
 from axi_4_master import AXI4Master
-from sram_controller import SRAMController
+from sw_models.axi_4_model.sram_controller import SRAMController
 from fifo_queue import FIFOQueue
 from descriptor import descriptor
 
