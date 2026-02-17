@@ -38,7 +38,7 @@ class DataMover:
         self.axi4 = axi4
         self.sram = sram
         self.dm_axi4_write_fifo = dm_axi4_write_fifo
-        self.dm_sram_write_fifo: FIFOQueue
+        self.dm_sram_write_fifo = dm_sram_write_fifo
 
     def read_from_axi4_master(self, start_addr, burst_length, data_size):
         data = self.axi4.fifo_to_dm.dequeue()  # gets a 32-bit data from axi4 master
