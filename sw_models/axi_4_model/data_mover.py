@@ -20,6 +20,7 @@ output: flag (int for now)
 
 from axi_4_master import AXI4Master
 from sram_controller import SRAMController
+from fifo_queue import FIFOQueue
 
 
 class DataMover:
@@ -27,21 +28,16 @@ class DataMover:
         self,
         axi4: AXI4Master,
         sram: SRAMController,
+        dm_write_fifo: FIFOQueue
     ):
         self.axi4 = axi4
         self.sram = sram
+        self.dm_write_fifo = dm_write_fifo
 
     def read_from_axi4_master(self, start_addr, burst_length, data_size):
-        # data_size is in bits; must be byte-multiple
-        if data_size % 8 != 0:
-            raise ValueError("data_size must be a multiple of 8 bits (1 byte)")
-
-        address = start_addr
-        for _ in range(burst_length):
-            self.axi.enqueue_read(address=address, size_bits=data_size)
-            address += data_size // 8  # advance by bytes per beat
-
-        return
+        word_start_address = self.axi4.fifo_to_df.dequeue()
+        word_burst_length = self.axi4.fifo_to_df.dequeue()
+        word_datasize = self.axi4.fifo_to_df.dequeue()
 
     def read_from_sram_controller(self, start_addr, burst_length, data_size):
         # data_size is in bits; must be byte-multiple
