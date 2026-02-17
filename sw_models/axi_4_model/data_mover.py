@@ -32,7 +32,7 @@ class DataMover:
         self,
         axi4: AXI4Master,
         sram: SRAMController,
-        dm_axi4_write_fifo: FIFOQueue
+        dm_axi4_write_fifo: FIFOQueue,
         dm_sram_write_fifo: FIFOQueue
     ):
         self.axi4 = axi4
@@ -41,39 +41,37 @@ class DataMover:
         self.dm_sram_write_fifo = dm_sram_write_fifo
 
     def read_from_axi4_master(self, start_addr, burst_length, data_size):
-        data = self.axi4.fifo_to_dm.dequeue()  # gets a 32-bit data from axi4 master
+        data = self.axi4.fifo_to_dm.dequeue()  # gets a 32-bit data from axi4
         return data
-        
-
-
+ 
     def read_from_sram_controller(self, start_addr, burst_length, data_size):
-        data = self.sram.fifo_to_dm.dequeue()  # gets a 32-bit data from sram controller
+        data = self.sram.fifo_to_dm.dequeue()  # gets a 32-bit data from sram
         return data
 
     def write_to_axi4_master(self, start_addr, burst_length, data_size):
-        raw_data = bin(self.dm_axi4_write_fifo.deque()) #Converts the value gotten in binary
-        address = raw_data[:ADDRESSBITS]
-        burst_size = raw_data[ADDRESSBITS:ADDRESSBITS+BURSTSIZEBITS]
-        data_width = raw_data[ADDRESSBITS+BURSTSIZEBITS : ADDRESSBITS+BURSTSIZEBITS+DATASIZEBITS]
+        raw_bits = self.dm_axi4_write_fifo.deque()
+        descrip_start_address = raw_bits & 0xFFFFFFFF
+        descrip_burst_length = (raw_bits >> 32) & 0xFF
+        descrip_datasize = (raw_bits >> 40) & 0x7
 
         new_descriptor = descriptor(
-            start_address = address,
-            burst_length = burst_size,
-            datasize = data_width
+            start_address=descrip_start_address,
+            burst_length=descrip_burst_length,
+            datasize=descrip_datasize
         )
 
         return new_descriptor
 
     def write_to_sram_controller(self, start_addr, burst_length, data_size):
-        raw_data = bin(self.dm_sram_write_fifo.deque()) #Converts the value gotten in binary
-        address = raw_data[:ADDRESSBITS]
-        burst_size = raw_data[ADDRESSBITS:ADDRESSBITS+BURSTSIZEBITS]
-        data_width = raw_data[ADDRESSBITS+BURSTSIZEBITS : ADDRESSBITS+BURSTSIZEBITS+DATASIZEBITS]
+        raw_bits = self.dm_sram_write_fifo.deque()
+        descrip_start_address = raw_bits & 0xFFFFFFFF
+        descrip_burst_length = (raw_bits >> 32) & 0xFF
+        descrip_datasize = (raw_bits >> 40) & 0x7
 
         new_descriptor = descriptor(
-            start_address = address,
-            burst_length = burst_size,
-            datasize = data_width
+            start_address=descrip_start_address,
+            burst_length=descrip_burst_length,
+            datasize=descrip_datasize
         )
 
         return new_descriptor
