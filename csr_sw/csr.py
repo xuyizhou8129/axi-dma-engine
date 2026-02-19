@@ -69,7 +69,7 @@ class CSR:
             raise ValueError(f"Invalid register offset: 0x{offset:02X}")
         return self.registers[offset]
 
-    # --- Internal helpers ---
+    # helpers
 
     def _handle_start(self):
         src    = self.registers[self.SRC_ADDR_REG]
