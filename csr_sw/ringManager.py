@@ -21,14 +21,14 @@ class ringManager:
 
     #  SW-side (producer) 
 
-    def enqueue(self, src_addr, dst_addr, length, direction=0):
+    def enqueue(self, src_addr, dst_addr, length):
         """
         Add a new descriptor to the ring.
         Returns the Descriptor object, or raises OverflowError if the ring is full.
         """
         if self.is_full:
             raise OverflowError("Descriptor ring is full")
-        desc = Descriptor(src_addr, dst_addr, length, direction)
+        desc = Descriptor(src_addr, dst_addr, length)
         self._ring[self.head] = desc
         self.head = (self.head + 1) % self.capacity
         return desc
