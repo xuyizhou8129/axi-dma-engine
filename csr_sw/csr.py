@@ -100,7 +100,7 @@ class CSR:
         self.registers[self.STATUS_REG] |= (1 << self.ERROR_BIT)
         self.registers[self.IRQ_STATUS_REG] |= (1 << self.IRQ_ERROR_BIT)
 
-    # --- DMA engine callbacks ---
+    # DMA engine callbacks
 
     def signal_done(self):
         """Called by the DMA engine when a transfer completes successfully."""
