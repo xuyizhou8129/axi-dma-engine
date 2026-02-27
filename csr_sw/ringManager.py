@@ -11,7 +11,11 @@ class ringManager:
         head: next empty slot     (SW advances after enqueue)
         tail: oldest pending slot (DMA advances after complete)
     """
-
+    """
+    only based on ring_len, head and tail pointer
+    should check if the head and tail overlap -- writing over the values before they are read
+    also needs wrap around, no access to ._ring
+    """
     def __init__(self, capacity=16):
         if capacity < 2:
             raise ValueError("Ring capacity must be at least 2")
