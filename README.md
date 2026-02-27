@@ -3,8 +3,8 @@
 A memory-mapped DMA subsystem that performs autonomous scatter–gather transfers between system memory (AXI4 memory-mapped) and on-chip SRAM/BRAM using a descriptor ring stored in system memory. The CPU configures the DMA by writing ring base/size and control flags through CSRs, then the DMA independently fetches descriptors over AXI4, executes the copy operations, writes status back to memory, and notifies the CPU via interrupts.
 
 ## Overview
-
 This DMA separates control, scheduling, and data movement:
+(Notes for developers: We have freedom to decide what data should be provided by the SoC bus and what registers exist in CSR. In a real world setting, we make design choices and than use files to "teach" the CPU to use our hardware)
 
 **CPU (control plane):**
 - Programs CSRs with where the descriptor rings live in system memory (base address, size, head/tail policy, enables)
