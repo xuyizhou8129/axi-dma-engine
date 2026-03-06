@@ -6,17 +6,19 @@ module IRQ (
     input logic         error_event,    //pulse from data mover
     input logic         irq_en,         //CTRL from CSR
     input logic [1:0]   irq_clear,      //written by CPU
-    input logic         next_status_empty       //status flag for empty IRQ register
 
     output logic [1:0]  irq_status,     //feeds back into IRQ_STATUS in CSR? (unsure)
     output logic        irq             //goes to CPU interrupt pin
 );
     // comb signals
     logic [1:0] irq_status_c;
-    //flip flop for empty_event
+    
+    logic next_status_error;
     logic status_empty;
     logic status_error;
+    logic next_status_empty;      //status flag for empty IRQ register
 
+    // comb blocks for error and empty ffs
     always_comb begin 
         next_status_empty = status_empty;
 
@@ -26,13 +28,36 @@ module IRQ (
             next_status_empty = 0;
     end
 
-    // latches the value on rising edge
+    always_comb begin 
+        next_status_error = status_error;
+        if (error_event)
+            next_status_error = 1;
+        else if (irq_clear[1]) 
+            next_status_error = 0;
+    end
+
+    // latches the value on rising edge for empty 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             status_empty <= 0;
-        else
+        end else begin
             status_empty <= next_status_empty;
         end
+    end
+
+    // latches the value on rising edge for error, similar to empty
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            status_error <= 0;
+        end else begin
+            status_error <= next_status_error;
+        end
+    end     
+
+    //wire up outputs
+    // msb first, flipped indexing apparently
+    assign irq_status = {status_error, status_empty}
+    irq = (status_error | status_empty) & irq_en;
 
 endmodule
 
