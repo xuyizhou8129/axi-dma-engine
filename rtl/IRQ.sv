@@ -11,8 +11,6 @@ module IRQ (
     output logic        irq             //goes to CPU interrupt pin
 );
     // comb signals
-    logic [1:0] irq_status_c;
-    
     logic next_status_error;
     logic status_empty;
     logic status_error;
@@ -56,8 +54,8 @@ module IRQ (
 
     //wire up outputs
     // msb first, flipped indexing apparently
-    assign irq_status = {status_error, status_empty}
-    irq = (status_error | status_empty) & irq_en;
+    assign irq_status = {status_error, status_empty};
+    assign irq = (status_error | status_empty) & irq_en;
 
 endmodule
 
