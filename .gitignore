@@ -41,3 +41,15 @@ output.txt
 .DS_Store
 pic/.DS_Store
 pic/**/.DS_Store
+
+# Questa / ModelSim (tb_axi4master + repo root artifacts)
+tb_axi4master/__pycache__/
+tb_axi4master/source/__pycache__/
+tb_axi4master/out/
+tb_axi4master/sim/work/
+tb_axi4master/sim/axi4master.wlf
+tb_axi4master/sim/modelsim.ini
+tb_axi4master/sim/transcript
+work/
+modelsim.ini
+transcript
