@@ -1,9 +1,8 @@
 class FIFOQueue:
-    def __init__(self, id, queue_length: int):
+    def __init__(self, queue_id, queue_length: int):
         if queue_length <= 0:
             raise ValueError("FIFO queue_length must be positive")
-        
-        self.id = id
+        self.id = queue_id
         self.queue_length = queue_length
         self.buffer = []
     
@@ -22,6 +21,11 @@ class FIFOQueue:
         if self.is_empty():
             raise RuntimeError(f"{self.id} FIFO empty")
         return self.buffer.pop(0)
+
+    def peek(self):
+        if self.is_empty():
+            return None
+        return self.buffer[0]
 
     def clear(self):
         self.buffer.clear()

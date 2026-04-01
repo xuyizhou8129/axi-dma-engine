@@ -1,39 +1,46 @@
-# Ben
-''' Description: The data mover itself contains a smaller data buffer
-Functionalities:
-- Read data from AXI4 Master: 
-input: start_addr, burst_length, data_size
-output: data (as an array)
-
-- Read data from SRAM Controller:
-input: start_addr, burst_length, data_size
-output: data (as an array)
-
-- Write data to AXI4 Master (which talks to system memory):
-input: start_addr, burst_length, data_size
-output: flag (int for now)
-
-- Write data to SRAM Controller:
-input: start_addr, burst_length, data_size
-output: flag (int for now)
-'''
-import descriptor
+from structs import Instruction
 
 class DataMover:
-    def __init__(self, descriptor_fetcher, axi4_master, sram_controller, data_fifo)
-        self.descriptor_fetcher = descriptor_fetcher
-        self.axi4_master = axi4_master
-        self.sram_controller = sram_controller
-        self.data_fifo = data_fifo
-    
-    def read_from_axi4_master(self, start_addr, burst_length, data_size):
-        pass
+    """
+    Sits between Descriptor Fetcher (DF) and memory-side clients.
+    Decodes oneDescriptor into two Instruction streams.
+    Tracks completions and tells Ring Manager when a transaction is done.
+    """
+    def __init__(self, df_dm_fifo, axi_inst_fifo, sram_inst_fifo, ring_manager):
+        self.df_dm_fifo = df_dm_fifo       # Input from DF
+        self.axi_inst_fifo = axi_inst_fifo # Output to AXI Master
+        self.sram_inst_fifo = sram_inst_fifo # Output to SRAM Controller
+        self.ring_manager = ring_manager
+        
+        self.pending_transactions = 0
 
-    def read_from_sram_controller(self, start_addr, burst_length, data_size):
-        pass
+    def update(self):
+        # Read from DF and issue instructions
+        if not self.df_dm_fifo.is_empty():
+            if not self.axi_inst_fifo.is_full() and not self.sram_inst_fifo.is_full():
+                desc = self.df_dm_fifo.dequeue()
+                
+                # Direction: 1 = System -> SRAM, 0 = SRAM -> System
+                if desc.direction == 1:
+                    # Sys -> SRAM: AXI Master reads SysMem -> SRAM writes SRAM
+                    axi_inst = Instruction(desc.src_addr, desc.length, is_read=True, is_sram=False)
+                    sram_inst = Instruction(desc.dst_addr, desc.length, is_read=False, is_sram=True)
+                else:
+                    # SRAM -> Sys: SRAM reads SRAM -> AXI Master writes SysMem
+                    sram_inst = Instruction(desc.src_addr, desc.length, is_read=True, is_sram=True)
+                    axi_inst = Instruction(desc.dst_addr, desc.length, is_read=False, is_sram=False)
+                
+                # Issue
+                self.axi_inst_fifo.enqueue(axi_inst)
+                self.sram_inst_fifo.enqueue(sram_inst)
+                
+                self.pending_transactions += 1
 
-    def write_to_axi4_master(self, start_addr, burst_length, data_size):
-        pass
-
-    def write_to_sram_controller(self, start_addr, burst_length, data_size):
-        pass
+    def mark_done(self):
+        """
+        Called by the writer (either AXI Master or SRAM Controller) when 
+        its burst instruction completes.
+        """
+        if self.pending_transactions > 0:
+            self.pending_transactions -= 1
+            self.ring_manager.mark_completed()

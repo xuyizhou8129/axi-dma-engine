@@ -1,54 +1,62 @@
-import memory
-from memory import SystemMemory
-import fifo_queue
-from fifo_queue import FIFOQueue
-
 class AXI4Master:
-    #/*Key questions: How close are we to hardware?*/
-    def __init__(self, memory: SystemMemory, df_read_fifo: FIFOQueue, df_write_fifo: FIFOQueue, dm_read_fifo: FIFOQueue, dm_write_fifo: FIFOQueue):
+    """
+    AXI4 Master implements the system-memory side.
+    Arbitrates Handle priorities over Instruction traffic.
+    Exchanges data via shared data FIFO with SRAM.
+    """
+    def __init__(self, memory, handle_fifo, inst_fifo, callback_fifo, data_fifo, data_mover):
         self.memory = memory
-        self.df_read_fifo = df_read_fifo
-        self.df_write_fifo = df_write_fifo
-        self.dm_read_fifo = dm_read_fifo
-        self.dm_write_fifo = dm_write_fifo
-
-    # add fifo data structure
-    # fixed size read/write buffer
-    # reset the buffers
         
-    def read_memory(self, start_addr, burst_length, datasize, target_fifo: FIFOQueue):
-        total_num_bytes = burst_length * datasize
-        end_addr = start_addr + total_num_bytes
+        # Connections
+        self.handle_fifo = handle_fifo       # From DF (highest priority)
+        self.inst_fifo = inst_fifo           # From Data Mover
+        self.callback_fifo = callback_fifo   # To DF
+        self.data_fifo = data_fifo           # Shared with SRAM
+        self.data_mover = data_mover
+        
+        # State
+        self.current_inst = None
+        self.words_processed = 0
 
-        if start_addr < 0 or end_addr > self.memory.size:
-            raise ValueError("AXI read out of bounds")
+    def update(self):
+        # Arbitrate Handles First
+        if not self.handle_fifo.is_empty():
+            # If callback FIFO isn't full enough for 4 words, wait
+            if len(self.callback_fifo) + 4 <= self.callback_fifo.queue_length:
+                handle = self.handle_fifo.dequeue()
+                # Read 4 words from sys mem for the descriptor
+                for i in range(4):
+                    word = self.memory.read_word(handle.base_address + i*4)
+                    self.callback_fifo.enqueue(word)
+                return # Descriptor fetch takes up this cycle block
 
-        for addr in range(start_addr, end_addr):
-            target_fifo.enqueue(self.memory.mem[addr])
-  
-  
-    def write_memory(self, start_addr, burst_length, datasize, source_fifo: FIFOQueue):
-        total_num_bytes = burst_length * datasize
-        end_addr = start_addr + total_num_bytes
+        # Otherwise Process Data Mover instructions
+        if self.current_inst is None and not self.inst_fifo.is_empty():
+            self.current_inst = self.inst_fifo.dequeue()
+            self.words_processed = 0
 
-        if start_addr < 0 or end_addr > self.memory.size:
-            raise ValueError("AXI write out of bounds")
-
-        if len(source_fifo) != total_num_bytes: # we wait for axi4 to write it into memory
-            raise ValueError("FIFO size mismatch for AXI write")
-
-        for addr in range(start_addr, end_addr):
-            self.memory.mem[addr] = source_fifo.dequeue()
-
-
-    # def write_a_byte(self, addr, value):
-    #     if addr < 0 or addr >= self.memory.size:
-    #         raise ValueError("AXI write out of bounds")
-    #     self.memory.mem[addr] = value
-    
-    # def read_a_byte(self, addr):
-    #     if addr < 0 or addr >= self.memory.size:
-    #         raise ValueError("AXI read out of bounds")
-    #     return self.memory.mem[addr]
-
-
+        # Execute data mover instruction
+        if self.current_inst is not None:
+            inst = self.current_inst
+            
+            if inst.is_read:
+                # SysMem -> Data FIFO
+                if not self.data_fifo.is_full():
+                    addr = inst.base_address + self.words_processed * 4
+                    word = self.memory.read_word(addr)
+                    self.data_fifo.enqueue(word)
+                    self.words_processed += 1
+            else:
+                # Data FIFO -> SysMem
+                if not self.data_fifo.is_empty():
+                    word = self.data_fifo.dequeue()
+                    addr = inst.base_address + self.words_processed * 4
+                    self.memory.write_word(addr, word)
+                    self.words_processed += 1
+            
+            # Check completion
+            if self.words_processed == inst.burst_size:
+                if not inst.is_read:
+                    # Write path signals done to Data Mover
+                    self.data_mover.mark_done()
+                self.current_inst = None
