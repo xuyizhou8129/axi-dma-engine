@@ -31,11 +31,12 @@ def test_sram_to_sys_memory_workflow():
     dma.ring_manager.sync_capacity() # Load RM's queue bounds
     tail = dma.csr.get_tail()
     dma.ring_manager.owner_bits[tail] = 0 # Hand over to DMA
-    dma.csr.write_register(CSR.TAIL_REG, tail + 1)
+    dma.csr.write_register(CSR.TAIL_REG, tail + 1) # Advance TAIL
     
     # 5. Tick Clock
     for cycle in range(100):
         dma.step()
+        print(f"Cycle {cycle}")
         if dma.ring_manager.owner_bits[tail] == 1:
             print(f"Transfer finished in {cycle} cycles.")
             break
@@ -76,8 +77,10 @@ def test_multiple_chained_descriptors():
     dma.csr.write_register(CSR.TAIL_REG, tail + 2) # Now TAIL is 2
     
     # Tick Clock
-    for cycle in range(150):
+    for cycle in range(100):
         dma.step()
+        print(f"Cycle {cycle}")
+
         # Wait until BOTH descriptors are yielded back to CPU
         if dma.ring_manager.owner_bits[0] == 1 and dma.ring_manager.owner_bits[1] == 1:
             print(f"Both transfers finished in {cycle} cycles.")
