@@ -7,8 +7,7 @@ The **handle** is what the Descriptor Fetcher sends to the **AXI4 Master** so th
 | Field            | Width | Description |
 |------------------|-------|-------------|
 | Base address     | 32    | Byte address of the descriptor in system memory |
-| Valid            | 1     | Handle is valid for this cycle / transfer |
-| Descriptor size  | —     | Number of words to read; **fixed to 4** in this design (matches the four 32-bit words in [descriptor_struct.md](descriptor_struct.md)) |
+| Descriptor size  | 8     | Number of words to read; **fixed to 4** in this design (matches the four 32-bit words in [descriptor_struct.md](descriptor_struct.md)) |
 
 How these fields are packed on the physical FIFO (exact bit layout) is **implementation-defined**; logically they are the three items above.
 
