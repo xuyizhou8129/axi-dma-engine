@@ -39,7 +39,7 @@ module descriptor_fetcher #(
     //handshake with ring manager
     input  logic [ADDR_WIDTH-1:0]  rm_df_addr,
     input logic rm_df_valid,
-    output logic df_ready,
+    output logic df_ready
 );
 
     localparam int RW_BIT  = INSTR_WIDTH - 1;
@@ -51,19 +51,17 @@ module descriptor_fetcher #(
 
     //Registered outputs - Data Mover
     logic dm_in_wr_en_c, dm_in_wr_en_o;
-    logic dm_in_din_c, dm_in_din_o;
+    logic [DESC_WIDTH-1:0] dm_in_din_c, dm_in_din_o;
 
     //Registered outputs - AXI4 Master
     logic df_in_wr_en_c, df_in_wr_en_o;
-    logic df_in_din_c, df_in_din_o;
-    logic df_out_rd_en_c, df_out_rd_en_o;
+    logic [HANDLE_WIDTH-1:0] df_in_din_c, df_in_din_o;
 
     //tied registered values to outputs
     assign dm_in_wr_en = dm_in_wr_en_o;
     assign dm_in_din = dm_in_din_o;
     assign df_in_wr_en = df_in_wr_en_o;
     assign df_in_din = df_in_din_o;
-    assign df_out_rd_en = df_out_rd_en_o;
 
     always_ff @(posedge clock or posedge reset) begin
         if (reset == 1'b1) begin
@@ -71,13 +69,11 @@ module descriptor_fetcher #(
             dm_in_din_o <= '0;
             df_in_wr_en_o <= 1'b0;
             df_in_din_o <= '0;
-            df_out_rd_en_o <= 1'b0;
         end else begin
             dm_in_wr_en_o <= dm_in_wr_en_c;
             dm_in_din_o <= dm_in_din_c;
             df_in_wr_en_o <= df_in_wr_en_c;
             df_in_din_o <= df_in_din_c;
-            df_out_rd_en_o <= df_out_rd_en_c;
         end
     end
 
@@ -86,7 +82,7 @@ module descriptor_fetcher #(
         dm_in_din_c = '0;
         df_in_wr_en_c = 1'b0;
         df_in_din_c = '0;
-        df_out_rd_en_c = 1'b0;
+        df_out_rd_en = 1'b0;
 //If descriptor side fifo is not full && ring manager is valid:
 //Take the address from the ring manager and make it a handle struct and put it into the AXI4 Master Input FIFO
 //If the AXI4 Master Output FIFO is not empty && Data Mover is not full:
@@ -98,7 +94,7 @@ module descriptor_fetcher #(
         end
         
         if (df_out_empty == 1'b0 && dm_in_full == 1'b0) begin
-            df_out_rd_en_c = 1'b1;
+            df_out_rd_en = 1'b1;
             dm_in_din_c = df_out_dout;
             dm_in_wr_en_c = 1'b1;
         end

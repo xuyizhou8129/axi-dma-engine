@@ -1,0 +1,7 @@
+op,arg1,arg2,arg3
+rm,aabbccdd,,
+cb,00112233445566778899aabbccddeeff,,
+rm,11223344,,
+cb,ffeeddccbbaa99887766554433221100,,
+rm,55667788,,
+cb,0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f,,

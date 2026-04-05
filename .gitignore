@@ -50,6 +50,8 @@ tb_axi4master/sim/work/
 tb_axi4master/sim/axi4master.wlf
 tb_axi4master/sim/modelsim.ini
 tb_axi4master/sim/transcript
+
+tb_descriptor_fetcher/out/
 work/
 modelsim.ini
 transcript
