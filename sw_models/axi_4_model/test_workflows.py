@@ -37,6 +37,7 @@ def test_sram_to_sys_memory_workflow():
     for cycle in range(100):
         dma.step()
         print(f"Cycle {cycle}")
+        sleep(10)
         if dma.ring_manager.owner_bits[tail] == 1:
             print(f"Transfer finished in {cycle} cycles.")
             break
