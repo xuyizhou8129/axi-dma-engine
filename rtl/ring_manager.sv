@@ -41,15 +41,21 @@ module ring_manager #(
     // ---------------------------------------------
 
     // local signals
-    logic [2:0]                          head_ptr;       // points to head of ring buffer
-    logic [$clog2(MAX_INFLIGHT+1)-1 : 0] inflight_count; // counter for number of descriptors in-flight
-    logic                                desc_complete;  // flag for when a descriptor completes
-    logic                                was_empty;      // HIGH if buffer was empty last clock cycle
+    logic [2:0]                          head_ptr;            // points to head of ring buffer
+    logic [$clog2(MAX_INFLIGHT+1)-1 : 0] inflight_count;      // counter for number of descriptors in-flight
+    logic                                desc_complete;       // flag for when a descriptor completes
+    logic                                was_empty;           // HIGH if buffer was empty last clock cycle
 
-    // 8 bytes per descriptor (64-bit alignment)
-    localparam int DESCRIPTOR_SIZE = 8;
+    logic [2:0]                          head_ptr_next;       
+    logic [$clog2(MAX_INFLIGHT+1)-1 : 0] inflight_count_next;
+    logic                                irq_empty_next;
+    logic                                irq_status_empty_next;
+    logic                                irq_status_error_next;
+    logic                                status_error_next;
+    logic                                irq_error_next;
 
-
+    // 16 bytes per descriptor
+    localparam int DESCRIPTOR_SIZE = 16;
 
     // ---------------------------------------------
     // Combinational logic
@@ -66,6 +72,49 @@ module ring_manager #(
 
         // descriptor complete: dm returns done or error
         desc_complete = dm_done || dm_error;
+
+        // head pointer logic //
+        head_ptr_next = head_ptr;
+
+        if (desc_complete) begin
+                if (head_ptr == (ring_len - 1) ) begin
+                    head_ptr_next = 3'b0; // reset head_ptr
+                end else begin
+                    head_ptr_next = head_ptr + 1'b1; // increment head if desc_complete = HIGH
+                end
+        end
+        // in-flight counter logic //
+        inflight_count_next = inflight_count;
+
+        if (fetch_req_ready && fetch_req_valid) begin
+            inflight_count_next = inflight_count + 1'b1; // Valid handshaking with DF: increment inflight_count 
+        end else if (desc_complete) begin
+            inflight_count_next = inflight_count - 1'b1; // Descriptor completed: decremenet inflight_count
+        end
+
+        // interrupt logic //
+        irq_status_empty_next = irq_status_empty;
+        irq_empty_next = 1'b0;
+        irq_status_error_next = irq_status_error;
+        irq_error_next = 1'b0;
+        status_error_next = status_error;
+
+        // empty interrupt - fires when ring buffer transitions from non-empty to empty
+        if ( !was_empty && buffer_empty ) begin
+            irq_status_empty_next = 1'b1;
+            if (irq_empty_en) begin
+                irq_empty_next = 1'b1;
+            end
+        end
+
+        // error interrupt - fires when DM reports a descriptor error
+        if (dm_error) begin
+            irq_status_error_next = 1'b1;
+            status_error_next     = 1'b1;
+            if (irq_error_en) begin
+                irq_error_next = 1'b1;
+            end
+        end
 
     end
 
@@ -86,50 +135,14 @@ module ring_manager #(
             status_error <= 1'b0;
 
         end else begin
-
-            // head pointer logic //
-            if (desc_complete) begin
-                if (head_ptr == (ring_len - 1) ) begin
-                    head_ptr <= 3'b0; // reset head_ptr
-                end else begin
-                    head_ptr <= head_ptr + 1'b1; // increment head if desc_complete = HIGH
-                end
-            end
-            
-            // in-flight counter logic //
-            if (fetch_req_ready && fetch_req_valid) begin
-                inflight_count <= inflight_count + 1'b1; // Valid handshaking with DF: increment inflight_count 
-            end else if (desc_complete) begin
-                inflight_count <= inflight_count - 1'b1; // Descriptor completed: decremenet inflight_count
-            end
-
-            // interrupt logic //
-            
-            // default pulse signals to 0
-            irq_empty <= 1'b0;
-            irq_error <= 1'b0;
-            
-            // update was_empty for state transition detection
-            was_empty <= buffer_empty;
-
-            // empty interrupt - fires when ring buffer transitions from non-empty to empty
-            if ( !was_empty && buffer_empty ) begin
-                irq_status_empty <= 1'b1;
-                if (irq_empty_en) begin
-                    irq_empty <= 1'b1;
-                end
-            end
-
-            // error interrupt - fires when DM reports a descriptor error
-            if (dm_error) begin
-                irq_status_error <= 1'b1;
-                status_error     <= 1'b1;
-                if (irq_error_en) begin
-                    irq_error <= 1'b1;
-                end
-            end
-            
-
+            head_ptr           <= head_ptr_next;
+            inflight_count     <= inflight_count_next;
+            irq_empty          <= irq_empty_next;
+            irq_status_empty   <= irq_status_empty_next;
+            irq_status_error   <= irq_status_error_next;
+            irq_error          <= irq_error_next;
+            was_empty          <= buffer_empty;
+            status_error       <= status_error_next;
         end
 
     end

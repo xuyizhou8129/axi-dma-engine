@@ -211,7 +211,7 @@ module ring_manager_tb;
         dm_done = 1'b0;
         @(posedge clk); #1;
 
-        check(rm_df_addr,   32'hA000_0008,  "rm_df_addr - Test 3 Step 2"); // rm_df_addr = ring_base_addr + 1 * 8
+        check(rm_df_addr,   32'hA000_0010,  "rm_df_addr - Test 3 Step 2"); // rm_df_addr = ring_base_addr + 1 * 8
         check(buffer_empty, 1'b0, "buffer_empty LOW - Test 3 Step 2");
 
         dm_done = 1'b1;
