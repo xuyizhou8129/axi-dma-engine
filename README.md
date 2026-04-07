@@ -51,4 +51,4 @@ The diagram matches the main internal blocks:
 
 
 # Contributors
-Xuyi Zhou, Ben Wong-Fodor
+Xuyi Zhou, Ben Wong-Fodor, Aarya Patel
