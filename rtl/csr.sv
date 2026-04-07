@@ -20,7 +20,8 @@ module csr #(
     localparam logic [7:0] REG_IRQ_STATUS = 8'h18;
     localparam logic [7:0] REG_IRQ_CLEAR  = 8'h2C;
 
-    localparam logic [1:0] AXI_RESP_OKAY = 2'b00;
+    localparam logic [1:0] AXI_RESP_OKAY   = 2'b00;
+    localparam logic [1:0] AXI_RESP_SLVERR = 2'b10;
 
     // ----------------------------------------------------------------
     // Writable CSR registers (software-owned via AXI writes)
@@ -61,6 +62,8 @@ module csr #(
     logic [AXIL_STRB_WIDTH-1:0]      wstrb_c;
     logic                            bvalid;
     logic                            bvalid_c;
+    logic [1:0]                      bresp;
+    logic [1:0]                      bresp_c;
 
     // ----------------------------------------------------------------
     // AXI read channel registers
@@ -130,6 +133,7 @@ module csr #(
             wdata              <= '0;
             wstrb              <= '0;
             bvalid             <= 1'b0;
+            bresp              <= AXI_RESP_OKAY;
             rdata              <= '0;
             rvalid             <= 1'b0;
             ring_mgr_error_clear <= 1'b0;
@@ -147,6 +151,7 @@ module csr #(
             wdata              <= wdata_c;
             wstrb              <= wstrb_c;
             bvalid             <= bvalid_c;
+            bresp              <= bresp_c;
             rdata              <= rdata_c;
             rvalid             <= rvalid_c;
             ring_mgr_error_clear <= ring_mgr_error_clear_c;
@@ -215,7 +220,7 @@ module csr #(
     assign soc_bus.awready = ~aw_pending && ~bvalid;
     assign soc_bus.wready  = ~w_pending  && ~bvalid;
     assign soc_bus.bvalid  = bvalid;
-    assign soc_bus.bresp   = AXI_RESP_OKAY;
+    assign soc_bus.bresp   = bresp;
 
     // ----------------------------------------------------------------
     // AXI read response channel.
@@ -265,6 +270,7 @@ module csr #(
         wdata_c              = wdata;
         wstrb_c              = wstrb;
         bvalid_c             = bvalid;
+        bresp_c              = bresp;
         rdata_c              = rdata;
         rvalid_c             = rvalid;
         ring_mgr_error_clear_c = 1'b0; // pulse: default deasserted
@@ -307,8 +313,17 @@ module csr #(
                     end
                 end
 
+                // Read-only registers: write attempt pauses the system
+                REG_HEAD,
+                REG_STATUS,
+                REG_IRQ_STATUS: begin
+                    reg_status_error_c = 1'b1;
+                    reg_irq_error_c    = 1'b1;
+                    bresp_c            = AXI_RESP_SLVERR;
+                end
+
                 default: begin
-                    // Writes to RO / reserved addresses: ignored
+                    // Writes to unmapped addresses: ignored
                 end
             endcase
 
@@ -316,6 +331,8 @@ module csr #(
             aw_pending_c = 1'b0;
             w_pending_c  = 1'b0;
             bvalid_c     = 1'b1;
+            if (bresp_c != AXI_RESP_SLVERR)
+                bresp_c = AXI_RESP_OKAY;
 
         // --- Write response handshake ---
         end else if (bvalid && soc_bus.bready) begin
