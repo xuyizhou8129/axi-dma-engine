@@ -48,3 +48,7 @@ The diagram matches the main internal blocks:
 | [`docs/descriptor_struct.md`](docs/descriptor_struct.md) | Descriptor memory layout |
 | [`docs/handle_struct.md`](docs/handle_struct.md) | Descriptor-fetch handle |
 | [`docs/instruction_struct.md`](docs/instruction_struct.md) | Payload instruction fields |
+
+
+# Contributors
+Xuyi Zhou, Ben Wong-Fodor
