@@ -25,6 +25,8 @@ module axi_4_master #(
     input  logic clock,
     input  logic reset,
 
+    input logic global_enable,
+
     // Descriptor Fetcher input FIFO (handle)
     output logic                    df_in_rd_en,
     input  logic                    df_in_empty,
@@ -134,42 +136,48 @@ module axi_4_master #(
 
         case (state)
             s_idle: begin
-                if (df_in_empty == 1'b0) begin
+                if (global_enable == 1'b1 && df_in_empty == 1'b0) begin
                     state_c = s_df_get;
-                end else if (dm_in_empty == 1'b0) begin
+                end else if (global_enable == 1'b1 && dm_in_empty == 1'b0) begin
                     state_c = s_dm_get;
                 end
             end
 
             s_df_get: begin
+                if (global_enable == 1'b1) begin
                 df_in_rd_en = 1'b1;
                 cur_addr_c  = df_in_dout[31:0];
-                cur_len_c   = df_in_dout[LEN_MSB:LEN_LSB];
-                beat_idx_c  = '0;
-                desc_buf_c  = '0;
-                state_c     = s_df_ar;
+                    cur_len_c   = df_in_dout[LEN_MSB:LEN_LSB];
+                    beat_idx_c  = '0;
+                    desc_buf_c  = '0;
+                    state_c     = s_df_ar;
+                end
             end
 
             s_df_ar: begin
+                if (global_enable == 1'b1) begin
                 axi.arvalid = 1'b1;
-                if (axi.arvalid && axi.arready) begin
-                    state_c = s_df_r;
+                    if (axi.arvalid && axi.arready) begin
+                        state_c = s_df_r;
+                    end
                 end
             end
 
             s_df_r: begin
+                if (global_enable == 1'b1) begin
                 axi.rready = 1'b1;
                 if (axi.rvalid && axi.rready) begin
                     desc_buf_c[$unsigned(beat_idx)*DATA_WIDTH +: DATA_WIDTH] = axi.rdata;
                     beat_idx_c = beat_idx + 1'b1;
                     if (axi.rlast == 1'b1) begin
                         state_c = s_df_push;
+                        end
                     end
                 end
             end
 
             s_df_push: begin
-                if (df_out_full == 1'b0) begin
+                if (global_enable == 1'b1 && df_out_full == 1'b0) begin
                     df_out_wr_en = 1'b1;
                     df_out_din   = desc_buf;
                     state_c      = s_wait_sram;
@@ -177,6 +185,7 @@ module axi_4_master #(
             end
 
             s_dm_get: begin
+                if (global_enable == 1'b1) begin
                 dm_in_rd_en  = 1'b1;
                 cur_addr_c   = dm_in_dout[31:0];
                 cur_len_c    = dm_in_dout[LEN_MSB:LEN_LSB];
@@ -185,18 +194,22 @@ module axi_4_master #(
                 if (dm_in_dout[RW_BIT] == 1'b1) begin
                     state_c = s_dm_wr_aw;
                 end else begin
-                    state_c = s_dm_rd_ar;
+                        state_c = s_dm_rd_ar;
+                    end
                 end
             end
 
             s_dm_rd_ar: begin
+                if (global_enable == 1'b1) begin
                 axi.arvalid = 1'b1;
                 if (axi.arvalid && axi.arready) begin
                     state_c = s_dm_rd_r;
+                    end
                 end
             end
 
             s_dm_rd_r: begin
+                if (global_enable == 1'b1) begin
                 axi.rready = (mid_full == 1'b0);
                 if (axi.rvalid && axi.rready) begin
                     mid_din   = axi.rdata;
@@ -205,18 +218,21 @@ module axi_4_master #(
                         state_c = s_wait_sram;
                     end
                 end
+                end
             end
 
             s_dm_wr_aw: begin
+                if (global_enable == 1'b1) begin
                 axi.awvalid = 1'b1;
                 if (axi.awvalid && axi.awready) begin
                     beat_idx_c = '0;
                     state_c = s_dm_wr_w;
                 end
+                end
             end
 
             s_dm_wr_w: begin
-                if (mid_empty == 1'b0) begin
+                if (global_enable == 1'b1 && mid_empty == 1'b0) begin
                     axi.wvalid = 1'b1;
                     axi.wdata  = mid_dout;
                     axi.wlast  = (beat_idx == (cur_len - 1'b1));
@@ -231,16 +247,20 @@ module axi_4_master #(
             end
 
             s_dm_wr_b: begin
+                if (global_enable == 1'b1) begin
                 axi.bready = 1'b1;
                 if (axi.bvalid && axi.bready) begin
                     state_c = s_wait_sram;
+                    end
                 end
             end
 
             s_wait_sram: begin
+                if (global_enable == 1'b1) begin
                 axi_done = 1'b1;
                 if (sram_done == 1'b1) begin
                     state_c = s_idle;
+                    end
                 end
             end
 
