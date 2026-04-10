@@ -11,17 +11,19 @@
 module sram_controller #(
     parameter int ADDR_WIDTH = 32,
     parameter int DATA_WIDTH = 32,
-    parameter int BRAM_DATA_WIDTH = 8,
+    parameter int BRAM_DATA_WIDTH = 32,
     parameter int LEN_WIDTH = 8,
-    parameter int INSTR_WIDTH = 41
+    parameter int BRAM_SIZE   = 8,
+    parameter int INSTR_WIDTH = 41,
+    localparam int BRAM_ADDR_WIDTH = $clog2(BRAM_SIZE)
 )(
     // global inputs 
     input logic clock,
     input logic reset,
     
     // interface with sram(bram)
-    output  logic [2:0] read_addr,
-    output  logic [2:0] write_addr, // maybe change later
+    output  logic [BRAM_ADDR_WIDTH-1:0] read_addr,
+    output  logic [BRAM_ADDR_WIDTH-1:0] write_addr, // maybe change later
     output  logic wr_en,
     output  logic [BRAM_DATA_WIDTH-1:0] din, 
     input logic [BRAM_DATA_WIDTH-1:0] dout,
@@ -75,9 +77,7 @@ module sram_controller #(
         end
     end
 
-    // Keeping BRAM ports as you defined them
-    assign read_addr  = cur_addr[2:0];
-    assign write_addr = cur_addr[2:0];
+    assign write_addr = cur_addr[BRAM_ADDR_WIDTH-1:0];
     
     // State machine logic
     always_comb begin
@@ -95,6 +95,7 @@ module sram_controller #(
         wr_en       = 1'b0;
         din         = '0;
         sram_done   = 1'b0;
+        read_addr   = '0;
 
         case (state)
             s_idle: begin
@@ -107,8 +108,16 @@ module sram_controller #(
                 cur_write_c = dm_in_dout[40];
                 beat_idx_c  = '0;
                 
-                if (dm_in_dout[40] == 1'b1) state_c = s_writing;
-                else                        state_c = s_reading;
+                if (dm_in_dout[40] == 1'b1) begin
+                    state_c = s_writing;
+                end else begin
+                    // Pre-fetch: present first read address so BRAM dout is ready on first s_reading cycle
+                    state_c    = s_reading;
+                    read_addr  = dm_in_dout[31:0];
+                    cur_addr_c = dm_in_dout[31:0] + 1'b1;
+                    beat_idx_c = '0;
+                end
+
             end
             s_writing: begin
                 if (!mid_empty) begin
@@ -129,12 +138,14 @@ module sram_controller #(
                     mid_din    = {{(DATA_WIDTH-BRAM_DATA_WIDTH){1'b0}}, dout};
                     cur_addr_c = cur_addr + 1'b1;
                     beat_idx_c = beat_idx + 1'b1;
-                    
+                    read_addr  = cur_addr;
+
                     if (beat_idx == (cur_len - 1'b1) || cur_len == '0) begin
                         state_c = s_wait_axi4master;
                     end
                 end
             end
+
             s_wait_axi4master: begin
                 sram_done = 1'b1;
                 if (axi4master_done) state_c = s_idle;
