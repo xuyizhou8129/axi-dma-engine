@@ -19,9 +19,9 @@ interface ring_manager_if ();
     // CSR → Ring Manager: ring configuration and control
     // -----------------------------------------------------------------------------------------
     logic           ctrl_enable;    // CTRL.ENABLE – must be asserted before descriptors are issued
-    logic [2:0]     tail_ptr;       // TAIL pointer written by the CPU
+    logic [31:0]     tail_ptr;       // TAIL pointer written by the CPU
     logic [31:0]    ring_base_addr; // Base address of the ring buffer in memory
-    logic [2:0]     ring_len;       // RINGLEN from CSR; number of valid ring slots (must be > 0)
+    logic [31:0]     ring_len;       // RINGLEN from CSR; number of valid ring slots (must be > 0)
     logic           irq_empty_en;   // IRQ_EN.EMPTY – enables the empty interrupt
     logic           irq_error_en;   // IRQ_EN.ERROR – enables the error interrupt
     logic           error_clear;    // Writing 1 clears STATUS.ERROR and IRQ_STATUS.ERROR

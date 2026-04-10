@@ -13,7 +13,7 @@ module ring_manager #(
 
     // Inputs from CSR
     input  logic             ctrl_enable,      // CTRL.ENABLE must be asserted before descriptor is issued
-    input  logic     [2:0]   tail_ptr,         // tail managed by CPU
+    input  logic     [31:0]   tail_ptr,         // tail managed by CPU
     input  logic     [31:0]  ring_base_addr,   // Base address of ring buffer
     input  logic     [2:0]   ring_len,         // RINGLEN from CSR (must be > 0)
     input  logic             irq_empty_en,     // IRQ enable for empty event
