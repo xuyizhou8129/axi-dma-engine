@@ -33,6 +33,8 @@ module data_mover #(
     input  logic                    dm_axi_out_full,
     output logic [INSTR_WIDTH-1:0]   dm_axi_out_din
 
+    input logic global_enable;
+
 );
 
     logic [INSTR_WIDTH-1:0] instr_axi, instr_axi_next;
@@ -89,8 +91,11 @@ module data_mover #(
         df_dm_in_rd_en = 0;
 
         case (state)
+
+            
             GET_DATA: begin
-                if (df_dm_in_empty == 0) begin
+             
+                if (global_enable && df_dm_in_empty == 0) begin
                     df_dm_in_rd_en = 1'b1;
                     next_state = DECODE;
                     new_input_data = df_dm_in_dout;
@@ -98,10 +103,11 @@ module data_mover #(
                 else begin
                     next_state = GET_DATA;
                 end
-
-            end
+                end
 
             DECODE: begin
+
+                if (global_enable) begin
 
                 if (input_data[96]) begin
                     // insutruction address
@@ -128,13 +134,20 @@ module data_mover #(
                     instr_axi_next[64] = 1'b0;
                     instr_sram_next[64] = 1'b1;
            end
-                next_state = SEND_INSTR;           
+                next_state = SEND_INSTR;   
+
+
+            end
+            else begin
+                next_state = DECODE;
+                input_data_next = input_data;
+            end
 
             end
 
  
     SEND_INSTR: begin
-        if (!dm_sram_out_full && !dm_axi_out_full) begin     
+        if (!dm_sram_out_full && !dm_axi_out_full && global_enable) begin     
             axi_wr_en  = 1'b1;
             sram_wr_en = 1'b1;
             next_state = GET_DATA;
