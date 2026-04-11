@@ -2,15 +2,6 @@
 // Interface: ring_manager_if
 // Description: Bundles all signals crossing the Ring Manager module boundary into a single
 //              interface with named modports for each connection.
-//
-// Connection map (signal direction is from the Ring Manager's perspective):
-//
-// Modport summary:
-//   rm        – Ring Manager (the module that drives this interface)
-//   csr       – CSR block view (drives config signals, receives status)
-//   df        – Descriptor Fetcher view (receives fetch request, drives ready/error)
-//   dm        – Data Mover view (drives the dm_done completion pulse)
-//   irq       – IRQ Controller view (receives interrupt pulses)
 // -------------------------------------------------------------------------------------------
 
 interface ring_manager_if ();
@@ -19,20 +10,21 @@ interface ring_manager_if ();
     // CSR → Ring Manager: ring configuration and control
     // -----------------------------------------------------------------------------------------
     logic           ctrl_enable;    // CTRL.ENABLE – must be asserted before descriptors are issued
-    logic [2:0]     tail_ptr;       // TAIL pointer written by the CPU
+    logic           ctrl_reset;     // CTRL.RESET – software reset; stops all tasks, clears state
+    logic [31:0]    tail_ptr;       // TAIL pointer written by the CPU
     logic [31:0]    ring_base_addr; // Base address of the ring buffer in memory
-    logic [2:0]     ring_len;       // RINGLEN from CSR; number of valid ring slots (must be > 0)
-    logic           irq_empty_en;   // IRQ_EN.EMPTY – enables the empty interrupt
-    logic           irq_error_en;   // IRQ_EN.ERROR – enables the error interrupt
+    logic [31:0]    ring_len;       // RINGLEN from CSR; number of valid ring slots (must be > 0)
+    logic           irq_en;         // CTRL.IRQ_EN – IRQ enable (gating performed in CSR/IRQ)
     logic           error_clear;    // Writing 1 clears STATUS.ERROR and IRQ_STATUS.ERROR
 
     // -----------------------------------------------------------------------------------------
-    // Ring Manager → CSR: status and sticky IRQ bits
+    // Ring Manager → CSR: status and IRQ set-pulses
     // -----------------------------------------------------------------------------------------
+    logic [31:0]    head_ptr;         // HEAD pointer; read by CSR for HEAD register
+    logic           busy;             // 1 while descriptors are in flight
     logic           buffer_empty;     // Asserted when head_ptr == tail_ptr (ring is empty)
-    logic           status_error;     // STATUS.ERROR – latched on any descriptor error
-    logic           irq_status_empty; // IRQ_STATUS.EMPTY – sticky bit; set on non-empty→empty transition
-    logic           irq_status_error; // IRQ_STATUS.ERROR – sticky bit; set when an error interrupt fires
+    logic           irq_status_empty; // Set-pulse on non-empty→empty transition; CSR latches
+    logic           irq_status_error; // Set-pulse on descriptor error; CSR latches
 
     // -----------------------------------------------------------------------------------------
     // Ring Manager → Descriptor Fetcher: fetch request channel (ready/valid handshake)
@@ -57,22 +49,23 @@ interface ring_manager_if ();
     // =========================================================================
     // Modport: rm
     //   Used by the ring_manager module itself.
-    //   Receives all configuration/status inputs; drives all outputs.
+    //   Receives all configuration/control inputs; drives all outputs.
     // =========================================================================
     modport rm (
         // clock / reset are passed directly to the module, not through the interface
         // --- CSR inputs ---
         input  ctrl_enable,
+        input  ctrl_reset,
         input  tail_ptr,
         input  ring_base_addr,
         input  ring_len,
-        input  irq_empty_en,
-        input  irq_error_en,
+        input  irq_en,
         input  error_clear,
 
         // --- CSR outputs ---
+        output head_ptr,
+        output busy,
         output buffer_empty,
-        output status_error,
         output irq_status_empty,
         output irq_status_error,
 
@@ -96,21 +89,22 @@ interface ring_manager_if ();
     // =========================================================================
     // Modport: csr
     //   Used by the CSR block.
-    //   Drives ring configuration; monitors status and sticky IRQ bits.
+    //   Drives ring configuration and control; monitors status and IRQ set-pulses.
     // =========================================================================
     modport csr (
         // --- configuration outputs (CSR drives these) ---
         output ctrl_enable,
+        output ctrl_reset,
         output tail_ptr,
         output ring_base_addr,
         output ring_len,
-        output irq_empty_en,
-        output irq_error_en,
+        output irq_en,
         output error_clear,
 
         // --- status inputs (RM drives these) ---
+        input  head_ptr,
+        input  busy,
         input  buffer_empty,
-        input  status_error,
         input  irq_status_empty,
         input  irq_status_error
     );
