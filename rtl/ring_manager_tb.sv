@@ -12,6 +12,8 @@
 //  5. In-flight limit - no new descrptor issued when in_flight_count == MAXINFLIGHTCOUNT.
 //  6. Error - df_error triggers irq pulse and suppresses further fetches.
 //
+// ADD TESTS FOR SW_RESET_EN, ERROR_CLEAR
+//
 // -----------------------------------------------------------------------------------------
 
 `timescale 1ns/1ps  // time unit / precision
@@ -35,7 +37,7 @@ module ring_manager_tb;
     logic             irq_en;           // IRQ enable (gating performed in CSR)
     logic             error_clear;      // clears internal error flag (IRQ_CLEAR[1])
     logic             fetch_req_ready;  // DF is ready for new address
-    logic             dm_done;          // Descriptor completed successfully
+    logic             as_done;          // Descriptor completed successfully
     logic             df_error;         // Descriptor fetch error
 
     // Outputs from DUT (Monitors)
@@ -73,7 +75,7 @@ module ring_manager_tb;
         .irq_en             (irq_en),
         .error_clear        (error_clear),
         .fetch_req_ready    (fetch_req_ready),
-        .dm_done            (dm_done),
+        .as_done            (as_done),
         .df_error           (df_error),
         .rm_df_addr         (rm_df_addr),
         .fetch_req_valid    (fetch_req_valid),
@@ -131,7 +133,7 @@ module ring_manager_tb;
         irq_en          = 1'b0;
         error_clear     = 1'b0;
         fetch_req_ready = 1'b0;
-        dm_done         = 1'b0;
+        as_done         = 1'b0;
         df_error        = 1'b0;
 
         tests_passed = 0;
@@ -174,10 +176,10 @@ module ring_manager_tb;
         check(fetch_req_valid,  1'b1, "fetch_req_valid HIGH - Test 2 step 1");
         check(rm_df_addr,       32'hA000_0000, "rm_df_addr - Test 2 step 1");
 
-        // Step 2: dm_done fires — check pulse on the SAME clock where buffer_empty first goes high.
+        // Step 2: as_done fires — check pulse on the SAME clock where buffer_empty first goes high.
         // was_empty is still 0 at this point (it registered the old buffer_empty=0),
         // so !was_empty && buffer_empty = 1 for exactly this one cycle.
-        dm_done = 1'b1;
+        as_done = 1'b1;
         @(posedge clk); #1;   // head advances, buffer_empty=1, was_empty=0 -> pulse fires
 
         check(buffer_empty,     1'b1, "buffer_empty HIGH - Test 2 step 2");
@@ -185,16 +187,16 @@ module ring_manager_tb;
         check(irq_empty,        1'b1, "irq_empty HIGH - Test 2 step 2");
 
         // Step 3: one more clock - was_empty catches up to 1, pulse gone
-        dm_done = 1'b0;
+        as_done = 1'b0;
         @(posedge clk); #1;
 
         check(irq_empty,        1'b0, "irq_empty LOW - Test 2 step 3");
         check(irq_status_empty, 1'b0, "irq_status_empty LOW - Test 2 step 3");
 
         // Test 3: Head Wrap //
-        // Description: Ring length is 3. CPU loads 2 descriptors, dm_done fires
+        // Description: Ring length is 3. CPU loads 2 descriptors, as_done fires
         // twice to send head to slot (ring_len - 1), CPU loads another descriptor
-        // and dm_done fires again to send head to slot 0.
+        // and as_done fires again to send head to slot 0.
 
         // Step 1: Toggle reset, reinitialize inputs (load 2 descriptors)
         reset_n = 1'b0;
@@ -211,34 +213,34 @@ module ring_manager_tb;
 
         check(buffer_empty, 1'b0, "buffer_empty LOW - Test 3 step 1");
 
-        // Step 2: fire dm_done twice
-        dm_done = 1'b1;
+        // Step 2: fire as_done twice
+        as_done = 1'b1;
         @(posedge clk); #1;
-        dm_done = 1'b0;
+        as_done = 1'b0;
         @(posedge clk); #1;
 
         check(rm_df_addr,   32'hA000_0010,  "rm_df_addr - Test 3 Step 2"); // rm_df_addr = ring_base_addr + 1 * 16
         check(buffer_empty, 1'b0, "buffer_empty LOW - Test 3 Step 2");
 
-        dm_done = 1'b1;
+        as_done = 1'b1;
         @(posedge clk); #1;
-        dm_done = 1'b0;
+        as_done = 1'b0;
         @(posedge clk); #1;
 
         check(buffer_empty, 1'b1, "buffer_empty HIGH - Test 3 step 2");
 
-        // Step 3: load another descriptor and fire dm_done
+        // Step 3: load another descriptor and fire as_done
         tail_ptr = 32'd0;
         @(posedge clk); #1;
 
         check(buffer_empty, 1'b0, "buffer_empty LOW - Test 3 step 3");
 
-        dm_done = 1'b1;
+        as_done = 1'b1;
         @(posedge clk); #1;   // head wraps to 0, buffer_empty=1, was_empty=0 -> pulse fires
 
         check(irq_empty,    1'b1,           "irq_empty HIGH - Test 3 step 3");
 
-        dm_done = 1'b0;
+        as_done = 1'b0;
         @(posedge clk); #1;   // was_empty catches up, pulse gone
 
         check(rm_df_addr,   32'hA000_0000,  "rm_df_addr - Test 3 step 3");
