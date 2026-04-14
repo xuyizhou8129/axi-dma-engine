@@ -6,7 +6,6 @@ module IRQ (
     input logic         error_event,    //pulse from ring manager
     input logic         irq_en,         //CTRL from CSR
     input logic [1:0]   irq_clear,      //written by CPU
-    input logic         global_en,
 
     output logic [1:0]  irq_status,     //feeds back into IRQ_STATUS in CSR? (unsure)
     output logic        irq             //goes to CPU interrupt pin
