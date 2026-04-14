@@ -52,6 +52,7 @@ tb_axi4master/sim/modelsim.ini
 tb_axi4master/sim/transcript
 
 tb_descriptor_fetcher/out/
+tb_descriptor_fetcher/source/__pycache__/
 work/
 modelsim.ini
 transcript
