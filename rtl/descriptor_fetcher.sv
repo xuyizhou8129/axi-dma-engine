@@ -9,6 +9,11 @@
 
 //Theoretically I can make this module purely combinational,
 //but for cutting down worst path, I register the outputs
+
+//Check the error cases: Invalid SRAM address, Invalid Length (From Descriptor)
+//Once error is detected, send out a df_error to the ring manager
+//after sending the reset signal to the ring manager, it skips the current bad descriptor and continues
+
 module descriptor_fetcher #(
     parameter int ADDR_WIDTH = 32,
     parameter int DATA_WIDTH = 32,
@@ -16,7 +21,8 @@ module descriptor_fetcher #(
     parameter int DESC_WORDS = 4,
     parameter int HANDLE_WIDTH = 40,      // [31:0] addr, [39:32] len (beats)
     parameter int INSTR_WIDTH  = 41,      // [31:0] addr, [39:32] len, [40] rw (1=write, 0=read)
-    parameter int DESC_WIDTH   = (DESC_WORDS * DATA_WIDTH)
+    parameter int DESC_WIDTH   = (DESC_WORDS * DATA_WIDTH),
+    parameter int MAX_SRAM_ADDR = 2**16 - 1 //arbitrarily set to 64KB
 )(
     input  logic clock,
     input  logic reset,
@@ -39,7 +45,8 @@ module descriptor_fetcher #(
     //handshake with ring manager
     input  logic [ADDR_WIDTH-1:0]  rm_df_addr,
     input logic rm_df_valid,
-    output logic df_ready
+    output logic df_ready,
+    output logic df_error //asserted when an error is detected
 );
 
     localparam int RW_BIT  = INSTR_WIDTH - 1;
@@ -57,11 +64,26 @@ module descriptor_fetcher #(
     logic df_in_wr_en_c, df_in_wr_en_o;
     logic [HANDLE_WIDTH-1:0] df_in_din_c, df_in_din_o;
 
+    //Internal flag to stop receiving from ring manager
+    logic df_error_c;
+
+    // 33-bit end-address check to prevent 32-bit wrap-around false negatives
+    logic [32:0] desc_end_addr;
+    assign desc_end_addr = {1'b0, df_out_dout[31:0]} + ({1'b0, df_out_dout[39:32]} << 2);
+
+typedef enum logic [1:0] {
+    s_error,
+    s_normal
+} state_types;
+
+state_types state, state_c;
+
     //tied registered values to outputs
     assign dm_in_wr_en = dm_in_wr_en_o;
     assign dm_in_din = dm_in_din_o;
     assign df_in_wr_en = df_in_wr_en_o;
     assign df_in_din = df_in_din_o;
+    assign df_error = df_error_c;
 
     always_ff @(posedge clock or posedge reset) begin
         if (reset == 1'b1) begin
@@ -69,35 +91,71 @@ module descriptor_fetcher #(
             dm_in_din_o <= '0;
             df_in_wr_en_o <= 1'b0;
             df_in_din_o <= '0;
+            state <= s_normal;
         end else begin
             dm_in_wr_en_o <= dm_in_wr_en_c;
             dm_in_din_o <= dm_in_din_c;
             df_in_wr_en_o <= df_in_wr_en_c;
             df_in_din_o <= df_in_din_c;
+            state <= state_c;
         end
     end
 
     always_comb begin
+        state_c = state;
         dm_in_wr_en_c = 1'b0;
         dm_in_din_c = '0;
         df_in_wr_en_c = 1'b0;
         df_in_din_c = '0;
         df_out_rd_en = 1'b0;
+        df_error_c = 1'b0;
 //If descriptor side fifo is not full && ring manager is valid:
 //Take the address from the ring manager and make it a handle struct and put it into the AXI4 Master Input FIFO
 //If the AXI4 Master Output FIFO is not empty && Data Mover is not full:
 //Pass the descriptor from the AXI4 Master Output FIFO to the Data Mover Input FIFO
-        if (df_in_full == 1'b0 && rm_df_valid == 1'b1) begin
-            df_in_wr_en_c = 1'b1;
-            df_in_din_c[31:0] = rm_df_addr;
-            df_in_din_c[39:32] = 8'h4; //Fixed length of 4 words for current descriptor structure
-        end
-        
-        if (df_out_empty == 1'b0 && dm_in_full == 1'b0) begin
-            df_out_rd_en = 1'b1;
-            dm_in_din_c = df_out_dout;
-            dm_in_wr_en_c = 1'b1;
-        end
-    end
 
+//Check the error cases: Invalid SRAM address, Invalid Length (From Descriptor)
+//Once error is detected, send out a df_error to the ring manager
+//after sending the reset signal to the ring manager, it pauses half of the pipeline(receiving from ring manager)
+// and clear out the wrong descriptor
+    case (state)
+        s_normal: begin
+
+                if (df_in_full == 1'b0 && rm_df_valid == 1'b1) begin
+                    df_in_wr_en_c = 1'b1;
+                    df_in_din_c[31:0] = rm_df_addr;
+                    df_in_din_c[39:32] = 8'h4; //Fixed length of 4 words for current descriptor structure
+                end
+                
+                if (df_out_empty == 1'b0 && dm_in_full == 1'b0) begin
+                    df_out_rd_en = 1'b1;
+                    if (desc_end_addr > MAX_SRAM_ADDR) begin
+                        df_error_c = 1'b1;
+                        state_c = s_error;
+                    end else begin
+                        dm_in_din_c = df_out_dout;
+                        dm_in_wr_en_c = 1'b1;
+                end
+            end
+        end
+
+         s_error: begin
+                if (df_out_empty == 1'b0 && dm_in_full == 1'b0) begin
+                    df_out_rd_en = 1'b1;
+                    if (desc_end_addr > MAX_SRAM_ADDR) begin
+                        df_error_c = 1'b1;
+                    end else begin
+                        dm_in_din_c = df_out_dout;
+                        dm_in_wr_en_c = 1'b1;
+                end
+            end
+                if (df_in_full == 1'b0 && rm_df_valid == 1'b1) begin
+                    df_in_wr_en_c = 1'b1;
+                    df_in_din_c[31:0] = rm_df_addr;
+                    df_in_din_c[39:32] = 8'h4; //Fixed length of 4 words for current descriptor structure
+                    state_c = s_normal;
+                end
+        end
+    endcase
+    end
 endmodule
