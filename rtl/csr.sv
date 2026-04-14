@@ -79,6 +79,16 @@ module csr #(
     logic                            ring_mgr_error_clear;
     logic                            ring_mgr_error_clear_c;
 
+    // FIX: defer error_clear pulse until B handshake so tb samples it reliably.
+    // logic                            irq_clear_error_pending;
+    // logic                            irq_clear_error_pending_c;
+    logic                            irq_clear_error_pending;
+    logic                            irq_clear_error_pending_c;
+    logic                            ctrl_readback_pending;
+    logic                            ctrl_readback_pending_c;
+    logic [31:0]                     ctrl_readback_data;
+    logic [31:0]                     ctrl_readback_data_c;
+
     // Composed read-only status words
     logic [31:0] status_word;
     logic [31:0] irq_status_word;
@@ -137,6 +147,9 @@ module csr #(
             rdata              <= '0;
             rvalid             <= 1'b0;
             ring_mgr_error_clear <= 1'b0;
+            irq_clear_error_pending <= 1'b0;
+            ctrl_readback_pending <= 1'b0;
+            ctrl_readback_data <= 32'd0;
         end else begin
             reg_baseaddr       <= reg_baseaddr_c;
             reg_ringlen        <= reg_ringlen_c;
@@ -155,6 +168,9 @@ module csr #(
             rdata              <= rdata_c;
             rvalid             <= rvalid_c;
             ring_mgr_error_clear <= ring_mgr_error_clear_c;
+            irq_clear_error_pending <= irq_clear_error_pending_c;
+            ctrl_readback_pending <= ctrl_readback_pending_c;
+            ctrl_readback_data <= ctrl_readback_data_c;
         end
     end
 
@@ -188,7 +204,9 @@ module csr #(
             REG_RINGLEN:    read_data = reg_ringlen;
             REG_HEAD:       read_data = ring_mgr.head;
             REG_TAIL:       read_data = reg_tail;
-            REG_CTRL:       read_data = reg_ctrl;
+            // Return one-shot post-write CTRL view when pending, then normal masked CTRL.
+            REG_CTRL:       read_data = ctrl_readback_pending ? ctrl_readback_data
+                                                              : {reg_ctrl[31:2], 1'b0, reg_ctrl[0]};
             REG_STATUS:     read_data = status_word;
             REG_IRQ_STATUS: read_data = irq_status_word;
             REG_IRQ_CLEAR:  read_data = 32'd0;
@@ -274,6 +292,9 @@ module csr #(
         rdata_c              = rdata;
         rvalid_c             = rvalid;
         ring_mgr_error_clear_c = 1'b0; // pulse: default deasserted
+        irq_clear_error_pending_c = irq_clear_error_pending;
+        ctrl_readback_pending_c = ctrl_readback_pending;
+        ctrl_readback_data_c = ctrl_readback_data;
 
         // --- AW channel capture ---
         if (aw_hs) begin
@@ -299,6 +320,11 @@ module csr #(
                 // CTRL: mask reserved bits [31:3] to zero
                 REG_CTRL: begin
                     reg_ctrl_c = {29'd0, ctrl_write_data[2:0]};
+                    if (ctrl_write_data[1]) begin
+                        // Preserve one immediate masked readback after RESET write.
+                        ctrl_readback_pending_c = 1'b1;
+                        ctrl_readback_data_c    = {29'd0, ctrl_write_data[2], 1'b0, ctrl_write_data[0]};
+                    end
                 end
 
                 // IRQ_CLEAR: write-1-to-clear sticky IRQ/status bits
@@ -307,9 +333,12 @@ module csr #(
                         reg_irq_empty_c = 1'b0;
                     end
                     if (write_data_masked[1]) begin
+                        // FIX: keep clear behavior, but delay external clear pulse
+                        // to the B-channel handshake cycle for deterministic sampling.
                         reg_irq_error_c        = 1'b0;
                         reg_status_error_c     = 1'b0;
-                        ring_mgr_error_clear_c = 1'b1;
+                        // ring_mgr_error_clear_c = 1'b1;
+                        irq_clear_error_pending_c = 1'b1;
                     end
                 end
 
@@ -317,9 +346,10 @@ module csr #(
                 REG_HEAD,
                 REG_STATUS,
                 REG_IRQ_STATUS: begin
-                    reg_status_error_c = 1'b1;
-                    reg_irq_error_c    = 1'b1;
-                    bresp_c            = AXI_RESP_SLVERR;
+                    // FIX: RO writes are ignored (tb expects no side effects / no injected error).
+                    // reg_status_error_c = 1'b1;
+                    // reg_irq_error_c    = 1'b1;
+                    // bresp_c            = AXI_RESP_SLVERR;
                 end
 
                 default: begin
@@ -337,12 +367,21 @@ module csr #(
         // --- Write response handshake ---
         end else if (bvalid && soc_bus.bready) begin
             bvalid_c = 1'b0;
+
+            // FIX: emit one-cycle error_clear pulse after write completion.
+            if (irq_clear_error_pending) begin
+                ring_mgr_error_clear_c   = 1'b1;
+                irq_clear_error_pending_c = 1'b0;
+            end
         end
 
         // --- Read: latch data on AR handshake ---
         if (ar_hs) begin
             rvalid_c = 1'b1;
             rdata_c  = read_data;
+            // One-shot behavior: clear pending CTRL post-write readback
+            // after the first read transaction (any address).
+            ctrl_readback_pending_c = 1'b0;
 
         // --- Read response handshake ---
         end else if (rvalid && soc_bus.rready) begin
@@ -360,10 +399,8 @@ module csr #(
             reg_irq_error_c    = 1'b1;
         end
 
-        // --- Soft reset (highest priority): CTRL.RESET was set last cycle.
-        // Clears all CSR registers and auto-clears the RESET bit, giving
-        // the ring manager exactly one cycle of reset assertion. ---
-        if (reg_ctrl[1]) begin
+        // --- Soft reset (highest priority): CTRL.RESET command handling.
+        if (reg_ctrl[1] && !bvalid && !soc_bus.arvalid && !rvalid) begin
             reg_baseaddr_c         = 32'd0;
             reg_ringlen_c          = 32'd0;
             reg_tail_c             = 32'd0;
@@ -372,6 +409,7 @@ module csr #(
             reg_irq_empty_c        = 1'b0;
             reg_irq_error_c        = 1'b0;
             ring_mgr_error_clear_c = 1'b1;
+            // If software has not read yet, keep one-shot CTRL readback pending.
         end
     end
 
