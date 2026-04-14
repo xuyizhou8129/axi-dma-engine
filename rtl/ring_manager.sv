@@ -83,7 +83,7 @@ module ring_manager #(
                 head_ptr_next = '0;
             else
                 head_ptr_next = head_ptr + 1'b1;
-        end
+        end 
 
         // In-flight counter logic
         inflight_count_next = inflight_count;
@@ -101,7 +101,7 @@ module ring_manager #(
 
         // SW reset enable
         sw_rst_enable_next = sw_rst_enable;
-        if (int_status_error && (inflight_count == 0)) sw_rst_enable_next = 1'b1;
+        if (~int_status_error && (inflight_count == 0)) sw_rst_enable_next = 1'b1;
         if (error_clear)                               sw_rst_enable_next = 1'b0;
 
     end
