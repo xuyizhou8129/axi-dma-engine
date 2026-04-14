@@ -15,14 +15,14 @@
 //after sending the reset signal to the ring manager, it skips the current bad descriptor and continues
 
 module descriptor_fetcher #(
-    parameter int ADDR_WIDTH = 32,
-    parameter int DATA_WIDTH = 32,
-    parameter int LEN_WIDTH  = 8,
-    parameter int DESC_WORDS = 4,
-    parameter int HANDLE_WIDTH = 40,      // [31:0] addr, [39:32] len (beats)
-    parameter int INSTR_WIDTH  = 41,      // [31:0] addr, [39:32] len, [40] rw (1=write, 0=read)
+    parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH,
+    parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH,
+    parameter int LEN_WIDTH  = dma_pkg::LEN_WIDTH,
+    parameter int DESC_WORDS = dma_pkg::DESC_WORDS,
+    parameter int HANDLE_WIDTH = dma_pkg::HANDLE_WIDTH,
+    parameter int INSTR_WIDTH  = dma_pkg::INSTR_WIDTH,
     parameter int DESC_WIDTH   = (DESC_WORDS * DATA_WIDTH),
-    parameter int MAX_SRAM_ADDR = 2**16 - 1 //arbitrarily set to 64KB
+    parameter int MAX_SRAM_ADDR = dma_pkg::MAX_SRAM_ADDR
 )(
     input  logic clock,
     input  logic reset,
@@ -49,9 +49,9 @@ module descriptor_fetcher #(
     output logic df_error //asserted when an error is detected
 );
 
-    localparam int RW_BIT  = INSTR_WIDTH - 1;
-    localparam int LEN_MSB = 32 + LEN_WIDTH - 1;
-    localparam int LEN_LSB = 32;
+    localparam int RW_BIT  = dma_pkg::instr_rw_bit(INSTR_WIDTH);
+    localparam int LEN_MSB = dma_pkg::instr_len_msb(LEN_WIDTH);
+    localparam int LEN_LSB = dma_pkg::INSTR_LEN_LSB;
 
     //Descriptor Fetcher is ready to fetch a descriptor if the descriptor side fifo is not full
     assign df_ready = df_in_full == 1'b0;

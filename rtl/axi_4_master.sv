@@ -14,12 +14,12 @@
 //
 // NOTES: After each burst, FSM enters s_wait_sram until input sram_done is high (SRAM controller finished).
 module axi_4_master #(
-    parameter int ADDR_WIDTH = 32,
-    parameter int DATA_WIDTH = 32,
-    parameter int LEN_WIDTH  = 8,
-    parameter int DESC_WORDS = 4,
-    parameter int HANDLE_WIDTH = 40,      // [31:0] addr, [39:32] len (beats)
-    parameter int INSTR_WIDTH  = 41,      // [31:0] addr, [39:32] len, [40] rw (1=write, 0=read)
+    parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH,
+    parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH,
+    parameter int LEN_WIDTH  = dma_pkg::LEN_WIDTH,
+    parameter int DESC_WORDS = dma_pkg::DESC_WORDS,
+    parameter int HANDLE_WIDTH = dma_pkg::HANDLE_WIDTH,
+    parameter int INSTR_WIDTH  = dma_pkg::INSTR_WIDTH,
     parameter int DESC_WIDTH   = (DESC_WORDS * DATA_WIDTH)
 )(
     input  logic clock,
@@ -58,9 +58,9 @@ module axi_4_master #(
     axi_4_if.master axi
 );
 
-    localparam int RW_BIT  = INSTR_WIDTH - 1;
-    localparam int LEN_MSB = 32 + LEN_WIDTH - 1;
-    localparam int LEN_LSB = 32;
+    localparam int RW_BIT  = dma_pkg::instr_rw_bit(INSTR_WIDTH);
+    localparam int LEN_MSB = dma_pkg::instr_len_msb(LEN_WIDTH);
+    localparam int LEN_LSB = dma_pkg::INSTR_LEN_LSB;
 
     typedef enum logic [3:0] {
         s_idle,

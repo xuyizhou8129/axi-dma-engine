@@ -1,7 +1,7 @@
 module bram 
 #(
-  parameter BRAM_DATA_WIDTH = 32,
-  parameter BRAM_SIZE = 1024,
+  parameter BRAM_DATA_WIDTH = dma_pkg::DATA_WIDTH,
+  parameter BRAM_SIZE = dma_pkg::BRAM_SIZE,
   localparam BRAM_ADDR_WIDTH = $clog2(BRAM_SIZE)
 ) (
   input  logic clock,

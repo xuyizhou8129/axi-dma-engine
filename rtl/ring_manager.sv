@@ -6,7 +6,7 @@
 // -------------------------------------------------------------------------------------------
 
 module ring_manager #(
-    parameter MAX_INFLIGHT = 4 // maximum number of requests in flight (arbitrarily chosen)
+    parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT
 )(
     input logic clk,            // system clock
     input logic reset_n,        // active-low reset
@@ -55,7 +55,7 @@ module ring_manager #(
     logic                                irq_error_next;
 
     // 16 bytes per descriptor
-    localparam int DESCRIPTOR_SIZE = 16;
+    localparam int DESCRIPTOR_SIZE = dma_pkg::DESCRIPTOR_SIZE_BYTES;
 
     // ---------------------------------------------
     // Combinational logic

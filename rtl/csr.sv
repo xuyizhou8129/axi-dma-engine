@@ -1,6 +1,6 @@
 module csr #(
-    parameter int AXIL_ADDR_WIDTH = 32,
-    parameter int AXIL_DATA_WIDTH = 32
+    parameter int AXIL_ADDR_WIDTH = dma_pkg::AXIL_ADDR_WIDTH,
+    parameter int AXIL_DATA_WIDTH = dma_pkg::AXIL_DATA_WIDTH
 ) (
     csr_soc_bus_if.csr          soc_bus,
     csr_ring_manager_if.csr     ring_mgr
@@ -8,20 +8,7 @@ module csr #(
 
     localparam int AXIL_STRB_WIDTH = AXIL_DATA_WIDTH / 8;
 
-    // ----------------------------------------------------------------
-    // Register address offsets (byte-addressed, 32-bit aligned)
-    // ----------------------------------------------------------------
-    localparam logic [7:0] REG_BASEADDR   = 8'h00;
-    localparam logic [7:0] REG_RINGLEN    = 8'h04;
-    localparam logic [7:0] REG_HEAD       = 8'h08;
-    localparam logic [7:0] REG_TAIL       = 8'h0C;
-    localparam logic [7:0] REG_CTRL       = 8'h10;
-    localparam logic [7:0] REG_STATUS     = 8'h14;
-    localparam logic [7:0] REG_IRQ_STATUS = 8'h18;
-    localparam logic [7:0] REG_IRQ_CLEAR  = 8'h2C;
-
-    localparam logic [1:0] AXI_RESP_OKAY   = 2'b00;
-    localparam logic [1:0] AXI_RESP_SLVERR = 2'b10;
+    // Register offsets and AXI responses: dma_pkg
 
     // ----------------------------------------------------------------
     // Writable CSR registers (software-owned via AXI writes)
@@ -143,7 +130,7 @@ module csr #(
             wdata              <= '0;
             wstrb              <= '0;
             bvalid             <= 1'b0;
-            bresp              <= AXI_RESP_OKAY;
+            bresp              <= dma_pkg::AXI_RESP_OKAY;
             rdata              <= '0;
             rvalid             <= 1'b0;
             ring_mgr_error_clear <= 1'b0;
@@ -200,16 +187,16 @@ module csr #(
         read_data   = 32'd0;
 
         unique case (rd_addr_lsb)
-            REG_BASEADDR:   read_data = reg_baseaddr;
-            REG_RINGLEN:    read_data = reg_ringlen;
-            REG_HEAD:       read_data = ring_mgr.head;
-            REG_TAIL:       read_data = reg_tail;
+            dma_pkg::REG_BASEADDR:   read_data = reg_baseaddr;
+            dma_pkg::REG_RINGLEN:    read_data = reg_ringlen;
+            dma_pkg::REG_HEAD:       read_data = ring_mgr.head;
+            dma_pkg::REG_TAIL:       read_data = reg_tail;
             // Return one-shot post-write CTRL view when pending, then normal masked CTRL.
-            REG_CTRL:       read_data = ctrl_readback_pending ? ctrl_readback_data
+            dma_pkg::REG_CTRL:       read_data = ctrl_readback_pending ? ctrl_readback_data
                                                               : {reg_ctrl[31:2], 1'b0, reg_ctrl[0]};
-            REG_STATUS:     read_data = status_word;
-            REG_IRQ_STATUS: read_data = irq_status_word;
-            REG_IRQ_CLEAR:  read_data = 32'd0;
+            dma_pkg::REG_STATUS:     read_data = status_word;
+            dma_pkg::REG_IRQ_STATUS: read_data = irq_status_word;
+            dma_pkg::REG_IRQ_CLEAR:  read_data = 32'd0;
             default:        read_data = 32'd0;
         endcase
     end
@@ -246,7 +233,7 @@ module csr #(
     // ----------------------------------------------------------------
     assign soc_bus.arready = ~rvalid;
     assign soc_bus.rvalid  = rvalid;
-    assign soc_bus.rresp   = AXI_RESP_OKAY;
+    assign soc_bus.rresp   = dma_pkg::AXI_RESP_OKAY;
     assign soc_bus.rdata   = rdata;
 
     // ----------------------------------------------------------------
@@ -313,12 +300,12 @@ module csr #(
         if (~bvalid && aw_pending && w_pending) begin
             unique case (wr_addr_lsb)
                 // R/W registers: merge with wstrb
-                REG_BASEADDR: reg_baseaddr_c = apply_wstrb(reg_baseaddr, wdata, wstrb);
-                REG_RINGLEN:  reg_ringlen_c  = apply_wstrb(reg_ringlen,  wdata, wstrb);
-                REG_TAIL:     reg_tail_c     = apply_wstrb(reg_tail,     wdata, wstrb);
+                dma_pkg::REG_BASEADDR: reg_baseaddr_c = apply_wstrb(reg_baseaddr, wdata, wstrb);
+                dma_pkg::REG_RINGLEN:  reg_ringlen_c  = apply_wstrb(reg_ringlen,  wdata, wstrb);
+                dma_pkg::REG_TAIL:     reg_tail_c     = apply_wstrb(reg_tail,     wdata, wstrb);
 
                 // CTRL: mask reserved bits [31:3] to zero
-                REG_CTRL: begin
+                dma_pkg::REG_CTRL: begin
                     reg_ctrl_c = {29'd0, ctrl_write_data[2:0]};
                     if (ctrl_write_data[1]) begin
                         // Preserve one immediate masked readback after RESET write.
@@ -328,7 +315,7 @@ module csr #(
                 end
 
                 // IRQ_CLEAR: write-1-to-clear sticky IRQ/status bits
-                REG_IRQ_CLEAR: begin
+                dma_pkg::REG_IRQ_CLEAR: begin
                     if (write_data_masked[0]) begin
                         reg_irq_empty_c = 1'b0;
                     end
@@ -343,9 +330,9 @@ module csr #(
                 end
 
                 // Read-only registers: write attempt pauses the system
-                REG_HEAD,
-                REG_STATUS,
-                REG_IRQ_STATUS: begin
+                dma_pkg::REG_HEAD,
+                dma_pkg::REG_STATUS,
+                dma_pkg::REG_IRQ_STATUS: begin
                     // FIX: RO writes are ignored (tb expects no side effects / no injected error).
                     // reg_status_error_c = 1'b1;
                     // reg_irq_error_c    = 1'b1;
@@ -361,8 +348,8 @@ module csr #(
             aw_pending_c = 1'b0;
             w_pending_c  = 1'b0;
             bvalid_c     = 1'b1;
-            if (bresp_c != AXI_RESP_SLVERR)
-                bresp_c = AXI_RESP_OKAY;
+            if (bresp_c != dma_pkg::AXI_RESP_SLVERR)
+                bresp_c = dma_pkg::AXI_RESP_OKAY;
 
         // --- Write response handshake ---
         end else if (bvalid && soc_bus.bready) begin

@@ -9,12 +9,12 @@
 // wait for done signal from axi4master before going idle
 
 module sram_controller #(
-    parameter int ADDR_WIDTH = 32,
-    parameter int DATA_WIDTH = 32,
-    parameter int BRAM_DATA_WIDTH = 32,
-    parameter int LEN_WIDTH = 8,
-    parameter int BRAM_SIZE   = 8,
-    parameter int INSTR_WIDTH = 41,
+    parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH,
+    parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH,
+    parameter int BRAM_DATA_WIDTH = dma_pkg::DATA_WIDTH,
+    parameter int LEN_WIDTH = dma_pkg::LEN_WIDTH,
+    parameter int BRAM_SIZE   = dma_pkg::BRAM_SIZE,
+    parameter int INSTR_WIDTH = dma_pkg::INSTR_WIDTH,
     localparam int BRAM_ADDR_WIDTH = $clog2(BRAM_SIZE)
 )(
     // global inputs 

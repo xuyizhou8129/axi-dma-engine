@@ -3,8 +3,8 @@
 // representing the connection between the AXI4 Master and the System Memory
 
 interface axi_4_if #(
-    parameter int ADDR_WIDTH = 32,
-    parameter int DATA_WIDTH = 32
+    parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH,
+    parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH
 )(
     input logic clk,
     input logic rst_n
