@@ -43,10 +43,7 @@ module descriptor_fetcher #(
     output logic [DESC_WIDTH-1:0]  dm_in_din,
 
     //handshake with ring manager
-    input  logic [ADDR_WIDTH-1:0]  rm_df_addr,
-    input logic rm_df_valid,
-    output logic df_ready,
-    output logic df_error //asserted when an error is detected
+    rm_df_if.df rm_df
 );
 
     localparam int RW_BIT  = dma_pkg::instr_rw_bit(INSTR_WIDTH);
@@ -54,7 +51,7 @@ module descriptor_fetcher #(
     localparam int LEN_LSB = dma_pkg::INSTR_LEN_LSB;
 
     //Descriptor Fetcher is ready to fetch a descriptor if the descriptor side fifo is not full
-    assign df_ready = df_in_full == 1'b0;
+    assign rm_df.fetch_req_ready = df_in_full == 1'b0;
 
     //Registered outputs - Data Mover
     logic dm_in_wr_en_c, dm_in_wr_en_o;
@@ -83,7 +80,7 @@ state_types state, state_c;
     assign dm_in_din = dm_in_din_o;
     assign df_in_wr_en = df_in_wr_en_o;
     assign df_in_din = df_in_din_o;
-    assign df_error = df_error_c;
+    assign rm_df.df_error = df_error_c;
 
     always_ff @(posedge clock or posedge reset) begin
         if (reset == 1'b1) begin
@@ -121,12 +118,12 @@ state_types state, state_c;
     case (state)
         s_normal: begin
 
-                if (df_in_full == 1'b0 && rm_df_valid == 1'b1) begin
+                if (df_in_full == 1'b0 && rm_df.fetch_req_valid == 1'b1) begin
                     df_in_wr_en_c = 1'b1;
-                    df_in_din_c[31:0] = rm_df_addr;
+                    df_in_din_c[31:0] = rm_df.rm_df_addr;
                     df_in_din_c[39:32] = 8'h4; //Fixed length of 4 words for current descriptor structure
                 end
-                
+
                 if (df_out_empty == 1'b0 && dm_in_full == 1'b0) begin
                     df_out_rd_en = 1'b1;
                     if (desc_end_addr > MAX_SRAM_ADDR) begin
@@ -149,9 +146,9 @@ state_types state, state_c;
                         dm_in_wr_en_c = 1'b1;
                 end
             end
-                if (df_in_full == 1'b0 && rm_df_valid == 1'b1) begin
+                if (df_in_full == 1'b0 && rm_df.fetch_req_valid == 1'b1) begin
                     df_in_wr_en_c = 1'b1;
-                    df_in_din_c[31:0] = rm_df_addr;
+                    df_in_din_c[31:0] = rm_df.rm_df_addr;
                     df_in_din_c[39:32] = 8'h4; //Fixed length of 4 words for current descriptor structure
                     state_c = s_normal;
                 end
