@@ -11,9 +11,9 @@ class IRQ:
         self.csr = csr
 
     def is_irq_empty(self):
-        """True if empty-IRQ is pending and IRQ_EN is set."""
+        """True if empty-IRQ is pending and the DMA engine is enabled."""
         status = self.csr.read(self.csr.REG_IRQ_STATUS)
-        return bool((status >> self.csr.IRQ_EMPTY_BIT) & 1) and self.csr.irq_en()
+        return bool((status >> self.csr.IRQ_EMPTY_BIT) & 1) and self.csr.is_enabled()
 
     def is_irq_error(self):
         """True if error-IRQ is pending and IRQ_EN is set."""
