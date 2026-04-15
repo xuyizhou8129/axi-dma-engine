@@ -13,12 +13,13 @@ Instruction encoding (41 bits, matching axi_4_master.py / RTL):
   [40]    rw  (1=write to SRAM, 0=read from SRAM)
 """
 
+from fifo_queue import FIFOQueue 
 LEN_LSB = 32
 RW_BIT  = 40
 
 
 class SRAMController:
-    def __init__(self, sram_mem, dm_in_fifo, mid_fifo):
+    def __init__(self, sram_mem, dm_in_fifo: FIFOQueue, mid_fifo: FIFOQueue):
         """
         sram_mem  : list of 32-bit words (BRAM backing store)
         dm_in_fifo: FIFOQueue of 41-bit instructions from the data mover
