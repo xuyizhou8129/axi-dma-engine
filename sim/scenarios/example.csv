@@ -1,0 +1,42 @@
+op,arg1,arg2,arg3,arg4
+# ============================================================
+# System-level DMA scenario — one descriptor, DMA read
+#
+# Ring layout (baseaddr = 0x00000000, ringlen = 4):
+#   Descriptor slot 0 occupies system-memory words 0-3
+#   (byte addresses 0x00 – 0x0F)
+#
+# Descriptor 0 fields:
+#   w0 = 0x00000100  start address (byte addr in sys mem / SRAM word addr)
+#   w1 = 0x00000004  burst length = 4 words; rw = w1[8] = 0 (read)
+#   w2 = 0x00000000  unused (reserved)
+#   w3 = 0x00000000  unused (reserved)
+#
+# DM instruction extracted from descriptor[40:0]:
+#   [31:0]  = 0x100  -> AXI reads from sys_mem[0x100] (word 64..67)
+#                    -> SRAM reads from SRAM word 0x100 = 256 (word 256..259)
+#   [39:32] = 4      -> 4 beats
+#   [40]    = 0      -> rw=0 (read)
+#
+# After DMA:
+#   ring.head = 1  (advanced by ring_manager after as_done)
+#   irq_rm_empty fires (ring went non-empty -> empty)
+#   sys_mem is UNCHANGED (read-only operation for AXI path with rw=0)
+# ============================================================
+
+# --- Data region that the AXI master will read during the DM phase ---
+# System-memory word 64 = byte address 0x100
+smem,64,aabbccdd,,
+smem,65,11223344,,
+smem,66,deadbeef,,
+smem,67,cafecafe,,
+
+# --- Configure ring descriptor manager ---
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+
+# --- Enqueue one descriptor (writes words 0-3, advances tail to 1) ---
+desc,00000100,00000004,00000000,00000000
+
+# --- Enable DMA ---
+enable,,,,
