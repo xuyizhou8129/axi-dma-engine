@@ -3,7 +3,10 @@ module csr #(
     parameter int AXIL_DATA_WIDTH = dma_pkg::AXIL_DATA_WIDTH
 ) (
     csr_soc_bus_if.csr          soc_bus,
-    csr_ring_manager_if.csr     ring_mgr
+    csr_ring_manager_if.csr     ring_mgr,
+    // One-cycle pulses when IRQ_CLEAR write-1-to-clear commits (for IRQ.sv)
+    output logic                irq_clear_pulse_empty,
+    output logic                irq_clear_pulse_error
 );
 
     localparam int AXIL_STRB_WIDTH = AXIL_DATA_WIDTH / 8;
@@ -246,6 +249,11 @@ module csr #(
     assign ring_mgr.reset       = reg_ctrl[1];
     assign ring_mgr.irq_en      = reg_ctrl[2];
     assign ring_mgr.error_clear = ring_mgr_error_clear;
+
+    assign irq_clear_pulse_empty = (~bvalid && aw_pending && w_pending)
+        && (wr_addr_lsb == dma_pkg::REG_IRQ_CLEAR) && write_data_masked[0];
+    assign irq_clear_pulse_error = (~bvalid && aw_pending && w_pending)
+        && (wr_addr_lsb == dma_pkg::REG_IRQ_CLEAR) && write_data_masked[1];
 
     // ----------------------------------------------------------------
     // IRQ outputs: gated by CTRL.IRQ_EN (bit 2).
