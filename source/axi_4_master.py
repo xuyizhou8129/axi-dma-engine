@@ -18,6 +18,7 @@ Encodings (same as RTL):
   Instruction:    [31:0] addr, [39:32] len (beats), [40] rw (1=write, 0=read)
 """
 
+from fifo_queue import FIFOQueue
 
 ADDR_WIDTH = 32
 DATA_WIDTH = 32
@@ -62,7 +63,7 @@ class AXI4MasterGolden:
     one handle or one instruction (never interleaved).
     """
 
-    def __init__(self, memory, df_in_fifo, df_out_fifo, dm_in_fifo, mid_fifo):
+    def __init__(self, memory, df_in_fifo: FIFOQueue, df_out_fifo: FIFOQueue, dm_in_fifo: FIFOQueue, mid_fifo: FIFOQueue):
         self.memory = memory
         self.df_in = df_in_fifo
         self.df_out = df_out_fifo
