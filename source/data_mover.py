@@ -8,7 +8,7 @@ from axi_4_master import pack_instruction
 
 
 class DataMover:
-    def __init__(self, fifo_instr_to_axi, fifo_mid):
+    def __init__(self, fifo_instr_to_axi: FIFOQueue, fifo_mid: FIFOQueue):
         self.fifo_instr_to_axi = fifo_instr_to_axi
         self.fifo_mid = fifo_mid
 
