@@ -10,7 +10,7 @@ from axi_4_master import pack_handle
 
 
 class DescriptorFetcher:
-    def __init__(self, fifo_handle_to_axi, fifo_desc_from_axi):
+    def __init__(self, fifo_handle_to_axi: FIFOQueue, fifo_desc_from_axi: FIFOQueue):
         self.fifo_handle_to_axi = fifo_handle_to_axi
         self.fifo_desc_from_axi = fifo_desc_from_axi
 
