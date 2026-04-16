@@ -25,6 +25,11 @@ module tb_desc_fetcher_top (
     localparam int QD = 64;
     localparam int MAX_CAP = 128;
 
+    rm_df_if rm_df ();
+    assign rm_df.rm_df_addr      = rm_df_addr;
+    assign rm_df.fetch_req_valid = rm_df_valid;
+    assign df_ready              = rm_df.fetch_req_ready;
+
     // DF <-> AXI-master input FIFO (handle)
     logic                    df_in_wr_en;
     logic                    df_in_full;
@@ -58,9 +63,7 @@ module tb_desc_fetcher_top (
         .dm_in_wr_en (dm_in_wr_en),
         .dm_in_full  (dm_in_full),
         .dm_in_din   (dm_in_din),
-        .rm_df_addr  (rm_df_addr),
-        .rm_df_valid (rm_df_valid),
-        .df_ready    (df_ready)
+        .rm_df       (rm_df)
     );
 
     logic [HANDLE_WIDTH-1:0] df_in_fifo_dout_unused;

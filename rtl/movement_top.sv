@@ -37,6 +37,13 @@ module movement_top #(
 
     wire reset = ~rst_n;
 
+    // Ring manager <-> descriptor_fetcher bundle (scalar ports on movement_top <-> rm_df_if.df on u_df)
+    rm_df_if rm_df ();
+    assign rm_df.rm_df_addr       = rm_df_addr;
+    assign rm_df.fetch_req_valid  = rm_df_valid;
+    assign df_ready                = rm_df.fetch_req_ready;
+    assign df_error                = rm_df.df_error;
+
     // -------------------------------------------------------------------------
     // Descriptor fetcher
     // -------------------------------------------------------------------------
@@ -72,10 +79,7 @@ module movement_top #(
         .dm_in_wr_en (dm_in_wr_en),
         .dm_in_full  (dm_in_full),
         .dm_in_din   (dm_in_din),
-        .rm_df_addr  (rm_df_addr),
-        .rm_df_valid (rm_df_valid),
-        .df_ready    (df_ready),
-        .df_error    (df_error)
+        .rm_df       (rm_df)
     );
 
     // -------------------------------------------------------------------------

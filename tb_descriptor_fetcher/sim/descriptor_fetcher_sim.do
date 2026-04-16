@@ -6,6 +6,8 @@ setenv LMC_TIMEUNIT -9
 vlib work
 vmap work work
 
+vlog -sv -work work ../../rtl/dma_pkg.sv
+vlog -sv -work work ../../rtl/rm_df_if.sv
 vlog -sv -work work ../../rtl/fifo.sv
 vlog -sv -work work ../../rtl/descriptor_fetcher.sv
 vlog -sv -work work ../tb_desc_fetcher_top.sv

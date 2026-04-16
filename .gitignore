@@ -47,9 +47,11 @@ __pycache__/
 *.py[cod]
 
 # Questa / ModelSim (tb_axi4master + repo root artifacts)
+sim/out/
+*.wlf
+
 tb_axi4master/out/
 tb_axi4master/sim/work/
-tb_axi4master/sim/axi4master.wlf
 tb_axi4master/sim/modelsim.ini
 tb_axi4master/sim/transcript
 
