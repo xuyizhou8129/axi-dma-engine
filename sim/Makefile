@@ -10,7 +10,7 @@ SIM_DIR        := $(CURDIR)
 MODELSIM_ENV   ?= /vol/eecs392/env/modelsim.env
 MODELSIM_SHELL ?= tcsh
 VSIM           ?= vsim
-VSIM_DO        := sim_top.do
+VSIM_DO        := dma_sim.do
 
 GUI_FIX ?= 1
 ifeq ($(GUI_FIX),1)

@@ -20,12 +20,6 @@
 //   5. check_mem()   — compare model_sys_mem.ram[] against out/golden_smem.hex
 //   6. check_irq()   — verify at least one irq_rm_empty pulse was observed
 //
-// RTL note
-//   descriptor_fetcher.sv uses an rm_df_if interface port; movement_top.sv
-//   currently connects individual signals instead.  This mismatch must be
-//   resolved in the RTL before simulation will compile (either switch
-//   descriptor_fetcher to individual ports, or have movement_top create an
-//   rm_df_if instance internally).
 // ============================================================================
 
 module tb_dma_top;
