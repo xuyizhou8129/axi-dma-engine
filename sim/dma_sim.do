@@ -46,6 +46,7 @@ vlog -sv -work work ${RTL}/bram.sv
 vlog -sv -work work ${RTL}/axi_4_master.sv
 vlog -sv -work work ${RTL}/sram_controller.sv
 vlog -sv -work work ${RTL}/descriptor_fetcher.sv
+vlog -sv -work work ${RTL}/data_mover.sv
 vlog -sv -work work ${RTL}/ring_manager.sv
 vlog -sv -work work ${RTL}/IRQ.sv
 vlog -sv -work work ${RTL}/csr.sv

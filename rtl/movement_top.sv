@@ -34,6 +34,9 @@ module movement_top #(
 );
 
     localparam int BRAM_DATA_WIDTH = DATA_WIDTH;
+    // data_mover packs len as 32 bits; AXI/SRAM masters use dma_pkg::INSTR_WIDTH (41) with 8-bit len
+    localparam int DM_MOVER_BURST_W = 32;
+    localparam int DM_MOVER_INSTR_W = ADDR_WIDTH + DM_MOVER_BURST_W + 1;
 
     wire reset = ~rst_n;
 
@@ -233,45 +236,93 @@ module movement_top #(
         .empty  (df_out_empty)
     );
 
-    // DM: duplicate FIFOs (same write from DF) — AXI and SRAM each have a read port
-    logic dm_full_axi;
-    logic dm_full_sram;
+    // Descriptor fetcher -> FIFO -> data_mover -> FIFOs -> AXI / SRAM (65b -> 41b instr)
+    logic                    df_dm_in_rd_en;
+    logic                    df_dm_in_empty;
+    logic [DESC_WIDTH-1:0]   df_dm_in_dout;
+    logic                    desc_full;
 
-    // Descriptor fetcher drives 128b dm_in_din; AXI/SRAM expect 41b instruction — use low bits
-    wire [INSTR_WIDTH-1:0] dm_in_instr = dm_in_din[INSTR_WIDTH-1:0];
+    logic [DM_MOVER_INSTR_W-1:0] dm_axi_out_din_wide;
+    logic [DM_MOVER_INSTR_W-1:0] dm_sram_out_din_wide;
+    logic                        dm_axi_out_wr_en;
+    logic                        dm_sram_out_wr_en;
+    logic                        dm_full_axi;
+    logic                        dm_full_sram;
+    logic [DM_MOVER_INSTR_W-1:0] dm_fifo_axi_dout_wide;
+    logic [DM_MOVER_INSTR_W-1:0] dm_fifo_sram_dout_wide;
 
     fifo #(
-        .FIFO_DATA_WIDTH (INSTR_WIDTH),
+        .FIFO_DATA_WIDTH (DESC_WIDTH),
+        .FIFO_BUFFER_SIZE(DM_FIFO_Q)
+    ) u_desc_to_dm_fifo (
+        .reset  (reset),
+        .wr_clk (clk),
+        .wr_en  (dm_in_wr_en),
+        .din    (dm_in_din),
+        .full   (desc_full),
+        .rd_clk (clk),
+        .rd_en  (df_dm_in_rd_en),
+        .dout   (df_dm_in_dout),
+        .empty  (df_dm_in_empty)
+    );
+
+    data_mover #(
+        .ADDR_WIDTH      (ADDR_WIDTH),
+        .BURST_SIZE_WIDTH(DM_MOVER_BURST_W),
+        .DATA_WIDTH      (DATA_WIDTH),
+        .DESC_WORDS      (DESC_WORDS),
+        .DESC_WIDTH      (DESC_WIDTH)
+    ) u_data_mover (
+        .clock           (clk),
+        .reset           (reset),
+        .df_dm_in_rd_en  (df_dm_in_rd_en),
+        .df_dm_in_empty  (df_dm_in_empty),
+        .df_dm_in_dout   (df_dm_in_dout),
+        .dm_sram_out_wr_en(dm_sram_out_wr_en),
+        .dm_sram_out_full(dm_full_sram),
+        .dm_sram_out_din (dm_sram_out_din_wide),
+        .dm_axi_out_wr_en(dm_axi_out_wr_en),
+        .dm_axi_out_full(dm_full_axi),
+        .dm_axi_out_din  (dm_axi_out_din_wide)
+    );
+
+    fifo #(
+        .FIFO_DATA_WIDTH (DM_MOVER_INSTR_W),
         .FIFO_BUFFER_SIZE(DM_FIFO_Q)
     ) u_dm_fifo_axi (
         .reset  (reset),
         .wr_clk (clk),
-        .wr_en  (dm_in_wr_en),
-        .din    (dm_in_instr),
+        .wr_en  (dm_axi_out_wr_en),
+        .din    (dm_axi_out_din_wide),
         .full   (dm_full_axi),
         .rd_clk (clk),
         .rd_en  (dm_in_rd_en_axi),
-        .dout   (dm_in_dout_axi),
+        .dout   (dm_fifo_axi_dout_wide),
         .empty  (dm_in_empty_axi)
     );
 
     fifo #(
-        .FIFO_DATA_WIDTH (INSTR_WIDTH),
+        .FIFO_DATA_WIDTH (DM_MOVER_INSTR_W),
         .FIFO_BUFFER_SIZE(DM_FIFO_Q)
     ) u_dm_fifo_sram (
         .reset  (reset),
         .wr_clk (clk),
-        .wr_en  (dm_in_wr_en),
-        .din    (dm_in_instr),
+        .wr_en  (dm_sram_out_wr_en),
+        .din    (dm_sram_out_din_wide),
         .full   (dm_full_sram),
         .rd_clk (clk),
         .rd_en  (dm_in_rd_en_sram),
-        .dout   (dm_in_dout_sram),
+        .dout   (dm_fifo_sram_dout_wide),
         .empty  (dm_in_empty_sram)
     );
 
-    // Block DF push if either parallel DM FIFO is full
-    assign dm_in_full = dm_full_axi | dm_full_sram;
+    // Narrow 41b: {rw, len[7:0], addr} from 65b {rw, len32[31:0], addr}
+    assign dm_in_dout_axi  = {dm_fifo_axi_dout_wide[64], dm_fifo_axi_dout_wide[39:32],
+                                dm_fifo_axi_dout_wide[31:0]};
+    assign dm_in_dout_sram = {dm_fifo_sram_dout_wide[64], dm_fifo_sram_dout_wide[39:32],
+                                dm_fifo_sram_dout_wide[31:0]};
+
+    assign dm_in_full = desc_full;
 
     // mid: shared between AXI and SRAM (muxed write data / enables)
     wire mid_wr_en = mid_wr_en_axi | mid_wr_en_sram;
