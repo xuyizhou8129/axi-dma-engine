@@ -12,13 +12,15 @@
 // Stimulus flow
 //   1. Assert reset.
 //   2. model_sys_mem loads initial_smem.hex (via +MEMHEX= plusarg or default path).
+//      load_initial_sram() loads out/initial_sram.hex into dut BRAM (matches run_golden.py).
 //   3. load_stim() reads out/stim.txt and issues CSR writes through axil_write().
 //      Each line is either:
 //        csr_write <byte_offset_hex> <data_hex>
 //        (# comment — ignored)
 //   4. Wait up to TIMEOUT cycles for ring_empty status.
 //   5. check_mem()   — compare model_sys_mem.ram[] against out/golden_smem.hex
-//   6. check_irq()   — verify at least one irq_rm_empty pulse was observed
+//   6. check_sram()  — compare dut BRAM mem[] against out/golden_sram.hex (Python model)
+//   7. check_irq()   — verify at least one irq_rm_empty pulse was observed
 //
 // ============================================================================
 
@@ -28,6 +30,7 @@ module tb_dma_top;
     // Parameters
     // -----------------------------------------------------------------------
     localparam int  MEM_WORDS      = 1024;
+    localparam int  BRAM_WORDS     = dma_pkg::BRAM_SIZE;
     localparam int  CLK_HALF_NS    = 5;      // 100 MHz
     localparam int  TIMEOUT_CYCLES = 50_000;
     localparam int  RESET_CYCLES   = 8;
@@ -167,6 +170,14 @@ module tb_dma_top;
     endtask
 
     // -----------------------------------------------------------------------
+    // Preload BRAM from initial_sram.hex (same image Python uses at DMA start)
+    // -----------------------------------------------------------------------
+    task automatic load_initial_sram();
+        $readmemh("out/initial_sram.hex", dut.u_movement.u_bram.mem);
+        $display("TB: loaded out/initial_sram.hex into BRAM (%0d words)", BRAM_WORDS);
+    endtask
+
+    // -----------------------------------------------------------------------
     // Checker: system memory vs golden_smem.hex
     // -----------------------------------------------------------------------
     task automatic check_mem();
@@ -184,6 +195,26 @@ module tb_dma_top;
         if (mism != 0)
             $fatal(1, "check_mem: %0d mismatche(s)", mism);
         $display("TB: check_mem PASS (%0d words compared)", MEM_WORDS);
+    endtask
+
+    // -----------------------------------------------------------------------
+    // Checker: BRAM (movement_top u_bram) vs golden_sram.hex
+    // -----------------------------------------------------------------------
+    task automatic check_sram();
+        logic [31:0] golden[0:BRAM_WORDS-1];
+        int i, mism;
+        mism = 0;
+        $readmemh("out/golden_sram.hex", golden);
+        for (i = 0; i < BRAM_WORDS; i = i + 1) begin
+            if (golden[i] !== dut.u_movement.u_bram.mem[i]) begin
+                $display("SRAM mismatch @word%0d: got %08x  exp %08x",
+                         i, dut.u_movement.u_bram.mem[i], golden[i]);
+                mism = mism + 1;
+            end
+        end
+        if (mism != 0)
+            $fatal(1, "check_sram: %0d mismatch(es)", mism);
+        $display("TB: check_sram PASS (%0d words compared)", BRAM_WORDS);
     endtask
 
     // -----------------------------------------------------------------------
@@ -248,6 +279,9 @@ module tb_dma_top;
         // Give model_sys_mem one cycle to set ram_preloaded
         repeat (4) @(posedge clk);
 
+        // Match Python SRAM image before DMA (zeros + any CSV "sram" rows)
+        load_initial_sram();
+
         // Apply CSR setup from golden runner (baseaddr, ringlen, tail, ctrl.enable)
         load_stim("out/stim.txt");
 
@@ -259,6 +293,9 @@ module tb_dma_top;
 
         // Compare system memory against golden
         check_mem();
+
+        // Compare on-chip BRAM against Python golden model
+        check_sram();
 
         // Verify completion IRQ fired
         check_irq();
