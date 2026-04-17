@@ -103,32 +103,27 @@ module data_mover #(
                 end
                 end
 
+            // Descriptor layout (docs/descriptor_struct.md):
+            // [31:0]=SRC_ADDR, [63:32]=DST_ADDR, [95:64]=LEN, [127:96]=FLAGS; DIR=FLAGS[0]=input_data[96]
+            // DIR=1: system memory -> SRAM (AXI read, SRAM write)
+            // DIR=0: SRAM -> system memory (AXI write, SRAM read)
             DECODE: begin
 
                 if (input_data[96]) begin
-                    // insutruction address
-                    instr_axi_next[31:0] = input_data[31:0];// src_addr , read = true, is sram = False
-                    instr_sram_next[31:0] = input_data[63:32];// dest addr,
-
-                    // length
-                    instr_axi_next[63:32] = input_data[95:64];
+                    instr_axi_next[31:0]   = input_data[31:0];   // SRC (byte addr)
+                    instr_sram_next[31:0]  = input_data[63:32];  // DST (byte addr)
+                    instr_axi_next[63:32]  = input_data[95:64];
                     instr_sram_next[63:32] = input_data[95:64];
-
-                    // read and write
-                    instr_axi_next[64] = 1'b1;
-                    instr_sram_next[64] = 1'b0;
+                    instr_axi_next[64]     = 1'b0;               // read system memory
+                    instr_sram_next[64]    = 1'b1;               // write SRAM
                 end
                 else begin
-                    instr_axi_next[31:0] = input_data[63:32];
-                    instr_sram_next[31:0] = input_data[31:0];
-
-                    // length
-                    instr_axi_next[63:32] = input_data[95:64];
+                    instr_axi_next[31:0]   = input_data[63:32];  // DST (byte addr)
+                    instr_sram_next[31:0]  = input_data[31:0];  // SRC (byte addr)
+                    instr_axi_next[63:32]  = input_data[95:64];
                     instr_sram_next[63:32] = input_data[95:64];
-
-                    // read and write
-                    instr_axi_next[64] = 1'b0;
-                    instr_sram_next[64] = 1'b1;
+                    instr_axi_next[64]     = 1'b1;               // write system memory
+                    instr_sram_next[64]    = 1'b0;               // read SRAM
                 end
                 next_state = SEND_INSTR;
 

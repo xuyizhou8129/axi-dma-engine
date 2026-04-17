@@ -1,5 +1,8 @@
 """
 Descriptor: four 32-bit words packed LSB-first into a 128-bit int (matches Verilog +: order).
+
+Memory layout matches docs/descriptor_struct.md:
+  word0 = SRC_ADDR, word1 = DST_ADDR, word2 = LEN, word3 = FLAGS (DIR = FLAGS[0]).
 """
 
 DESC_WORDS = 4

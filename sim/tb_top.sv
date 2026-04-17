@@ -171,10 +171,16 @@ module tb_dma_top;
 
     // -----------------------------------------------------------------------
     // Preload BRAM from initial_sram.hex (same image Python uses at DMA start)
+    //
+    // Note: $readmemh(dut....mem) into a hierarchical 2-D array often does NOT
+    // load in Questa/ModelSim (mem stays X). Load a flat TB array then copy.
     // -----------------------------------------------------------------------
     task automatic load_initial_sram();
-        $readmemh("out/initial_sram.hex", dut.u_movement.u_bram.mem);
-        $display("TB: loaded out/initial_sram.hex into BRAM (%0d words)", BRAM_WORDS);
+        logic [31:0] sram_init [0:BRAM_WORDS-1];
+        int i;
+        $readmemh("out/initial_sram.hex", sram_init);
+        for (i = 0; i < BRAM_WORDS; i = i + 1)
+            dut.u_movement.u_bram.mem[i] = sram_init[i];
     endtask
 
     // -----------------------------------------------------------------------

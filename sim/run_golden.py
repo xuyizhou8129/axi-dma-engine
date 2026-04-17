@@ -11,7 +11,7 @@ CSV row format  (op, arg1, arg2, arg3, arg4):
   sram,<word_idx>,<hex_data>                  preload SRAM/BRAM word    (decimal index)
   csr_baseaddr,<hex_addr>                     configure REG_BASEADDR
   csr_ringlen,<decimal_len>                   configure REG_RINGLEN
-  desc,<w0_hex>,<w1_hex>,<w2_hex>,<w3_hex>   enqueue descriptor (writes sys mem + advances tail)
+  desc,<src>,<dst>,<len>,<flags>             enqueue descriptor (SRC/DST/LEN/FLAGS per docs/descriptor_struct.md)
   enable                                      assert CTRL.ENABLE and start the model event loop
 
 Artifacts written to out_dir/:
@@ -23,11 +23,10 @@ Artifacts written to out_dir/:
   stim.txt           CSR write commands for tb_top.sv  (csr_write <byte_offset> <hex_data>)
   summary.txt        statistics
 
-DM path note:
-  Both axi_4_master and sram_controller receive the same 41-bit instruction extracted
-  from descriptor bits [40:0], mirroring movement_top.sv.  With rw=0 both read into MID.
-  With rw=1 both write from MID.  This matches RTL behaviour at the cost of MID containing
-  data from both sources for rw=0 operations.
+Descriptor layout (docs/descriptor_struct.md):
+  w0=SRC_ADDR, w1=DST_ADDR, w2=LEN, w3=FLAGS; DIR=FLAGS[0]. DIR=1 => system mem -> SRAM.
+  The golden builds two 65-bit DM words like rtl/data_mover.sv, then narrows to 41 bits
+  like rtl/movement_top.sv for dm_axi and dm_sram separately.
 
 Usage:
   python3 run_golden.py scenarios/example.csv [out_dir]
@@ -77,12 +76,38 @@ def _parse_row(row):
     return raw.lower(), [c.strip() for c in row[1:]]
 
 
-def _desc_to_instr(desc):
-    """Extract the 41-bit DM instruction from a Descriptor (matches movement_top.sv)."""
-    addr     = desc.w0 & 0xFFFFFFFF
-    len_bits = (desc.w1 & 0xFF)            # beats = w1[7:0]
-    rw_bit   = (desc.w1 >> 8) & 1          # rw    = w1[8]
-    return addr | (len_bits << _LEN_LSB) | (rw_bit << _RW_BIT)
+def _build_65(addr, len32, rw):
+    """65-bit DM word before movement_top narrow: {rw, len32, addr}."""
+    return (addr & 0xFFFFFFFF) | ((len32 & 0xFFFFFFFF) << 32) | ((rw & 1) << 64)
+
+
+def _narrow65_to_41(w65):
+    """Match rtl/movement_top.sv: 65 -> 41 using len[7:0] from len32."""
+    return (
+        (w65 & 0xFFFFFFFF)
+        | (((w65 >> 32) & 0xFF) << _LEN_LSB)
+        | (((w65 >> 64) & 1) << _RW_BIT)
+    )
+
+
+def _desc_to_instr_pair(desc):
+    """
+    Build (instr_axi_41, instr_sram_41) from descriptor (docs/descriptor_struct.md),
+    matching rtl/data_mover.sv + movement_top narrow.
+    """
+    src = desc.w0 & 0xFFFFFFFF
+    dst = desc.w1 & 0xFFFFFFFF
+    len32 = desc.w2 & 0xFFFFFFFF
+    dir_bit = desc.w3 & 1
+    if dir_bit:
+        # System memory -> SRAM
+        axi65 = _build_65(src, len32, 0)
+        sram65 = _build_65(dst, len32, 1)
+    else:
+        # SRAM -> system memory
+        axi65 = _build_65(dst, len32, 1)
+        sram65 = _build_65(src, len32, 0)
+    return _narrow65_to_41(axi65), _narrow65_to_41(sram65)
 
 
 # -------------------------------------------------------------------------
@@ -186,10 +211,10 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             break
         descs_fetched.append(desc.pack())
 
-        # 2. descriptor_fetcher.sv passes descriptor[40:0] to BOTH dm FIFOs
-        instr = _desc_to_instr(desc)
-        dm_axi.enqueue(instr)
-        dm_sram.enqueue(instr)
+        # 2. data_mover produces two DM instructions (AXI path vs SRAM path)
+        instr_axi, instr_sram = _desc_to_instr_pair(desc)
+        dm_axi.enqueue(instr_axi)
+        dm_sram.enqueue(instr_sram)
 
         # 3. Drain AXI DM path (df_in is empty so process_one handles dm path)
         steps = 0
@@ -198,7 +223,7 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
                 break
             steps += 1
             if steps > 512:
-                raise RuntimeError("AXI golden DM path stalled (instr=%#011x)" % instr)
+                raise RuntimeError("AXI golden DM path stalled (instr=%#011x)" % instr_axi)
 
         # 4. Drain SRAM controller DM path
         steps = 0
@@ -207,7 +232,7 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
                 break
             steps += 1
             if steps > 512:
-                raise RuntimeError("SRAM controller DM path stalled (instr=%#011x)" % instr)
+                raise RuntimeError("SRAM controller DM path stalled (instr=%#011x)" % instr_sram)
 
         # 5. Advance head (mirrors as_done → ring_manager head increment)
         ring.complete()

@@ -7,7 +7,7 @@ package dma_pkg;
     parameter int ADDR_WIDTH    = 32;
     parameter int DATA_WIDTH    = 32;
     parameter int LEN_WIDTH     = 8;
-    parameter int DESC_WORDS    = 4;
+    parameter int DESC_WORDS    = 4;  // 16 bytes; layout docs/descriptor_struct.md
     parameter int HANDLE_WIDTH  = 40;  // [31:0] addr, [39:32] len (beats)
     parameter int INSTR_WIDTH = 41;  // [31:0] addr, [39:32] len, [40] rw
 

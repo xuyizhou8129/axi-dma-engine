@@ -1,0 +1,9 @@
+Add those as comments in the csv files:
+Where does the descriptor ring start in system memory,
+how many descriptors are there,
+and what does each descriptor mean: move (how many) data starting from (what address) in (system memmory/sram) to
+(system memmory/sram) at (what address)
+
+Scenarios live under sim/scenarios/*.csv — each file should open with a "Scenario summary" comment block covering the above.
+
+Descriptor field order (SRC, DST, LEN, FLAGS) is defined in docs/descriptor_struct.md; CSV desc rows must match that layout.

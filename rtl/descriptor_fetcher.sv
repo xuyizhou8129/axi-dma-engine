@@ -63,9 +63,21 @@ module descriptor_fetcher #(
     //Internal flag to stop receiving from ring manager
     logic df_error_c;
 
-    // 33-bit end-address check to prevent 32-bit wrap-around false negatives
+    // docs/descriptor_struct.md: w0=SRC, w1=DST, w2=LEN, w3=FLAGS; DIR=w3[0] = df_out_dout[96]
+    // Bounds-check the SRAM side: word index = byte_addr >> 2; last word = base_word + LEN[7:0] - 1
+    logic        dir_sys_to_sram;
+    logic [31:0] sram_byte_addr;
+    logic [31:0] sram_word_idx;
+    logic [7:0]  len_beats;
     logic [32:0] desc_end_addr;
-    assign desc_end_addr = {1'b0, df_out_dout[31:0]} + ({1'b0, df_out_dout[39:32]} << 2);
+
+    assign dir_sys_to_sram = df_out_dout[96];
+    assign sram_byte_addr  = dir_sys_to_sram ? df_out_dout[63:32] : df_out_dout[31:0];
+    assign sram_word_idx   = sram_byte_addr >> 2;
+    assign len_beats       = df_out_dout[71:64];  // LEN[7:0]
+    assign desc_end_addr   = (len_beats == 8'd0)
+        ? {1'b0, sram_word_idx}
+        : ({1'b0, sram_word_idx} + {1'b0, len_beats} - 33'd1);
 
 typedef enum logic [1:0] {
     s_error,
