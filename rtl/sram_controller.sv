@@ -77,7 +77,9 @@ module sram_controller #(
         end
     end
 
-    assign write_addr = cur_addr[BRAM_ADDR_WIDTH-1:0];
+    // Descriptor/SRAM instruction addresses are byte addresses.
+    // BRAM is word-addressed, so convert byte -> word index.
+    assign write_addr = cur_addr[BRAM_ADDR_WIDTH+1:2];
     
     // State machine logic
     always_comb begin
@@ -113,8 +115,8 @@ module sram_controller #(
                 end else begin
                     // Pre-fetch: present first read address so BRAM dout is ready on first s_reading cycle
                     state_c    = s_reading;
-                    read_addr  = dm_in_dout[31:0];
-                    cur_addr_c = dm_in_dout[31:0] + 1'b1;
+                    read_addr  = dm_in_dout[BRAM_ADDR_WIDTH+1:2];
+                    cur_addr_c = dm_in_dout[31:0] + 32'd4;
                     beat_idx_c = '0;
                 end
 
@@ -124,7 +126,7 @@ module sram_controller #(
                     mid_rd_en  = 1'b1;
                     wr_en      = 1'b1;
                     din        = mid_dout[BRAM_DATA_WIDTH-1:0];
-                    cur_addr_c = cur_addr + 1'b1;
+                    cur_addr_c = cur_addr + 32'd4;
                     beat_idx_c = beat_idx + 1'b1;
                     
                     if (beat_idx == (cur_len - 1'b1) || cur_len == '0) begin
@@ -136,9 +138,9 @@ module sram_controller #(
                 if (!mid_full) begin
                     mid_wr_en  = 1'b1;
                     mid_din    = {{(DATA_WIDTH-BRAM_DATA_WIDTH){1'b0}}, dout};
-                    cur_addr_c = cur_addr + 1'b1;
+                    cur_addr_c = cur_addr + 32'd4;
                     beat_idx_c = beat_idx + 1'b1;
-                    read_addr  = cur_addr;
+                    read_addr  = cur_addr[BRAM_ADDR_WIDTH+1:2];
 
                     if (beat_idx == (cur_len - 1'b1) || cur_len == '0) begin
                         state_c = s_wait_axi4master;

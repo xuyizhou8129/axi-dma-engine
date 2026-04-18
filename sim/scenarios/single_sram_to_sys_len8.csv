@@ -1,0 +1,21 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary
+# Ring start in system memory: 0x00000000
+# Ring length: 4 descriptor slots
+# Number of descriptors: 1
+# Descriptor 0: move 8 beats from SRAM (0x00000200) to system memory (0x00000280)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000200,00000280,00000008,00000000
+# =============================================================================
+sram,128,20000001,,
+sram,129,20000002,,
+sram,130,20000003,,
+sram,131,20000004,,
+sram,132,20000005,,
+sram,133,20000006,,
+sram,134,20000007,,
+sram,135,20000008,,
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+desc,00000200,00000280,00000008,00000000
+enable,,,,

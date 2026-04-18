@@ -1,9 +1,58 @@
-Add those as comments in the csv files:
-Where does the descriptor ring start in system memory,
-how many descriptors are there,
-and what does each descriptor mean: move (how many) data starting from (what address) in (system memmory/sram) to
-(system memmory/sram) at (what address)
+DMA testcase authoring guide
 
-Scenarios live under sim/scenarios/*.csv — each file should open with a "Scenario summary" comment block covering the above.
+All top-level scenarios live under sim/scenarios/*.csv and must follow this format:
 
-Descriptor field order (SRC, DST, LEN, FLAGS) is defined in docs/descriptor_struct.md; CSV desc rows must match that layout.
+1) Start every file with this header row:
+op,arg1,arg2,arg3,arg4
+
+2) Add a Scenario summary comment block at the top of each file.
+The summary must answer all of these:
+- Where does the descriptor ring start in system memory?
+- How many descriptor slots are configured (ring length)?
+- How many descriptors are used in this scenario?
+- For each descriptor: move how many beats, from which address, from which memory space, to which address, to which memory space?
+
+3) Use descriptor row field order exactly as defined in docs/descriptor_struct.md:
+desc,SRC,DST,LEN,FLAGS
+
+Descriptor semantics:
+- SRC and DST are byte addresses (hex).
+- LEN is beat count (hex). The RTL uses LEN[7:0].
+- FLAGS bit0 is DIR:
+	- DIR=1: system memory -> SRAM
+	- DIR=0: SRAM -> system memory
+
+Allowed CSV operations:
+- smem,<word_idx_decimal>,<word_hex>
+- sram,<word_idx_decimal>,<word_hex>
+- csr_baseaddr,<hex_addr>
+- csr_ringlen,<decimal_len>
+- desc,<src_hex>,<dst_hex>,<len_hex>,<flags_hex>
+- enable
+
+Minimal scenario template:
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary
+# Ring start in system memory: 0x00000000
+# Ring length: 4 descriptor slots
+# Number of descriptors: 1
+# Descriptor 0: move 4 beats from system memory (0x00000100) to SRAM (0x00000140)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000100,00000140,00000004,00000001
+# =============================================================================
+smem,64,aabbccdd,,
+smem,65,11223344,,
+smem,66,deadbeef,,
+smem,67,cafecafe,,
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+desc,00000100,00000140,00000004,00000001
+enable,,,,
+
+Checklist before running a scenario:
+- Descriptor rows match desc,SRC,DST,LEN,FLAGS layout.
+- Memory preload rows cover all source beats used by descriptors.
+- Ring length is non-zero and large enough for descriptor count.
+- Scenario summary reflects actual row values in the file.
+
+

@@ -12,7 +12,8 @@
 // If the instruction is a write instruction:
 // 1.1 Keep checking the MID_FIFO, if it is not empty, then send the data to the interface
 //
-// NOTES: After each burst, FSM enters s_wait_sram until input sram_done is high (SRAM controller finished).
+// NOTES: DM bursts enter s_wait_sram until sram_done is high (SRAM controller finished).
+// Descriptor fetch bursts return directly to idle after pushing descriptor payload.
 module axi_4_master #(
     parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH,
     parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH,
@@ -172,7 +173,7 @@ module axi_4_master #(
                 if (df_out_full == 1'b0) begin
                     df_out_wr_en = 1'b1;
                     df_out_din   = desc_buf;
-                    state_c      = s_wait_sram;
+                    state_c      = s_idle;
                 end
             end
 

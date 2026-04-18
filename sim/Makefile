@@ -6,11 +6,13 @@
 
 PYTHON         ?= python3
 OUT_DIR        ?= out
+SCENARIO       ?= scenarios/example.csv
 SIM_DIR        := $(CURDIR)
 MODELSIM_ENV   ?= /vol/eecs392/env/modelsim.env
 MODELSIM_SHELL ?= tcsh
 VSIM           ?= vsim
 VSIM_DO        := dma_sim.do
+TRANSCRIPT     ?= transcript
 
 GUI_FIX ?= 1
 ifeq ($(GUI_FIX),1)
@@ -19,11 +21,11 @@ else
 GUI_FIX_TCSH :=
 endif
 
-.PHONY: golden sim sim-gui clean
+.PHONY: golden sim sim-gui verify clean
 
 # Generate golden reference files from the Python model
 golden:
-	$(PYTHON) run_golden.py scenarios/example.csv $(OUT_DIR)
+	$(PYTHON) run_golden.py $(SCENARIO) $(OUT_DIR)
 
 # Batch simulation (no GUI)
 sim: golden
@@ -47,6 +49,20 @@ else
 	bash -lc 'cd "$(SIM_DIR)" && $(VSIM) -do $(VSIM_DO)'
 endif
 endif
+
+# Batch simulation with transcript verification checks
+verify: sim
+	@echo "Checking simulation transcript: $(TRANSCRIPT)"
+	@grep -q "TB: ring empty after" $(TRANSCRIPT)
+	@grep -q "TB: check_mem PASS" $(TRANSCRIPT)
+	@grep -q "TB: check_sram PASS" $(TRANSCRIPT)
+	@grep -q "TB: check_irq PASS" $(TRANSCRIPT)
+	@grep -q "\*\*\* TB PASS \*\*\*" $(TRANSCRIPT)
+	@if grep -Eiq "mismatch|fatal|timed out" $(TRANSCRIPT); then \
+		echo "Verification FAILED: found mismatch/fatal/timeout in $(TRANSCRIPT)"; \
+		exit 1; \
+	fi
+	@echo "Verification PASS for SCENARIO=$(SCENARIO)"
 
 clean:
 	rm -f transcript vsim.wlf

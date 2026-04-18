@@ -1,0 +1,19 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary
+# Ring start in system memory: 0x00000000
+# Ring length: 4 descriptor slots
+# Number of descriptors: 2
+# Descriptor 0: system memory -> SRAM, 4 beats, SRC 0x00000300, DST 0x00000100
+# Descriptor 1: SRAM -> system memory, 4 beats, SRC 0x00000100, DST 0x00000380
+# This validates back-to-back completion and mixed direction handling.
+# =============================================================================
+smem,192,30000001,,
+smem,193,30000002,,
+smem,194,30000003,,
+smem,195,30000004,,
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+desc,00000300,00000100,00000004,00000001
+desc,00000100,00000380,00000004,00000000
+enable,,,,
