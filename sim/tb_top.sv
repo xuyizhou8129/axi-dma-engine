@@ -144,9 +144,9 @@ module tb_dma_top;
     // Stimulus loader — parses out/stim.txt
     // -----------------------------------------------------------------------
     task automatic load_stim(input string path);
-        int    fh;
-        int    n;
-        logic [31:0] csr_addr, csr_data;
+        int     fh;
+        int     n;
+        integer csr_addr, csr_data;   // integer required for $sscanf %x in Questa
         reg [2047:0] line;
 
         fh = $fopen(path, "r");
@@ -158,10 +158,11 @@ module tb_dma_top;
         n = 0;
         while (!$feof(fh)) begin
             if ($fgets(line, fh) == 0) continue;
-            if (line[7:0] == 8'h0A) continue;   // blank
-            if (line[7:0] == 8'h23) continue;   // '#'
+            // $fgets into reg[N:0] stores string MSB-first; first char is at line[2047:2040]
+            if (line[2047:2040] == 8'h0A) continue;   // blank
+            if (line[2047:2040] == 8'h23) continue;   // '#'
             if ($sscanf(line, "csr_write %x %x", csr_addr, csr_data) == 2) begin
-                axil_write(csr_addr, csr_data);
+                axil_write(csr_addr[31:0], csr_data[31:0]);
                 n = n + 1;
             end
         end
