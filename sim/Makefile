@@ -6,6 +6,7 @@
 
 PYTHON         ?= python3
 OUT_DIR        ?= out
+SCENARIO       ?= scenarios/example.csv
 SIM_DIR        := $(CURDIR)
 MODELSIM_ENV   ?= /vol/eecs392/env/modelsim.env
 MODELSIM_SHELL ?= tcsh
@@ -23,7 +24,7 @@ endif
 
 # Generate golden reference files from the Python model
 golden:
-	$(PYTHON) run_golden.py scenarios/example.csv $(OUT_DIR)
+	$(PYTHON) run_golden.py $(SCENARIO) $(OUT_DIR)
 
 # Batch simulation (no GUI)
 sim: golden
