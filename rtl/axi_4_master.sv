@@ -172,7 +172,7 @@ module axi_4_master #(
                 if (df_out_full == 1'b0) begin
                     df_out_wr_en = 1'b1;
                     df_out_din   = desc_buf;
-                    state_c      = s_wait_sram;
+                    state_c      = s_idle;
                 end
             end
 

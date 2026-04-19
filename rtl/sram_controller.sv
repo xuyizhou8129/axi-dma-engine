@@ -103,18 +103,18 @@ module sram_controller #(
             end
             s_dm_get: begin
                 dm_in_rd_en = 1'b1;
-                cur_addr_c  = dm_in_dout[31:0];
+                cur_addr_c  = {2'b0, dm_in_dout[31:2]};  // byte addr → word addr (>> 2)
                 cur_len_c   = dm_in_dout[39:32];
                 cur_write_c = dm_in_dout[40];
                 beat_idx_c  = '0;
-                
+
                 if (dm_in_dout[40] == 1'b1) begin
                     state_c = s_writing;
                 end else begin
                     // Pre-fetch: present first read address so BRAM dout is ready on first s_reading cycle
                     state_c    = s_reading;
-                    read_addr  = dm_in_dout[31:0];
-                    cur_addr_c = dm_in_dout[31:0] + 1'b1;
+                    read_addr  = dm_in_dout[31:2];
+                    cur_addr_c = {2'b0, dm_in_dout[31:2]} + 1'b1;
                     beat_idx_c = '0;
                 end
 
