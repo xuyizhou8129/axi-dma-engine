@@ -1,0 +1,18 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary
+# Ring start in system memory: 0x00000000
+# Ring length: 4 descriptor slots
+# Number of descriptors: 1
+# Descriptor 0: system memory -> SRAM near upper bound, 4 beats
+#   SRC 0x00000400 -> DST 0x0003FFF0, LEN 4, DIR=1
+# This stays in range if SRAM byte address limit is 0x0003FFFF and catches boundary bugs.
+# =============================================================================
+smem,256,c0000001,,
+smem,257,c0000002,,
+smem,258,c0000003,,
+smem,259,c0000004,,
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+desc,00000400,0003fff0,00000004,00000001
+enable,,,,

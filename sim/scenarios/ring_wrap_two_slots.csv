@@ -1,0 +1,18 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary
+# Ring start in system memory: 0x00000000
+# Ring length: 2 descriptor slots (forces tail wrap during enqueue)
+# Number of descriptors: 2
+# Descriptor 0: system memory -> SRAM, 2 beats, SRC 0x00000100, DST 0x00000240
+# Descriptor 1: system memory -> SRAM, 2 beats, SRC 0x00000120, DST 0x00000260
+# =============================================================================
+smem,64,aa000001,,
+smem,65,aa000002,,
+smem,72,bb000001,,
+smem,73,bb000002,,
+csr_baseaddr,00000000,,
+csr_ringlen,2,,
+desc,00000100,00000240,00000002,00000001
+desc,00000120,00000260,00000002,00000001
+enable,,,,
