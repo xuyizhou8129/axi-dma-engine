@@ -1,0 +1,26 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Reverse direction: SRAM -> system memory
+#
+# Pre-load SRAM word 64 with 4 words of data.
+# Descriptor moves them to system memory word 64.
+#
+# SRC_ADDR = 0x00000100 (byte) = SRAM word 64
+# DST_ADDR = 0x00000100 (byte) = sys mem word 64
+# LEN      = 4 beats
+# FLAGS    = 0x00000000 (DIR=0: SRAM -> system memory)
+# =============================================================================
+
+# --- Source data in SRAM ---
+sram,64,aabbccdd,,
+sram,65,11223344,,
+sram,66,deadbeef,,
+sram,67,cafecafe,,
+
+# --- Configure ring ---
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+
+desc,00000100,00000100,00000004,00000000
+
+enable,,,,

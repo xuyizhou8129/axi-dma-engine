@@ -182,7 +182,7 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             stim_lines.append("csr_write %02x %08x" % (csr.REG_TAIL, tail))
 
         elif op == "enable":
-            ctrl = csr.read(csr.REG_CTRL) | (1 << CSR.ENABLE_BIT)
+            ctrl = csr.read(csr.REG_CTRL) | (1 << CSR.ENABLE_BIT) | (1 << CSR.IRQ_EN_BIT)
             csr.write(csr.REG_CTRL, ctrl)
             stim_lines.append("csr_write %02x %08x" % (csr.REG_CTRL, ctrl))
 

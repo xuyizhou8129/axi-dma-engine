@@ -244,7 +244,7 @@ module tb_dma_top;
         cycles = 0;
         forever begin
             axil_read(CSR_STATUS, status);
-            if (status[RING_EMPTY_BIT]) break;
+            if (status[RING_EMPTY_BIT] && !status[0]) break;  // ring empty AND not busy (all in-flight done)
             @(posedge clk);
             cycles = cycles + 1;
             if (cycles >= TIMEOUT_CYCLES)

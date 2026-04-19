@@ -62,7 +62,7 @@ module ring_manager #(
 
         // Head pointer logic
         head_ptr_next = csr_rm.head;
-        if (as_done && !csr_rm.ring_empty) begin
+        if (fetch_req_valid && fetch_req_ready) begin
             if (csr_rm.head == (csr_rm.ringlen - 1))
                 head_ptr_next = '0;
             else
