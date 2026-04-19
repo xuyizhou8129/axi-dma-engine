@@ -6,9 +6,9 @@ op,arg1,arg2,arg3,arg4
 # Ring length: 4 descriptor slots
 # Number of descriptors: 1
 #
-# Descriptor 0: move 4 beats from system memory (0x00000400) to SRAM (0x0003FFF0)
-#   desc,SRC,DST,LEN,FLAGS = desc,00000400,0003fff0,00000004,00000001
-#   (DIR=1; DST near upper SRAM — valid if BRAM byte space covers 0x0003FFF0..0x0003FFFF)
+# Descriptor 0: move 4 beats from system memory (0x00000400) to SRAM (0x00000FF0)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000400,00000ff0,00000004,00000001
+#   (DIR=1; BRAM_SIZE=1024 words — last aligned 4-beat block: words 1020..1023, byte 0xFF0)
 # =============================================================================
 smem,256,c0000001,,
 smem,257,c0000002,,
@@ -16,5 +16,5 @@ smem,258,c0000003,,
 smem,259,c0000004,,
 csr_baseaddr,00000000,,
 csr_ringlen,4,,
-desc,00000400,0003fff0,00000004,00000001
+desc,00000400,00000ff0,00000004,00000001
 enable,,,,
