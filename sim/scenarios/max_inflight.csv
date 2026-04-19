@@ -1,0 +1,48 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Max inflight: 4 descriptors queued simultaneously (MAX_INFLIGHT = 4)
+#
+# The ring manager dispatches all 4 before any completes, driving
+# inflight_count to its maximum of 4.
+#
+# Descriptor ring lives at baseaddr=0x0 in sys mem:
+#   slot 0: bytes 0x00-0x0F   slot 1: bytes 0x10-0x1F
+#   slot 2: bytes 0x20-0x2F   slot 3: bytes 0x30-0x3F
+#   slot 4: bytes 0x40-0x4F   (empty slot required: ringlen=5, tail=4)
+#
+# Data sources start at 0x100, well above the descriptor ring.
+# Each descriptor moves 4 words sys mem -> SRAM at matching addresses.
+# =============================================================================
+
+# --- Source data in system memory ---
+smem,64,aabbccdd,,
+smem,65,11223344,,
+smem,66,deadbeef,,
+smem,67,cafecafe,,
+
+smem,128,12345678,,
+smem,129,9abcdef0,,
+smem,130,13579bdf,,
+smem,131,2468ace0,,
+
+smem,192,aaaaaaaa,,
+smem,193,bbbbbbbb,,
+smem,194,cccccccc,,
+smem,195,dddddddd,,
+
+smem,256,11111111,,
+smem,257,22222222,,
+smem,258,33333333,,
+smem,259,44444444,,
+
+# --- Configure ring: 5 slots to hold 4 descriptors (tail=4, ringlen=5) ---
+csr_baseaddr,00000000,,
+csr_ringlen,5,,
+
+# 4 descriptors, all sys -> SRAM
+desc,00000100,00000100,00000004,00000001
+desc,00000200,00000200,00000004,00000001
+desc,00000300,00000300,00000004,00000001
+desc,00000400,00000400,00000004,00000001
+
+enable,,,,
