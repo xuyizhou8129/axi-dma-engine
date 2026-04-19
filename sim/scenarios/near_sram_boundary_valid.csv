@@ -1,12 +1,14 @@
 op,arg1,arg2,arg3,arg4
 # =============================================================================
-# Scenario summary
+# Scenario summary (see sim/testcases_instruction.txt)
+#
 # Ring start in system memory: 0x00000000
 # Ring length: 4 descriptor slots
 # Number of descriptors: 1
-# Descriptor 0: system memory -> SRAM near upper bound, 4 beats
-#   SRC 0x00000400 -> DST 0x0003FFF0, LEN 4, DIR=1
-# This stays in range if SRAM byte address limit is 0x0003FFFF and catches boundary bugs.
+#
+# Descriptor 0: move 4 beats from system memory (0x00000400) to SRAM (0x0003FFF0)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000400,0003fff0,00000004,00000001
+#   (DIR=1; DST near upper SRAM — valid if BRAM byte space covers 0x0003FFF0..0x0003FFFF)
 # =============================================================================
 smem,256,c0000001,,
 smem,257,c0000002,,

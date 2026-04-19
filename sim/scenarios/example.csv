@@ -2,19 +2,13 @@ op,arg1,arg2,arg3,arg4
 # =============================================================================
 # Scenario summary (see sim/testcases_instruction.txt)
 #
-# Descriptor ring in system memory:
-#   Ring starts at byte address 0x00000000 (REG_BASEADDR from csr_baseaddr below).
-#   Each descriptor is 16 bytes (4 words). Ring length is 4 words (one slot for this test).
+# Ring start in system memory: 0x00000000 (csr_baseaddr below)
+# Ring length: 4 descriptor slots (16 bytes per descriptor in the ring buffer)
+# Number of descriptors: 1
 #
-# Number of descriptors in this scenario: 1
-#
-# Descriptor 0 (docs/descriptor_struct.md):
-#   SRC_ADDR = 0x00000100  (byte) — system memory words 64..67
-#   DST_ADDR = 0x00000100  (byte) — SRAM word indices 64..67 (byte >> 2)
-#   LEN      = 4             (beats; low 8 bits of LEN word)
-#   FLAGS    = 0x00000001   (DIR=1: system memory → SRAM)
-#
-# Effect: move 4 words from system memory at 0x100 to on-chip SRAM at 0x100.
+# Descriptor 0: move 4 beats from system memory (0x00000100) to SRAM (0x00000100)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000100,00000100,00000004,00000001
+#   (DIR=1; LEN low 8 bits = beat count; addresses are byte-aligned per descriptor_struct.md)
 # =============================================================================
 
 # --- Data region that the AXI master will read during the DM phase ---

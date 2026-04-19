@@ -1,12 +1,16 @@
 op,arg1,arg2,arg3,arg4
 # =============================================================================
-# Scenario summary
+# Scenario summary (see sim/testcases_instruction.txt)
+#
 # Ring start in system memory: 0x00000000
 # Ring length: 4 descriptor slots
 # Number of descriptors: 2
-# Descriptor 0: system memory -> SRAM, 4 beats, SRC 0x00000300, DST 0x00000100
-# Descriptor 1: SRAM -> system memory, 4 beats, SRC 0x00000100, DST 0x00000380
-# This validates back-to-back completion and mixed direction handling.
+#
+# Descriptor 0: move 4 beats from system memory (0x00000300) to SRAM (0x00000100)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000300,00000100,00000004,00000001
+# Descriptor 1: move 4 beats from SRAM (0x00000100) to system memory (0x00000380)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000100,00000380,00000004,00000000
+#   (Descriptor 0 fills SRAM at DST before descriptor 1 reads that region.)
 # =============================================================================
 smem,192,30000001,,
 smem,193,30000002,,
