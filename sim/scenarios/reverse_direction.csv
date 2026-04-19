@@ -1,14 +1,21 @@
 op,arg1,arg2,arg3,arg4
 # =============================================================================
-# Reverse direction: SRAM -> system memory
+# Scenario summary (see sim/testcases_instruction.txt)
 #
-# Pre-load SRAM word 64 with 4 words of data.
-# Descriptor moves them to system memory word 64.
+# Descriptor ring in system memory:
+#   Ring starts at byte address 0x00000000 (REG_BASEADDR from csr_baseaddr below).
+#   Each descriptor is 16 bytes (4 words). RINGLEN = 4 descriptor slots.
 #
-# SRC_ADDR = 0x00000100 (byte) = SRAM word 64
-# DST_ADDR = 0x00000100 (byte) = sys mem word 64
-# LEN      = 4 beats
-# FLAGS    = 0x00000000 (DIR=0: SRAM -> system memory)
+# Number of descriptors in this scenario: 1
+#
+# Descriptor 0 (docs/descriptor_struct.md):
+#   SRC_ADDR = 0x00000100  (byte) — on-chip SRAM, word indices 64..67 (byte >> 2)
+#   DST_ADDR = 0x00000100  (byte) — system memory words 64..67
+#   LEN      = 4             (beats; low 8 bits of LEN word)
+#   FLAGS    = 0x00000000   (DIR=0: SRAM → system memory)
+#
+# Effect: move 4 words from SRAM at 0x100 to system memory at 0x100.
+# Source pattern is preloaded via sram,* rows below (SRAM words 64..67).
 # =============================================================================
 
 # --- Source data in SRAM ---

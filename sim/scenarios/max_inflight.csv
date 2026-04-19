@@ -1,17 +1,25 @@
 op,arg1,arg2,arg3,arg4
 # =============================================================================
-# Max inflight: 4 descriptors queued simultaneously (MAX_INFLIGHT = 4)
+# Scenario summary (see sim/testcases_instruction.txt)
 #
-# The ring manager dispatches all 4 before any completes, driving
-# inflight_count to its maximum of 4.
+# Descriptor ring in system memory:
+#   Ring starts at byte address 0x00000000 (REG_BASEADDR from csr_baseaddr below).
+#   Each descriptor is 16 bytes (4 words). RINGLEN = 5 slots (room for 4 queued
+#   descriptors without meeting the full condition: tail advances to 4).
+#   Slot byte ranges: slot0 0x00-0x0F, slot1 0x10-0x1F, slot2 0x20-0x2F,
+#   slot3 0x30-0x3F, slot4 0x40-0x4F (unused here; data payloads live at 0x100+).
 #
-# Descriptor ring lives at baseaddr=0x0 in sys mem:
-#   slot 0: bytes 0x00-0x0F   slot 1: bytes 0x10-0x1F
-#   slot 2: bytes 0x20-0x2F   slot 3: bytes 0x30-0x3F
-#   slot 4: bytes 0x40-0x4F   (empty slot required: ringlen=5, tail=4)
+# Number of descriptors in this scenario: 4
 #
-# Data sources start at 0x100, well above the descriptor ring.
-# Each descriptor moves 4 words sys mem -> SRAM at matching addresses.
+# All use DIR=1 (system memory → SRAM). CSV desc rows: SRC, DST, LEN, FLAGS
+# (docs/descriptor_struct.md).
+#
+# Descriptor 0: move 4 words from system memory at 0x00000100 to SRAM at 0x00000100.
+# Descriptor 1: move 4 words from system memory at 0x00000200 to SRAM at 0x00000200.
+# Descriptor 2: move 4 words from system memory at 0x00000300 to SRAM at 0x00000300.
+# Descriptor 3: move 4 words from system memory at 0x00000400 to SRAM at 0x00000400.
+#
+# Intent: exercise multiple descriptors queued at once (ring depth / scheduling).
 # =============================================================================
 
 # --- Source data in system memory ---
