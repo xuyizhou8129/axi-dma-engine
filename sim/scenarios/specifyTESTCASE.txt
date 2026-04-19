@@ -1,0 +1,4 @@
+To specify a test case, use:
+make sim SCENARIO=scenarios/TESTNAME.csv
+For example, to test max flight:
+make sim SCENARIO=scenarios/max_inflight.csv
