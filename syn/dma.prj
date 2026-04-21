@@ -1,0 +1,92 @@
+#--  Synopsys, Inc.
+#--  Version O-2018.09-SP1
+#--  Written on Mon Jan 10 23:47:27 2022
+
+
+#project files
+add_file -verilog -vlog_std sysv "../rtl/dma_pkg.sv"
+add_file -verilog -vlog_std sysv "../rtl/axi_4_if.sv"
+add_file -verilog -vlog_std sysv "../rtl/csr_interfaces.sv"
+add_file -verilog -vlog_std sysv "../rtl/rm_df_if.sv"
+add_file -verilog -vlog_std sysv "../rtl/as_rm_if.sv"
+add_file -verilog -vlog_std sysv "../rtl/rm_to_irq_if.sv"
+add_file -verilog -vlog_std sysv "../rtl/fifo.sv"
+add_file -verilog -vlog_std sysv "../rtl/bram.sv"
+add_file -verilog -vlog_std sysv "../rtl/axi_4_master.sv"
+add_file -verilog -vlog_std sysv "../rtl/sram_controller.sv"
+add_file -verilog -vlog_std sysv "../rtl/descriptor_fetcher.sv"
+add_file -verilog -vlog_std sysv "../rtl/data_mover.sv"
+add_file -verilog -vlog_std sysv "../rtl/ring_manager.sv"
+add_file -verilog -vlog_std sysv "../rtl/IRQ.sv"
+add_file -verilog -vlog_std sysv "../rtl/csr.sv"
+add_file -verilog -vlog_std sysv "../rtl/movement_top.sv"
+add_file -verilog -vlog_std sysv "../rtl/dma_top.sv"
+
+
+
+#implementation: "rev_1"
+impl -add rev_1 -type fpga
+
+#
+#implementation attributes
+
+set_option -vlog_std sysv
+set_option -project_relative_includes 1
+
+#par_1 attributes
+set_option -job par_1 -add par
+
+#device options
+set_option -technology CYCLONEIV-E
+set_option -part EP4CE115
+set_option -package FC23
+set_option -speed_grade -7
+set_option -part_companion ""
+
+#compilation/mapping options
+set_option -use_fsm_explorer 0
+set_option -top_module "dma_top"
+
+# hdl_compiler_options
+set_option -distributed_compile 1
+
+# altera_options
+set_option -rw_check_on_ram 1
+
+# mapper_without_write_options
+set_option -frequency auto
+set_option -srs_instrumentation 1
+
+# mapper_options
+set_option -write_verilog 0
+set_option -write_vhdl 0
+
+# Intel STRATIX
+set_option -run_prop_extract 1
+set_option -maxfan 30
+set_option -disable_io_insertion 0
+set_option -pipe 1
+set_option -update_models_cp 0
+set_option -retiming 0
+set_option -no_sequential_opt 0
+set_option -fix_gated_and_generated_clocks 1
+
+# sequential_optimization_options
+set_option -symbolic_fsm_compiler 1
+
+# Compiler Options
+set_option -compiler_compatible 0
+set_option -resource_sharing 1
+set_option -multi_file_compilation_unit 1
+
+# Compiler Options
+set_option -auto_infer_blackbox 0
+
+#automatic place and route (vendor) options
+set_option -write_apr_constraint 1
+
+#set result format/file last
+project -result_file "rev_1/dma_top.vqm"
+
+#design plan options
+impl -active "rev_1"
