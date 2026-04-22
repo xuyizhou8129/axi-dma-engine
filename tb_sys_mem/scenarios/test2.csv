@@ -1,0 +1,8 @@
+op,arg1,arg2,arg3
+# Interleaved write-read: write 2 words, read back, write 2 more, read all 4
+wr,00000000,cafebabe,
+wr,00000004,0b00b135,
+rd,00000000,01,
+wr,00000008,facefeed,
+wr,0000000c,deadd00d,
+rd,00000000,03,
