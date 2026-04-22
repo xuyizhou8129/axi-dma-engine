@@ -24,11 +24,7 @@ module data_mover #(
     input  logic                    df_dm_in_empty,
     input  logic [DESC_WIDTH-1:0] df_dm_in_dout, // descriptor struct
 
-    // output instruction structs
-    output logic                    dm_sram_out_wr_en,
-    input  logic                    dm_sram_out_full,
-    output logic [INSTR_WIDTH-1:0]   dm_sram_out_din,
-
+    // output instruction struct (AXI only; SRAM path removed)
     output logic                    dm_axi_out_wr_en,
     input  logic                    dm_axi_out_full,
     output logic [INSTR_WIDTH-1:0]   dm_axi_out_din
@@ -36,16 +32,10 @@ module data_mover #(
 );
 
     logic [INSTR_WIDTH-1:0] instr_axi, instr_axi_next;
-    logic [INSTR_WIDTH-1:0] instr_sram, instr_sram_next;
-
     logic axi_wr_en;
-    logic sram_wr_en;
 
     assign dm_axi_out_din = instr_axi;
     assign dm_axi_out_wr_en = axi_wr_en;
-    
-    assign dm_sram_out_din = instr_sram;
-    assign dm_sram_out_wr_en = sram_wr_en;
 
 
 
@@ -59,33 +49,23 @@ module data_mover #(
 
     logic [DESC_WIDTH-1:0] input_data, new_input_data;
 
-
     always_ff @(posedge clock or posedge reset) begin
-
         if (reset == 1'b1) begin
             state <= GET_DATA;
             input_data <= '0;
-            instr_sram <= '0;
             instr_axi <= '0;
-
         end else begin
             state <= next_state;
             input_data <= new_input_data;
-            instr_sram <= instr_sram_next;
             instr_axi <= instr_axi_next;
-  
         end
-
     end
 
     always_comb begin
-
         next_state = state;
         new_input_data = input_data;
-        instr_sram_next = instr_sram; 
-        instr_axi_next = instr_axi; 
+        instr_axi_next = instr_axi;
         axi_wr_en = 0;
-        sram_wr_en = 0;
         df_dm_in_rd_en = 0;
 
         case (state)
@@ -105,45 +85,30 @@ module data_mover #(
 
             // Descriptor layout (docs/descriptor_struct.md):
             // [31:0]=SRC_ADDR, [63:32]=DST_ADDR, [95:64]=LEN, [127:96]=FLAGS; DIR=FLAGS[0]=input_data[96]
-            // DIR=1: system memory -> SRAM (AXI read, SRAM write)
-            // DIR=0: SRAM -> system memory (AXI write, SRAM read)
+            // DIR=1: AXI reads from SRC; DIR=0: AXI writes to DST
             DECODE: begin
-
                 if (input_data[96]) begin
-                    instr_axi_next[31:0]   = input_data[31:0];   // SRC (byte addr)
-                    instr_sram_next[31:0]  = input_data[63:32];  // DST (byte addr)
-                    instr_axi_next[63:32]  = input_data[95:64];
-                    instr_sram_next[63:32] = input_data[95:64];
-                    instr_axi_next[64]     = 1'b0;               // read system memory
-                    instr_sram_next[64]    = 1'b1;               // write SRAM
-                end
-                else begin
-                    instr_axi_next[31:0]   = input_data[63:32];  // DST (byte addr)
-                    instr_sram_next[31:0]  = input_data[31:0];  // SRC (byte addr)
-                    instr_axi_next[63:32]  = input_data[95:64];
-                    instr_sram_next[63:32] = input_data[95:64];
-                    instr_axi_next[64]     = 1'b1;               // write system memory
-                    instr_sram_next[64]    = 1'b0;               // read SRAM
+                    instr_axi_next[31:0]  = input_data[31:0];   // SRC addr
+                    instr_axi_next[63:32] = input_data[95:64];  // LEN
+                    instr_axi_next[64]    = 1'b0;               // read
+                end else begin
+                    instr_axi_next[31:0]  = input_data[63:32];  // DST addr
+                    instr_axi_next[63:32] = input_data[95:64];  // LEN
+                    instr_axi_next[64]    = 1'b1;               // write
                 end
                 next_state = SEND_INSTR;
-
             end
 
- 
-    SEND_INSTR: begin
-        if (!dm_sram_out_full && !dm_axi_out_full) begin     
-            axi_wr_en  = 1'b1;
-            sram_wr_en = 1'b1;
-            next_state = GET_DATA;
-        end 
-        else begin
-            next_state = SEND_INSTR;
-            sram_wr_en  = 1'b0;
-            axi_wr_en  = 1'b0;
-            instr_sram_next = instr_sram;
-            instr_axi_next = instr_axi;
-        end
-    end
+            SEND_INSTR: begin
+                if (!dm_axi_out_full) begin
+                    axi_wr_en  = 1'b1;
+                    next_state = GET_DATA;
+                end else begin
+                    next_state = SEND_INSTR;
+                    axi_wr_en  = 1'b0;
+                    instr_axi_next = instr_axi;
+                end
+            end
     default: next_state = GET_DATA;
         endcase
     end

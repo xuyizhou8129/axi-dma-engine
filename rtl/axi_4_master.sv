@@ -40,18 +40,7 @@ module axi_4_master #(
     input  logic                    dm_in_empty,
     input  logic [INSTR_WIDTH-1:0]  dm_in_dout,
 
-    // Mid FIFO between AXI read path and SRAM-side path
-    output logic                    mid_wr_en,
-    input  logic                    mid_full,
-    output logic [DATA_WIDTH-1:0]   mid_din,
-    output logic                    mid_rd_en,
-    input  logic                    mid_empty,
-    input  logic [DATA_WIDTH-1:0]   mid_dout,
-
-    // High when SRAM controller has finished internal work for the last transaction
-    input  logic sram_done,
-
-    // Asserted when the AXI master has finished the AXI-side portion of the current transaction
+    // One-cycle pulse when a DM transaction (read or write) completes
     output logic axi_done,
 
     // AXI4 master interface to system memory
@@ -73,8 +62,7 @@ module axi_4_master #(
         s_dm_rd_r,
         s_dm_wr_aw,
         s_dm_wr_w,
-        s_dm_wr_b,
-        s_wait_sram
+        s_dm_wr_b
     } state_types;
 
     state_types state, state_c;
@@ -108,16 +96,13 @@ module axi_4_master #(
         df_out_wr_en = 1'b0;
         df_out_din   = desc_buf;
         dm_in_rd_en  = 1'b0;
-        mid_wr_en    = 1'b0;
-        mid_din      = '0;
-        mid_rd_en    = 1'b0;
         axi_done     = 1'b0;
 
         axi.awvalid  = 1'b0;
         axi.awaddr   = cur_addr;
         axi.awlen    = (cur_len == '0) ? '0 : (cur_len - 1'b1);
         axi.wvalid   = 1'b0;
-        axi.wdata    = mid_dout;
+        axi.wdata    = '0;
         axi.wlast    = 1'b0;
         axi.bready   = 1'b0;
         axi.arvalid  = 1'b0;
@@ -197,13 +182,10 @@ module axi_4_master #(
             end
 
             s_dm_rd_r: begin
-                axi.rready = (mid_full == 1'b0);
-                if (axi.rvalid && axi.rready) begin
-                    mid_din   = axi.rdata;
-                    mid_wr_en = 1'b1;
-                    if (axi.rlast == 1'b1) begin
-                        state_c = s_wait_sram;
-                    end
+                axi.rready = 1'b1;
+                if (axi.rvalid && axi.rready && axi.rlast) begin
+                    state_c  = s_idle;
+                    axi_done = 1'b1;
                 end
             end
 
@@ -216,16 +198,12 @@ module axi_4_master #(
             end
 
             s_dm_wr_w: begin
-                if (mid_empty == 1'b0) begin
-                    axi.wvalid = 1'b1;
-                    axi.wdata  = mid_dout;
-                    axi.wlast  = (beat_idx == (cur_len - 1'b1));
-                    if (axi.wvalid && axi.wready) begin
-                        mid_rd_en = 1'b1;
-                        beat_idx_c = beat_idx + 1'b1;
-                        if (axi.wlast == 1'b1) begin
-                            state_c = s_dm_wr_b;
-                        end
+                axi.wvalid = 1'b1;
+                axi.wlast  = (beat_idx == (cur_len - 1'b1));
+                if (axi.wvalid && axi.wready) begin
+                    beat_idx_c = beat_idx + 1'b1;
+                    if (axi.wlast == 1'b1) begin
+                        state_c = s_dm_wr_b;
                     end
                 end
             end
@@ -233,14 +211,8 @@ module axi_4_master #(
             s_dm_wr_b: begin
                 axi.bready = 1'b1;
                 if (axi.bvalid && axi.bready) begin
-                    state_c = s_wait_sram;
-                end
-            end
-
-            s_wait_sram: begin
-                axi_done = 1'b1;
-                if (sram_done == 1'b1) begin
-                    state_c = s_idle;
+                    state_c  = s_idle;
+                    axi_done = 1'b1;
                 end
             end
 

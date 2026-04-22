@@ -26,11 +26,9 @@ package dma_pkg;
     // -------------------------------------------------------------------------
     // Default FIFO depths and BRAM (movement_top / bram defaults)
     // -------------------------------------------------------------------------
-    parameter int DF_IN_FIFO_Q  = 64;
-    parameter int DF_OUT_FIFO_Q = 64;
-    parameter int DM_FIFO_Q     = 16;
-    parameter int MID_FIFO_Q      = 64;
-    parameter int BRAM_SIZE       = 1024;
+    parameter int DF_IN_FIFO_Q  = 4;
+    parameter int DF_OUT_FIFO_Q = 4;
+    parameter int DM_FIFO_Q     = 4;
 
     // -------------------------------------------------------------------------
     // AXI-Lite CSR (dma csr.sv)
