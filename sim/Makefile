@@ -7,6 +7,7 @@
 PYTHON         ?= python3
 OUT_DIR        ?= out
 SCENARIO       ?= scenarios/example.csv
+SCENARIOS      := $(wildcard scenarios/*.csv)
 SIM_DIR        := $(CURDIR)
 MODELSIM_ENV   ?= /vol/eecs392/env/modelsim.env
 MODELSIM_SHELL ?= tcsh
@@ -20,7 +21,8 @@ else
 GUI_FIX_TCSH :=
 endif
 
-.PHONY: golden sim sim-gui clean
+.PHONY: golden sim sim-gui sim-all clean \
+        $(addprefix _sim-,$(SCENARIOS))
 
 # Generate golden reference files from the Python model
 golden:
@@ -48,6 +50,15 @@ else
 	bash -lc 'cd "$(SIM_DIR)" && $(VSIM) -do $(VSIM_DO)'
 endif
 endif
+
+# --- Per-scenario pattern rule: make _sim-scenarios/example.csv ---
+
+$(addprefix _sim-,$(SCENARIOS)): _sim-%:
+	$(MAKE) sim SCENARIO=$*
+
+# --- Run all scenarios ---
+
+sim-all: $(addprefix _sim-,$(SCENARIOS))
 
 clean:
 	rm -f transcript vsim.wlf

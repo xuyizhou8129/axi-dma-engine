@@ -53,13 +53,11 @@ vlog -sv -work work ${RTL}/csr.sv
 vlog -sv -work work ${RTL}/movement_top.sv
 vlog -sv -work work ${RTL}/dma_top.sv
 
-# --- TB + memory model ---
-vlog -sv -work work model_sys_mem.sv
+# --- TB + synthesizable system memory ---
+vlog -sv -work work ${RTL}/sys_mem.sv
 vlog -sv -work work tb_top.sv
 
-# +MEMHEX preloads system memory before the AXI master runs
 vsim -t 1ns -voptargs=+acc +notimingchecks -L work \
-    +MEMHEX=out/initial_smem.hex \
     work.tb_dma_top \
     -wlf dma.wlf
 

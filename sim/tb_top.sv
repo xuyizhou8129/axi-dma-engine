@@ -7,7 +7,7 @@
 //     dma_top  (DUT — rtl/dma_top.sv)
 //       csr, ring_manager, IRQ, movement_top
 //         axi_4_master, sram_controller, descriptor_fetcher, bram, FIFOs
-//     model_sys_mem (AXI4 behavioural system memory)
+//     sys_mem (AXI4 synthesizable system memory — rtl/sys_mem.sv)
 //
 // Stimulus flow
 //   1. Assert reset.
@@ -79,9 +79,9 @@ module tb_dma_top;
     );
 
     // -----------------------------------------------------------------------
-    // Behavioural system memory
+    // Synthesizable system memory (rtl/sys_mem.sv)
     // -----------------------------------------------------------------------
-    model_sys_mem #(
+    sys_mem #(
         .MEM_WORDS(MEM_WORDS)
     ) u_sysmem (
         .axi(axi_sys)
@@ -168,6 +168,18 @@ module tb_dma_top;
         end
         $fclose(fh);
         $display("TB: applied %0d CSR write(s) from %s", n, path);
+    endtask
+
+    // -----------------------------------------------------------------------
+    // Preload sys_mem RAM from initial_smem.hex (descriptor ring + data).
+    // Same flat-array copy trick used below for BRAM.
+    // -----------------------------------------------------------------------
+    task automatic load_initial_smem();
+        logic [31:0] smem_init [0:MEM_WORDS-1];
+        int i;
+        $readmemh("out/initial_smem.hex", smem_init);
+        for (i = 0; i < MEM_WORDS; i = i + 1)
+            u_sysmem.ram[i] = smem_init[i];
     endtask
 
     // -----------------------------------------------------------------------
@@ -283,8 +295,8 @@ module tb_dma_top;
         rst_n = 1'b1;
         @(posedge clk);
 
-        // Give model_sys_mem one cycle to set ram_preloaded
-        repeat (4) @(posedge clk);
+        // Preload sys_mem RAM image (descriptor ring + data) before DMA starts
+        load_initial_smem();
 
         // Match Python SRAM image before DMA (zeros + any CSV "sram" rows)
         load_initial_sram();

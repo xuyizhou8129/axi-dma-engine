@@ -27,6 +27,8 @@ Descriptor layout (docs/descriptor_struct.md):
   w0=SRC_ADDR, w1=DST_ADDR, w2=LEN, w3=FLAGS; DIR=FLAGS[0]. DIR=1 => system mem -> SRAM.
   The golden builds two 65-bit DM words like rtl/data_mover.sv, then narrows to 41 bits
   like rtl/movement_top.sv for dm_axi and dm_sram separately.
+  Event loop drains those paths in DIR order: DIR=1 AXI then SRAM; DIR=0 SRAM then AXI
+  so MID FIFO always has data before an AXI/SRAM write leg.
 
 Usage:
   python3 run_golden.py scenarios/example.csv [out_dir]
@@ -108,6 +110,28 @@ def _desc_to_instr_pair(desc):
         axi65 = _build_65(dst, len32, 1)
         sram65 = _build_65(src, len32, 0)
     return _narrow65_to_41(axi65), _narrow65_to_41(sram65)
+
+
+def _drain_axi_dm(axi_golden, instr_axi, max_steps=512):
+    """Drain AXI master's DM queue (df_in empty during this phase)."""
+    steps = 0
+    while not axi_golden.idle:
+        if not axi_golden.process_one():
+            break
+        steps += 1
+        if steps > max_steps:
+            raise RuntimeError("AXI golden DM path stalled (instr=%#011x)" % instr_axi)
+
+
+def _drain_sram_dm(sram_ctrl, instr_sram, max_steps=512):
+    """Drain SRAM controller's DM queue."""
+    steps = 0
+    while not sram_ctrl.idle:
+        if not sram_ctrl.process_one():
+            break
+        steps += 1
+        if steps > max_steps:
+            raise RuntimeError("SRAM controller DM path stalled (instr=%#011x)" % instr_sram)
 
 
 # -------------------------------------------------------------------------
@@ -216,23 +240,15 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
         dm_axi.enqueue(instr_axi)
         dm_sram.enqueue(instr_sram)
 
-        # 3. Drain AXI DM path (df_in is empty so process_one handles dm path)
-        steps = 0
-        while not axi_golden.idle:
-            if not axi_golden.process_one():
-                break
-            steps += 1
-            if steps > 512:
-                raise RuntimeError("AXI golden DM path stalled (instr=%#011x)" % instr_axi)
-
-        # 4. Drain SRAM controller DM path
-        steps = 0
-        while not sram_ctrl.idle:
-            if not sram_ctrl.process_one():
-                break
-            steps += 1
-            if steps > 512:
-                raise RuntimeError("SRAM controller DM path stalled (instr=%#011x)" % instr_sram)
+        # 3–4. Drain DM paths in MID-safe order (matches _desc_to_instr_pair read/write split)
+        # DIR=1: AXI read → MID → SRAM write.  DIR=0: SRAM read → MID → AXI write.
+        dir_bit = desc.w3 & 1
+        if dir_bit:
+            _drain_axi_dm(axi_golden, instr_axi)
+            _drain_sram_dm(sram_ctrl, instr_sram)
+        else:
+            _drain_sram_dm(sram_ctrl, instr_sram)
+            _drain_axi_dm(axi_golden, instr_axi)
 
         # 5. Advance head (mirrors as_done → ring_manager head increment)
         ring.complete()
