@@ -67,3 +67,4 @@ syn/synlog.tcl
 env.sh
 vivado*.log
 vivado*.jou
+logs/
