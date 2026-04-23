@@ -1,5 +1,5 @@
 # System-level DMA testbench — Questa / ModelSim
-# Run from sim/:   make golden | sim | sim-gui | clean
+# Run from sim/:   make golden | sim | sim-all | sim-gui | clean
 #
 # MODELSIM_ENV= to skip sourcing the environment file.
 # GUI_FIX=0   to disable the X11-over-SSH display fixes.
@@ -7,7 +7,6 @@
 PYTHON         ?= python3
 OUT_DIR        ?= out
 SCENARIO       ?= scenarios/example.csv
-SCENARIOS      := $(wildcard scenarios/*.csv)
 SIM_DIR        := $(CURDIR)
 MODELSIM_ENV   ?= /vol/eecs392/env/modelsim.env
 MODELSIM_SHELL ?= tcsh
@@ -21,8 +20,7 @@ else
 GUI_FIX_TCSH :=
 endif
 
-.PHONY: golden sim sim-gui sim-all clean \
-        $(addprefix _sim-,$(SCENARIOS))
+.PHONY: golden sim sim-gui sim-all clean
 
 # Generate golden reference files from the Python model
 golden:
@@ -37,6 +35,31 @@ else
 	bash -lc 'cd "$(SIM_DIR)" && TB_BATCH=1 $(VSIM) -c -do $(VSIM_DO)'
 endif
 
+# Batch simulation for every scenarios/*.csv. Each iteration runs golden + vsim;
+# OUT_DIR (default out/) is overwritten each time. Writes $(OUT_DIR)/sim-all-report.txt
+# (PASS/FAIL per scenario + timestamps). Exits with status 1 if any scenario failed.
+sim-all:
+	bash -lc 'shopt -s nullglob; cd "$(SIM_DIR)"; \
+	  mkdir -p "$(OUT_DIR)"; \
+	  rep="$(OUT_DIR)/sim-all-report.txt"; \
+	  echo "sim-all started $$(date -Iseconds)" > "$$rep"; \
+	  pass=0; fail=0; \
+	  for f in scenarios/*.csv; do \
+	    echo "=== sim-all: $$f ==="; \
+	    if $(MAKE) sim SCENARIO="$$f"; then \
+	      echo "$$f PASS $$(date -Iseconds)" >> "$$rep"; \
+	      pass=$$((pass + 1)); \
+	    else \
+	      echo "$$f FAIL $$(date -Iseconds)" >> "$$rep"; \
+	      fail=$$((fail + 1)); \
+	    fi; \
+	  done; \
+	  summ="--- summary: $$pass pass, $$fail fail ---"; \
+	  echo "$$summ" >> "$$rep"; \
+	  echo "$$summ"; \
+	  case "$$rep" in /*) echo "Report: $$rep";; *) echo "Report: $$(pwd)/$$rep";; esac; \
+	  test $$fail -eq 0'
+
 # GUI simulation
 sim-gui: golden
 ifneq ($(strip $(MODELSIM_ENV)),)
@@ -50,15 +73,6 @@ else
 	bash -lc 'cd "$(SIM_DIR)" && $(VSIM) -do $(VSIM_DO)'
 endif
 endif
-
-# --- Per-scenario pattern rule: make _sim-scenarios/example.csv ---
-
-$(addprefix _sim-,$(SCENARIOS)): _sim-%:
-	$(MAKE) sim SCENARIO=$*
-
-# --- Run all scenarios ---
-
-sim-all: $(addprefix _sim-,$(SCENARIOS))
 
 clean:
 	rm -f transcript vsim.wlf
