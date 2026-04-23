@@ -1,0 +1,41 @@
+Current RTL top
+---------------
+The DMA top level today includes the DMA engine and the SRAM block.
+
+FPGA bring-up goal
+------------------
+On the Arty A7-100T, I need a separate top level that also instantiates a
+synthesizable system-memory model and a SoC-style interface to the design.
+
+Planned architecture
+----------------------
+- System memory: a synthesizable behavioral or structural model, on-chip.
+- SoC role: MicroBlaze soft core — drives the DMA via AXI-Lite CSR, handles
+  interrupts, and coordinates tests.
+
+Validation strategy (CRC32, not full memory dumps)
+--------------------------------------------------
+1. Run the software reference model in simulation locally and record the same
+   stimulus I will use on the board (e.g. stim.txt or an equivalent binary
+   format).
+
+2. Over serial, send that stimulus to the FPGA. MicroBlaze parses it, programs
+   the CSR, runs the DMA against SRAM and system memory, and records completion
+   and interrupt behavior.
+
+3. After each test (or each DMA job), compute CRC32 over the agreed address
+   ranges (SRAM region, system-memory region). Transmit only CRC32 values plus
+   metadata over serial: test ID, byte length, seed (if any), IRQ count,
+   completion/error flags. Optionally embed expected CRC32 in the stimulus so
+   the firmware can report PASS/FAIL on-device.
+
+4. On the host, recompute CRC32 on the reference buffers from simulation (same
+   polynomial, reflection, endianness, and byte range as firmware) and compare
+   to the values reported from hardware. Reserve full memory dumps for rare
+   debug, not the default path.
+
+Summary
+-------
+MicroBlaze is the coordinator: serial in (stimulus), CSR + IRQ path to the DMA,
+CRC32 + metadata out (serial). Local simulation remains the golden reference;
+the board proves the same stimulus produces the same CRC32 signatures.

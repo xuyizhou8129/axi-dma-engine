@@ -63,3 +63,7 @@ transcript
 syn/rev_1/
 syn/stdout.log
 syn/synlog.tcl
+
+env.sh
+vivado*.log
+vivado*.jou
