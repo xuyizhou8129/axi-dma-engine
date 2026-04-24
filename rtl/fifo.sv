@@ -14,18 +14,6 @@ module fifo #(
     output logic empty
 );
 
-    function automatic logic [FIFO_DATA_WIDTH-1:0] to01( input logic [FIFO_DATA_WIDTH-1:0] data );
-        logic [FIFO_DATA_WIDTH-1:0] result;
-        for ( int i=0; i < $bits(data); i++ ) begin
-            case ( data[i] )  
-                0: result[i] = 1'b0;
-                1: result[i] = 1'b1;
-                default: result[i] = 1'b0;
-            endcase;
-        end;
-        return result;
-    endfunction
-
     localparam FIFO_ADDR_WIDTH = $clog2(FIFO_BUFFER_SIZE) + 1;
     logic [FIFO_DATA_WIDTH-1:0] fifo_buf [FIFO_BUFFER_SIZE-1:0];
     logic [FIFO_ADDR_WIDTH-1:0] wr_addr, wr_addr_t;
@@ -49,7 +37,7 @@ module fifo #(
 
     always_ff @(posedge rd_clk) 
     begin : p_rd_buffer
-        dout <= to01(fifo_buf[$unsigned(rd_addr_t[FIFO_ADDR_WIDTH-2:0])]);
+        dout <= fifo_buf[$unsigned(rd_addr_t[FIFO_ADDR_WIDTH-2:0])];
     end
 
     always_ff @(posedge rd_clk, posedge reset) 
