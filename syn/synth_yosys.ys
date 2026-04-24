@@ -10,7 +10,7 @@ read_verilog -sv ../rtl/descriptor_fetcher.sv
 read_verilog -sv ../rtl/data_mover.sv
 read_verilog -sv ../rtl/ring_manager.sv
 read_verilog -sv ../rtl/IRQ.sv
-read_verilog -sv ../rtl/csr.sv
+read_verilog -sv ../rtl/spi_csr.sv
 read_verilog -sv ../rtl/movement_top.sv
 read_verilog -sv ../rtl/dma_top.sv
 synth -top dma_top

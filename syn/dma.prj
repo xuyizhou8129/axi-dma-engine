@@ -17,7 +17,7 @@ add_file -verilog -vlog_std sysv "../rtl/descriptor_fetcher.sv"
 add_file -verilog -vlog_std sysv "../rtl/data_mover.sv"
 add_file -verilog -vlog_std sysv "../rtl/ring_manager.sv"
 add_file -verilog -vlog_std sysv "../rtl/IRQ.sv"
-add_file -verilog -vlog_std sysv "../rtl/csr.sv"
+add_file -verilog -vlog_std sysv "../rtl/spi_csr.sv"
 add_file -verilog -vlog_std sysv "../rtl/movement_top.sv"
 add_file -verilog -vlog_std sysv "../rtl/dma_top.sv"
 
