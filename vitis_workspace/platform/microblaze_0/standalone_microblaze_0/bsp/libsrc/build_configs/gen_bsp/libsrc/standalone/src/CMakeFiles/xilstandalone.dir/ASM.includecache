@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/hw_exception_handler.S
+microblaze_exceptions_g.h
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/microblaze_exceptions_g.h
+bspconfig.h
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/bspconfig.h
+xparameters.h
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/xparameters.h
+microblaze_instructions.h
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/microblaze_instructions.h
+
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/microblaze_exceptions_g.h
+
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/microblaze_instructions.h
+
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/microblaze_scrub.S
+bspconfig.h
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/bspconfig.h
+xparameters.h
+/pool/xuyi/axi-dma-engine/vitis_workspace/platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/standalone/src/microblaze/xparameters.h
+
+include/bspconfig.h
+xmem_config.h
+include/xmem_config.h
+
+include/xmem_config.h
+
