@@ -128,7 +128,7 @@ module axi_4_master #(
 
             s_df_get: begin
                 df_in_rd_en = 1'b1;
-                cur_addr_c  = df_in_dout[31:0];
+                cur_addr_c  = df_in_dout[ADDR_WIDTH-1:0];
                 cur_len_c   = df_in_dout[LEN_MSB:LEN_LSB];
                 beat_idx_c  = '0;
                 desc_buf_c  = '0;
@@ -163,7 +163,7 @@ module axi_4_master #(
 
             s_dm_get: begin
                 dm_in_rd_en  = 1'b1;
-                cur_addr_c   = dm_in_dout[31:0];
+                cur_addr_c   = dm_in_dout[ADDR_WIDTH-1:0];
                 cur_len_c    = dm_in_dout[LEN_MSB:LEN_LSB];
                 cur_write_c  = dm_in_dout[RW_BIT];
                 beat_idx_c   = '0;
