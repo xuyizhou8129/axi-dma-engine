@@ -1,5 +1,6 @@
 // DMA top-level: SPI-CSR + Ring Manager + Movement Top + IRQ.
-// External interface: SPI (4 pins) + AXI4 master + single IRQ output.
+// External interface: SPI (4 pins) + probe outputs for TinyTapeout validation.
+// AXI4 master removed; movement_top uses an internal memory stub.
 
 module dma_top #(
     parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT
@@ -13,11 +14,17 @@ module dma_top #(
     output logic spi_miso,
     input  logic spi_csn,
 
-    // AXI4 master to system memory
-    axi_4_if.master axi_sys,
-
     // Consolidated interrupt output
-    output logic irq
+    output logic irq,
+
+    // Probe outputs (map directly to TinyTapeout uo_out / uio pins)
+    output logic       probe_fetch_req_valid,  // ring manager firing a fetch
+    output logic       probe_df_in_wr_en,      // descriptor fetcher wrote a handle
+    output logic       probe_dm_wr_en,         // data mover produced an instruction
+    output logic       probe_dm_instr_rw,      // direction bit (0=read, 1=write)
+    output logic       probe_ring_empty,       // ring manager: head == tail
+    output logic       probe_busy,             // ring manager: descriptor in-flight
+    output logic [7:0] probe_rm_df_addr_lo     // lower byte of descriptor address
 );
 
     csr_ring_manager_if ring_mgr (.clk(clk), .rst_n(rst_n));
@@ -70,14 +77,21 @@ module dma_top #(
     );
 
     movement_top u_movement (
-        .clk        (clk),
-        .rst_n      (rst_core_n),
-        .rm_df_addr (rm_df_addr),
-        .rm_df_valid(fetch_req_valid),
-        .df_ready   (fetch_req_ready),
-        .df_error   (df_error),
-        .dm_done    (dm_done),
-        .axi        (axi_sys)
+        .clk              (clk),
+        .rst_n            (rst_core_n),
+        .rm_df_addr       (rm_df_addr),
+        .rm_df_valid      (fetch_req_valid),
+        .df_ready         (fetch_req_ready),
+        .df_error         (df_error),
+        .dm_done          (dm_done),
+        .probe_df_in_wr_en(probe_df_in_wr_en),
+        .probe_dm_wr_en   (probe_dm_wr_en),
+        .probe_dm_instr_rw(probe_dm_instr_rw)
     );
+
+    assign probe_fetch_req_valid = fetch_req_valid;
+    assign probe_ring_empty      = ring_mgr.ring_empty;
+    assign probe_busy            = ring_mgr.busy;
+    assign probe_rm_df_addr_lo   = rm_df_addr[7:0];
 
 endmodule
