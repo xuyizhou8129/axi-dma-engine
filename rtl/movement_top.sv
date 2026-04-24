@@ -31,9 +31,9 @@ module movement_top #(
     axi_4_if.master axi
 );
 
-    // data_mover packs len as 32 bits; AXI master uses dma_pkg::INSTR_WIDTH (41) with 8-bit len
-    localparam int DM_MOVER_BURST_W = 32;
-    localparam int DM_MOVER_INSTR_W = ADDR_WIDTH + DM_MOVER_BURST_W + 1;
+    // data_mover packs 8-bit len; INSTR_WIDTH = ADDR_WIDTH + LEN_WIDTH + 1
+    localparam int DM_MOVER_BURST_W = LEN_WIDTH;
+    localparam int DM_MOVER_INSTR_W = INSTR_WIDTH;
 
     wire reset = ~rst_n;
 
@@ -215,9 +215,8 @@ module movement_top #(
         .empty  (dm_in_empty_axi)
     );
 
-    // Narrow 41b: {rw, len[7:0], addr} from 65b {rw, len32[31:0], addr}
-    assign dm_in_dout_axi = {dm_fifo_axi_dout_wide[64], dm_fifo_axi_dout_wide[39:32],
-                               dm_fifo_axi_dout_wide[31:0]};
+    // FIFO width == INSTR_WIDTH; pass through directly
+    assign dm_in_dout_axi = dm_fifo_axi_dout_wide;
 
     assign dm_in_full = desc_full;
     // dm_done is driven directly by the axi_done pulse from u_axi
