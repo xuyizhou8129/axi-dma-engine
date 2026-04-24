@@ -6,7 +6,7 @@
 
 interface rm_df_if ();
 
-    logic [31:0]    rm_df_addr;       // Address of the next descriptor to fetch
+    logic [dma_pkg::ADDR_WIDTH-1:0] rm_df_addr;  // Address of the next descriptor to fetch
     logic           fetch_req_valid;  // Asserted by RM when a fetch can be issued
     logic           fetch_req_ready;  // Asserted by DF when it can accept a new request
     logic           df_error;         // Asserted by DF for one cycle when the fetched descriptor faults
