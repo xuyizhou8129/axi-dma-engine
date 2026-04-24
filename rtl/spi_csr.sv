@@ -108,8 +108,8 @@ module spi_csr (
                     bit_cnt <= bit_cnt + 1'b1;
                     // 8th rising edge: address byte complete
                     if (bit_cnt == 4'd7) begin
-                        is_read  <= {rx_byte[6:0], mosi_r[1]}[7];
-                        reg_addr <= {rx_byte[6:0], mosi_r[1]}[6:0];
+                        is_read  <= rx_byte[6];
+                        reg_addr <= {rx_byte[5:0], mosi_r[1]};
                     end
                     // 16th rising edge: data byte complete
                     if (bit_cnt == 4'd15)
