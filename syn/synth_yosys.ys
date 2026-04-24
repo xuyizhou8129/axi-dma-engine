@@ -1,0 +1,17 @@
+read_verilog -sv ../rtl/dma_pkg.sv
+read_verilog -sv ../rtl/axi_4_if.sv
+read_verilog -sv ../rtl/csr_interfaces.sv
+read_verilog -sv ../rtl/rm_df_if.sv
+read_verilog -sv ../rtl/as_rm_if.sv
+read_verilog -sv ../rtl/rm_to_irq_if.sv
+read_verilog -sv ../rtl/fifo.sv
+read_verilog -sv ../rtl/axi_4_master.sv
+read_verilog -sv ../rtl/descriptor_fetcher.sv
+read_verilog -sv ../rtl/data_mover.sv
+read_verilog -sv ../rtl/ring_manager.sv
+read_verilog -sv ../rtl/IRQ.sv
+read_verilog -sv ../rtl/csr.sv
+read_verilog -sv ../rtl/movement_top.sv
+read_verilog -sv ../rtl/dma_top.sv
+synth -top dma_top
+stat
