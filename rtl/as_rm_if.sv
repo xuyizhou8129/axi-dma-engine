@@ -16,4 +16,4 @@ interface as_rm_if ();
         input as_done
     );
 
-endinterface : as_rm_if
+endinterface

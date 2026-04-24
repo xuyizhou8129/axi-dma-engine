@@ -27,4 +27,4 @@ interface rm_df_if ();
         output df_error
     );
 
-endinterface : rm_df_if
+endinterface

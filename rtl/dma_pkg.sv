@@ -41,16 +41,10 @@ package dma_pkg;
     parameter logic [1:0] AXI_RESP_SLVERR = 2'b10;
 
     // -------------------------------------------------------------------------
-    // Instruction bit layout
+    // Instruction bit layout (replaces the old instr_rw_bit / instr_len_msb functions)
     // -------------------------------------------------------------------------
-    parameter int INSTR_LEN_LSB = ADDR_WIDTH;  // 16
-
-    function automatic int unsigned instr_rw_bit(int unsigned instr_w);
-        return instr_w - 1;
-    endfunction
-
-    function automatic int unsigned instr_len_msb(int unsigned len_w);
-        return ADDR_WIDTH + len_w - 1;
-    endfunction
+    parameter int INSTR_LEN_LSB = ADDR_WIDTH;                      // 16
+    parameter int INSTR_LEN_MSB = ADDR_WIDTH + LEN_WIDTH - 1;     // 23
+    parameter int INSTR_RW_BIT  = INSTR_WIDTH - 1;                // 24
 
 endpackage

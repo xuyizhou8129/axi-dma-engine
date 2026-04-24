@@ -47,8 +47,8 @@ module axi_4_master #(
     axi_4_if.master axi
 );
 
-    localparam int RW_BIT  = dma_pkg::instr_rw_bit(INSTR_WIDTH);
-    localparam int LEN_MSB = dma_pkg::instr_len_msb(LEN_WIDTH);
+    localparam int RW_BIT  = dma_pkg::INSTR_RW_BIT;
+    localparam int LEN_MSB = dma_pkg::INSTR_LEN_MSB;
     localparam int LEN_LSB = dma_pkg::INSTR_LEN_LSB;
 
     typedef enum logic [3:0] {

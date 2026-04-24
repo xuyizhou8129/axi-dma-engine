@@ -19,4 +19,4 @@ interface rm_to_irq_if ();
         input irq_error
     );
 
-endinterface : rm_to_irq_if
+endinterface 
