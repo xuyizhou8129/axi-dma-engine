@@ -1,66 +1,56 @@
-// Shared constants and small helpers for the DMA RTL. Compile this file before other rtl/*.sv.
 package dma_pkg;
 
     // -------------------------------------------------------------------------
-    // Data-path widths (AXI descriptor / data mover / AXI master)
+    // Data-path widths
     // -------------------------------------------------------------------------
-    parameter int ADDR_WIDTH    = 32;
-    parameter int DATA_WIDTH    = 32;
-    parameter int LEN_WIDTH     = 8;
-    parameter int DESC_WORDS    = 4;  // 16 bytes; layout docs/descriptor_struct.md
-    parameter int HANDLE_WIDTH  = 40;  // [31:0] addr, [39:32] len (beats)
-    parameter int INSTR_WIDTH = 41;  // [31:0] addr, [39:32] len, [40] rw
+    parameter int ADDR_WIDTH   = 16;
+    parameter int DATA_WIDTH   = 16;
+    parameter int LEN_WIDTH    = 8;
+    parameter int DESC_WORDS   = 4;
+
+    // Derived widths (depend on ADDR_WIDTH / LEN_WIDTH — must follow them)
+    parameter int HANDLE_WIDTH = ADDR_WIDTH + LEN_WIDTH;      // 24
+    parameter int INSTR_WIDTH  = ADDR_WIDTH + LEN_WIDTH + 1;  // 25
 
     // -------------------------------------------------------------------------
-    // Ring manager (descriptor ring in host memory)
+    // Ring manager
     // -------------------------------------------------------------------------
-    parameter int DESCRIPTOR_SIZE_BYTES = 16;
-    parameter int MAX_INFLIGHT          = 4;
-    parameter int RING_INDEX_WIDTH      = 3;  // index width when ring is 3-bit (tail/len slices)
+    parameter int DESCRIPTOR_SIZE_BYTES = DESC_WORDS * (DATA_WIDTH / 8);  // 8
+    parameter int MAX_INFLIGHT          = 1;
 
     // -------------------------------------------------------------------------
-    // Descriptor fetch (SRAM address space check)
-    // -------------------------------------------------------------------------
-    parameter int MAX_SRAM_ADDR = 2 ** 16 - 1;  // 64 KiB words (legacy bound in descriptor_fetcher)
-
-    // -------------------------------------------------------------------------
-    // Default FIFO depths and BRAM (movement_top / bram defaults)
+    // FIFO depths
     // -------------------------------------------------------------------------
     parameter int DF_IN_FIFO_Q  = 4;
     parameter int DF_OUT_FIFO_Q = 4;
     parameter int DM_FIFO_Q     = 4;
 
     // -------------------------------------------------------------------------
-    // AXI-Lite CSR (dma csr.sv)
+    // SPI CSR register byte addresses (7-bit)
     // -------------------------------------------------------------------------
-    parameter int AXIL_ADDR_WIDTH = 32;
-    parameter int AXIL_DATA_WIDTH = 32;
-
-    // Byte offsets, 32-bit aligned
-    parameter logic [7:0] REG_BASEADDR   = 8'h00;
-    parameter logic [7:0] REG_RINGLEN    = 8'h04;
-    parameter logic [7:0] REG_HEAD       = 8'h08;
-    parameter logic [7:0] REG_TAIL       = 8'h0C;
-    parameter logic [7:0] REG_CTRL       = 8'h10;
-    parameter logic [7:0] REG_STATUS     = 8'h14;
-    parameter logic [7:0] REG_IRQ_STATUS = 8'h18;
-    parameter logic [7:0] REG_IRQ_CLEAR  = 8'h2C;
+    parameter logic [6:0] REG_BASEADDR_LO = 7'h00;  // r/w  base address [7:0]
+    parameter logic [6:0] REG_BASEADDR_HI = 7'h01;  // r/w  base address [15:8]
+    parameter logic [6:0] REG_RINGLEN     = 7'h02;  // r/w  ring length (# descriptors)
+    parameter logic [6:0] REG_TAIL        = 7'h03;  // r/w  tail pointer (SW advances)
+    parameter logic [6:0] REG_CTRL        = 7'h04;  // r/w  [0]=enable [1]=reset [2]=irq_en
+    parameter logic [6:0] REG_HEAD        = 7'h05;  // r/o  head pointer (HW advances)
+    parameter logic [6:0] REG_STATUS      = 7'h06;  // r/o  [0]=busy [1]=ring_empty [2]=error
+    parameter logic [6:0] REG_IRQ         = 7'h07;  // r/o status; w=W1C clear
 
     parameter logic [1:0] AXI_RESP_OKAY   = 2'b00;
     parameter logic [1:0] AXI_RESP_SLVERR = 2'b10;
 
     // -------------------------------------------------------------------------
-    // Instruction bit layout (matches descriptor_fetcher / axi_4_master)
-    // ADDR_WIDTH fixed at 32 in handle/instruction packing.
+    // Instruction bit layout
     // -------------------------------------------------------------------------
-    parameter int INSTR_LEN_LSB = 32;
+    parameter int INSTR_LEN_LSB = ADDR_WIDTH;  // 16
 
     function automatic int unsigned instr_rw_bit(int unsigned instr_w);
         return instr_w - 1;
     endfunction
 
     function automatic int unsigned instr_len_msb(int unsigned len_w);
-        return 32 + len_w - 1;
+        return ADDR_WIDTH + len_w - 1;
     endfunction
 
 endpackage
