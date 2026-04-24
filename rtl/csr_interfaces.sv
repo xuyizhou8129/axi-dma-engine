@@ -1,86 +1,25 @@
-interface csr_soc_bus_if (
-    input logic clk,
-    input logic rst_n
-);
-    logic [31:0]           awaddr;
-    logic [2:0]            awprot;
-    logic                  awvalid;
-    logic                  awready;
-
-    logic [31:0]           wdata;
-    logic [3:0]            wstrb;
-    logic                  wvalid;
-    logic                  wready;
-
-    logic [1:0]            bresp;
-    logic                  bvalid;
-    logic                  bready;
-
-    logic [31:0]           araddr;
-    logic [2:0]            arprot;
-    logic                  arvalid;
-    logic                  arready;
-
-    logic [31:0]           rdata;
-    logic [1:0]            rresp;
-    logic                  rvalid;
-    logic                  rready;
-
-    logic                  irq;
-    logic                  irq_empty;
-    logic                  irq_error;
-
-    // CSR block is AXI4-Lite slave from the SoC perspective.
-    modport csr (
-        input  clk, rst_n,
-        input  awaddr, awprot, awvalid,
-        output awready,
-        input  wdata, wstrb, wvalid,
-        output wready,
-        output bresp, bvalid,
-        input  bready,
-        input  araddr, arprot, arvalid,
-        output arready,
-        output rdata, rresp, rvalid,
-        input  rready,
-        output irq, irq_empty, irq_error
-    );
-
-    modport soc (
-        input  clk, rst_n,
-        output awaddr, awprot, awvalid,
-        input  awready,
-        output wdata, wstrb, wvalid,
-        input  wready,
-        input  bresp, bvalid,
-        output bready,
-        output araddr, arprot, arvalid,
-        input  arready,
-        input  rdata, rresp, rvalid,
-        output rready,
-        input  irq, irq_empty, irq_error
-    );
-endinterface
+// csr_ring_manager_if: signals crossing the SPI-CSR / Ring-Manager boundary.
+// AXI-Lite csr_soc_bus_if has been removed; CSR is now SPI-based (spi_csr.sv).
 
 interface csr_ring_manager_if (
     input logic clk,
     input logic rst_n
 );
-    // CSR -> RingManager (configuration/control values)
-    logic [31:0] baseaddr;
-    logic [31:0] ringlen;
-    logic [31:0] tail;
-    logic        enable;
-    logic        reset;
-    logic        irq_en;
-    logic        error_clear;
+    // CSR -> RingManager (configuration / control)
+    logic [dma_pkg::ADDR_WIDTH-1:0] baseaddr;  // descriptor ring base address
+    logic [7:0]  ringlen;    // number of descriptors in ring
+    logic [7:0]  tail;       // tail pointer (SW-written)
+    logic        enable;     // DMA enable
+    logic        reset;      // soft reset
+    logic        irq_en;     // interrupt enable
+    logic        error_clear; // one-cycle pulse to clear error state
 
-    // RingManager -> CSR (status/events)
-    logic [31:0] head;
-    logic        busy;
-    logic        ring_empty;
-    logic        irq_empty_set;
-    logic        error_set;
+    // RingManager -> CSR (status / events)
+    logic [7:0]  head;          // head pointer (HW-advanced)
+    logic        busy;          // any descriptor in-flight
+    logic        ring_empty;    // head == tail
+    logic        irq_empty_set; // pulse: ring became empty
+    logic        error_set;     // pulse: descriptor error
 
     modport csr (
         input  clk, rst_n,
@@ -93,4 +32,5 @@ interface csr_ring_manager_if (
         input  baseaddr, ringlen, tail, enable, reset, irq_en, error_clear,
         output head, busy, ring_empty, irq_empty_set, error_set
     );
+
 endinterface
