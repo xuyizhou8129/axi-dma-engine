@@ -83,18 +83,18 @@ module data_mover #(
                 end
                 end
 
-            // Descriptor layout (docs/descriptor_struct.md):
-            // [31:0]=SRC_ADDR, [63:32]=DST_ADDR, [95:64]=LEN, [127:96]=FLAGS; DIR=FLAGS[0]=input_data[96]
+            // Descriptor layout (16-bit words, DESC_WIDTH=64):
+            // [15:0]=SRC_ADDR [31:16]=DST_ADDR [47:32]=LEN(8-bit@[39:32]) [63:48]=FLAGS([48]=DIR)
             // DIR=1: AXI reads from SRC; DIR=0: AXI writes to DST
             DECODE: begin
-                if (input_data[96]) begin
-                    instr_axi_next[31:0]  = input_data[31:0];   // SRC addr
-                    instr_axi_next[63:32] = input_data[95:64];  // LEN
-                    instr_axi_next[64]    = 1'b0;               // read
+                if (input_data[48]) begin
+                    instr_axi_next[ADDR_WIDTH-1:0]                    = input_data[ADDR_WIDTH-1:0]; // SRC
+                    instr_axi_next[ADDR_WIDTH+BURST_SIZE_WIDTH-1:ADDR_WIDTH] = input_data[39:32];   // LEN
+                    instr_axi_next[INSTR_WIDTH-1]                     = 1'b0;                       // read
                 end else begin
-                    instr_axi_next[31:0]  = input_data[63:32];  // DST addr
-                    instr_axi_next[63:32] = input_data[95:64];  // LEN
-                    instr_axi_next[64]    = 1'b1;               // write
+                    instr_axi_next[ADDR_WIDTH-1:0]                    = input_data[31:16];          // DST
+                    instr_axi_next[ADDR_WIDTH+BURST_SIZE_WIDTH-1:ADDR_WIDTH] = input_data[39:32];   // LEN
+                    instr_axi_next[INSTR_WIDTH-1]                     = 1'b1;                       // write
                 end
                 next_state = SEND_INSTR;
             end
