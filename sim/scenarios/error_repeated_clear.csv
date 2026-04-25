@@ -1,0 +1,53 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary — repeated set/clear cycles of the sticky error
+#
+# Purpose:
+#   Stress the error FSM through multiple set→clear cycles in a single run.
+#   Catches bugs where:
+#     - int_status_error fails to re-arm after the first clear
+#     - error_clear pulse only works once
+#     - inflight_count drifts (since both df_error AND as_done decrement it)
+#     - head pointer skips or repeats on the boundary between two errors
+#
+#   With three back-to-back bad descriptors and two intervening clears, the
+#   engine should sequentially: drop+latch, clear, drop+latch, clear,
+#   drop+latch, clear, then run the final good descriptor.
+#
+# Descriptor ring:
+#   REG_BASEADDR = 0x100, RINGLEN = 8, four descriptors.
+#
+# Descriptors (all DIR=1, all BAD until the last one):
+#   0: SRC=0  DST=0x00040000 LEN=4  FLAGS=1   (DST OOB)
+#   1: SRC=0  DST=0x00050000 LEN=4  FLAGS=1   (DST OOB, different addr)
+#   2: SRC=0  DST=0x000F0000 LEN=8  FLAGS=1   (DST OOB)
+#   3: SRC=0x00000400  DST=0x00000400  LEN=1  FLAGS=1   (GOOD)
+#       sysmem[256]=DEADC0DE  →  sram[256]=DEADC0DE
+#
+# Sequence:
+#   enable                          → fetch desc0, drop, latch error,    head=1
+#   csr_irq_clear=0x2               → clear, fetch desc1, drop, latch,   head=2
+#   csr_irq_clear=0x2               → clear, fetch desc2, drop, latch,   head=3
+#   csr_irq_clear=0x2               → clear, fetch desc3, run, complete, head=4
+#
+# Final state: sram[256]=DEADC0DE, head=tail=4, no sticky error, ring empty.
+# =============================================================================
+
+smem,256,deadc0de,,
+
+csr_baseaddr,00000100,,
+csr_ringlen,8,,
+
+# Three bad descriptors back-to-back
+desc,00000000,00040000,00000004,00000001
+desc,00000000,00050000,00000004,00000001
+desc,00000000,000F0000,00000008,00000001
+# One good descriptor at the end
+desc,00000400,00000400,00000001,00000001
+
+enable,,,,
+
+# Each clear releases exactly one bad descriptor's worth of progress.
+csr_irq_clear,00000002,,
+csr_irq_clear,00000002,,
+csr_irq_clear,00000002,,
