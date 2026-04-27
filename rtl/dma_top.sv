@@ -1,5 +1,5 @@
 // DMA top-level: SPI-CSR + Ring Manager + Movement Top + IRQ.
-// External interface: SPI (4 pins) + AXI4 master + single IRQ output.
+// External interface: SPI (4 pins) + single IRQ output.
 
 module dma_top #(
     parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT
@@ -12,9 +12,6 @@ module dma_top #(
     input  logic spi_mosi,
     output logic spi_miso,
     input  logic spi_csn,
-
-    // AXI4 master to system memory
-    axi_4_if.master axi_sys,
 
     // Consolidated interrupt output
     output logic irq
@@ -76,8 +73,7 @@ module dma_top #(
         .rm_df_valid(fetch_req_valid),
         .df_ready   (fetch_req_ready),
         .df_error   (df_error),
-        .dm_done    (dm_done),
-        .axi        (axi_sys)
+        .dm_done    (dm_done)
     );
 
 endmodule
