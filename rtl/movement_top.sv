@@ -1,9 +1,6 @@
-//Include Descriptor Fetcher, Data Mover, AXI4 Master, SRAM Controller
-//Wire the modules together
-//Interface with the ring manager, System Memmory(AXI4 Master), and SRAM(SRAM Controller)
-//The AND of the sram_done signal and the axi_done signal is the done signal for the movement top, connected to 
-//the ring manger
-//reuse the interfaces defined in the rtl folder
+// movement_top: Descriptor Fetcher + Data Mover + memory stub.
+// Stub replaces AXI4 master: fetches complete in 1 cycle with zeroed descriptor,
+// DM instructions complete in 1 cycle (dm_done pulse).
 
 module movement_top #(
     parameter int ADDR_WIDTH      = dma_pkg::ADDR_WIDTH,
@@ -20,151 +17,89 @@ module movement_top #(
 
     // Ring manager <-> Descriptor Fetcher
     input  logic [ADDR_WIDTH-1:0] rm_df_addr,
-    input  logic                    rm_df_valid,   // fetch_req_valid from RM
-    output logic                    df_ready,      // fetch_req_ready to RM
-    output logic                    df_error,
-    output logic                    dm_done,       // one-cycle pulse to RM when a movement completes
+    input  logic                  rm_df_valid,
+    output logic                  df_ready,
+    output logic                  df_error,
+    output logic                  dm_done,
 
-    // System memory (AXI4)
-    axi_4_if.master axi
+    // Probe outputs for observability
+    output logic                  probe_df_in_wr_en,
+    output logic                  probe_dm_wr_en,
+    output logic                  probe_dm_instr_rw
 );
 
-    // data_mover packs 8-bit len; INSTR_WIDTH = ADDR_WIDTH + LEN_WIDTH + 1
     localparam int DM_MOVER_BURST_W = LEN_WIDTH;
     localparam int DM_MOVER_INSTR_W = INSTR_WIDTH;
 
     wire reset = ~rst_n;
 
-    // Ring manager <-> descriptor_fetcher bundle (scalar ports on movement_top <-> rm_df_if.df on u_df)
+    // -------------------------------------------------------------------------
+    // rm_df_if wiring
+    // -------------------------------------------------------------------------
     rm_df_if rm_df ();
-    assign rm_df.rm_df_addr       = rm_df_addr;
-    assign rm_df.fetch_req_valid  = rm_df_valid;
-    assign df_ready                = rm_df.fetch_req_ready;
-    assign df_error                = rm_df.df_error;
+    assign rm_df.rm_df_addr      = rm_df_addr;
+    assign rm_df.fetch_req_valid = rm_df_valid;
+    assign df_ready               = rm_df.fetch_req_ready;
+    assign df_error               = rm_df.df_error;
 
     // -------------------------------------------------------------------------
-    // Descriptor fetcher
+    // Descriptor Fetcher <-> stub (df_in: handle, df_out: descriptor payload)
     // -------------------------------------------------------------------------
-    logic                    df_in_full;
     logic                    df_in_wr_en;
+    logic                    df_in_full;
     logic [HANDLE_WIDTH-1:0] df_in_din;
 
     logic                    df_out_rd_en;
     logic                    df_out_empty;
     logic [DESC_WIDTH-1:0]   df_out_dout;
 
-    logic                    dm_in_wr_en;
-    logic                    dm_in_full;
-    logic [DESC_WIDTH-1:0]   dm_in_din;
+    // Stub: accept fetch handle, respond next cycle with zeroed descriptor.
+    logic fetch_pending;
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset)                              fetch_pending <= 1'b0;
+        else if (df_in_wr_en && !df_in_full)   fetch_pending <= 1'b1;
+        else if (df_out_rd_en)                  fetch_pending <= 1'b0;
+    end
+    assign df_in_full   = fetch_pending;
+    assign df_out_empty = ~fetch_pending;
+    assign df_out_dout  = '0;
+
+    // -------------------------------------------------------------------------
+    // Descriptor Fetcher
+    // -------------------------------------------------------------------------
+    logic                  dm_in_wr_en;
+    logic                  dm_in_full;
+    logic [DESC_WIDTH-1:0] dm_in_din;
 
     descriptor_fetcher #(
-        .ADDR_WIDTH (ADDR_WIDTH),
-        .DATA_WIDTH (DATA_WIDTH),
-        .LEN_WIDTH  (LEN_WIDTH),
-        .DESC_WORDS (DESC_WORDS),
+        .ADDR_WIDTH  (ADDR_WIDTH),
+        .DATA_WIDTH  (DATA_WIDTH),
+        .LEN_WIDTH   (LEN_WIDTH),
+        .DESC_WORDS  (DESC_WORDS),
         .HANDLE_WIDTH(HANDLE_WIDTH),
         .INSTR_WIDTH (INSTR_WIDTH),
         .DESC_WIDTH  (DESC_WIDTH)
     ) u_df (
-        .clock       (clk),
-        .reset       (reset),
-        .df_in_wr_en (df_in_wr_en),
-        .df_in_full  (df_in_full),
-        .df_in_din   (df_in_din),
-        .df_out_rd_en(df_out_rd_en),
-        .df_out_empty(df_out_empty),
-        .df_out_dout (df_out_dout),
-        .dm_in_wr_en (dm_in_wr_en),
-        .dm_in_full  (dm_in_full),
-        .dm_in_din   (dm_in_din),
-        .rm_df       (rm_df)
-    );
-
-    // -------------------------------------------------------------------------
-    // AXI4 master
-    // -------------------------------------------------------------------------
-    logic                    df_in_rd_en;
-    logic                    df_in_empty;
-    logic [HANDLE_WIDTH-1:0] df_in_dout;
-
-    logic                    df_out_wr_en;
-    logic                    df_out_full;
-    logic [DESC_WIDTH-1:0]   df_out_din;
-
-    logic                    dm_in_rd_en_axi;
-    logic                    dm_in_empty_axi;
-    logic [INSTR_WIDTH-1:0]  dm_in_dout_axi;
-
-    axi_4_master #(
-        .ADDR_WIDTH (ADDR_WIDTH),
-        .DATA_WIDTH (DATA_WIDTH),
-        .LEN_WIDTH  (LEN_WIDTH),
-        .DESC_WORDS (DESC_WORDS),
-        .HANDLE_WIDTH(HANDLE_WIDTH),
-        .INSTR_WIDTH (INSTR_WIDTH),
-        .DESC_WIDTH  (DESC_WIDTH)
-    ) u_axi (
         .clock        (clk),
         .reset        (reset),
-        .df_in_rd_en  (df_in_rd_en),
-        .df_in_empty  (df_in_empty),
-        .df_in_dout   (df_in_dout),
-        .df_out_wr_en (df_out_wr_en),
-        .df_out_full  (df_out_full),
-        .df_out_din   (df_out_din),
-        .dm_in_rd_en  (dm_in_rd_en_axi),
-        .dm_in_empty  (dm_in_empty_axi),
-        .dm_in_dout   (dm_in_dout_axi),
-        .axi_done     (dm_done),
-        .axi          (axi)
+        .df_in_wr_en  (df_in_wr_en),
+        .df_in_full   (df_in_full),
+        .df_in_din    (df_in_din),
+        .df_out_rd_en (df_out_rd_en),
+        .df_out_empty (df_out_empty),
+        .df_out_dout  (df_out_dout),
+        .dm_in_wr_en  (dm_in_wr_en),
+        .dm_in_full   (dm_in_full),
+        .dm_in_din    (dm_in_din),
+        .rm_df        (rm_df)
     );
 
     // -------------------------------------------------------------------------
-    // FIFOs (fifo.sv) — df_in, df_out, dm axi
+    // Descriptor Fetcher -> Data Mover FIFO
     // -------------------------------------------------------------------------
-
-    // df_in: DF -> AXI (handle)
-    fifo #(
-        .FIFO_DATA_WIDTH (HANDLE_WIDTH),
-        .FIFO_BUFFER_SIZE(DF_IN_FIFO_Q)
-    ) u_df_in_fifo (
-        .reset  (reset),
-        .wr_clk (clk),
-        .wr_en  (df_in_wr_en),
-        .din    (df_in_din),
-        .full   (df_in_full),
-        .rd_clk (clk),
-        .rd_en  (df_in_rd_en),
-        .dout   (df_in_dout),
-        .empty  (df_in_empty)
-    );
-
-    // df_out: AXI -> DF (descriptor payload)
-    fifo #(
-        .FIFO_DATA_WIDTH (DESC_WIDTH),
-        .FIFO_BUFFER_SIZE(DF_OUT_FIFO_Q)
-    ) u_df_out_fifo (
-        .reset  (reset),
-        .wr_clk (clk),
-        .wr_en  (df_out_wr_en),
-        .din    (df_out_din),
-        .full   (df_out_full),
-        .rd_clk (clk),
-        .rd_en  (df_out_rd_en),
-        .dout   (df_out_dout),
-        .empty  (df_out_empty)
-    );
-
-    // Descriptor fetcher -> FIFO -> data_mover -> AXI FIFO (65b -> 41b instr)
-    logic                    df_dm_in_rd_en;
-    logic                    df_dm_in_empty;
-    logic [DESC_WIDTH-1:0]   df_dm_in_dout;
-    logic                    desc_full;
-
-    logic [DM_MOVER_INSTR_W-1:0] dm_axi_out_din_wide;
-    logic                        dm_axi_out_wr_en;
-    logic                        dm_full_axi;
-    logic [DM_MOVER_INSTR_W-1:0] dm_fifo_axi_dout_wide;
+    logic                  df_dm_in_rd_en;
+    logic                  df_dm_in_empty;
+    logic [DESC_WIDTH-1:0] df_dm_in_dout;
 
     fifo #(
         .FIFO_DATA_WIDTH (DESC_WIDTH),
@@ -181,9 +116,16 @@ module movement_top #(
         .empty  (df_dm_in_empty)
     );
 
+    // -------------------------------------------------------------------------
+    // Data Mover
+    // -------------------------------------------------------------------------
+    logic [DM_MOVER_INSTR_W-1:0] dm_instr;
+    logic                         dm_instr_wr_en;
+    logic                         dm_instr_full;
+
     data_mover #(
         .ADDR_WIDTH      (ADDR_WIDTH),
-        .BURST_SIZE_WIDTH(LEN_WIDTH),
+        .BURST_SIZE_WIDTH(DM_MOVER_BURST_W),
         .DATA_WIDTH      (DATA_WIDTH),
         .DESC_WORDS      (DESC_WORDS),
         .DESC_WIDTH      (DESC_WIDTH)
@@ -193,36 +135,23 @@ module movement_top #(
         .df_dm_in_rd_en  (df_dm_in_rd_en),
         .df_dm_in_empty  (df_dm_in_empty),
         .df_dm_in_dout   (df_dm_in_dout),
-        .dm_axi_out_wr_en(dm_axi_out_wr_en),
-        .dm_axi_out_full (dm_full_axi),
-        .dm_axi_out_din  (dm_axi_out_din_wide)
+        .dm_axi_out_wr_en(dm_instr_wr_en),
+        .dm_axi_out_full (dm_instr_full),
+        .dm_axi_out_din  (dm_instr)
     );
 
+    // Stub: always accept DM instruction, pulse dm_done 1 cycle later.
+    assign dm_instr_full = 1'b0;
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) dm_done <= 1'b0;
+        else       dm_done <= dm_instr_wr_en;
+    end
+
     // -------------------------------------------------------------------------
-    // DM output FIFO: stub drains it each cycle and pulses dm_done
+    // Probe outputs
     // -------------------------------------------------------------------------
-    logic                   dm_in_rd_en_stub;
-    logic                   dm_in_empty_stub;
-
-    fifo #(
-        .FIFO_DATA_WIDTH (DM_MOVER_INSTR_W),
-        .FIFO_BUFFER_SIZE(DM_FIFO_Q)
-    ) u_dm_fifo_axi (
-        .reset  (reset),
-        .wr_clk (clk),
-        .wr_en  (dm_axi_out_wr_en),
-        .din    (dm_axi_out_din_wide),
-        .full   (dm_full_axi),
-        .rd_clk (clk),
-        .rd_en  (dm_in_rd_en_axi),
-        .dout   (dm_fifo_axi_dout_wide),
-        .empty  (dm_in_empty_axi)
-    );
-
-    // FIFO width == INSTR_WIDTH; pass through directly
-    assign dm_in_dout_axi = dm_fifo_axi_dout_wide;
-
-    assign dm_in_full = desc_full;
-    // dm_done is driven directly by the axi_done pulse from u_axi
+    assign probe_df_in_wr_en  = df_in_wr_en;
+    assign probe_dm_wr_en     = dm_instr_wr_en;
+    assign probe_dm_instr_rw  = dm_instr[dma_pkg::INSTR_RW_BIT];
 
 endmodule

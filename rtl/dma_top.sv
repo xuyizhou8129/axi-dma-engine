@@ -1,5 +1,5 @@
 // DMA top-level: SPI-CSR + Ring Manager + Movement Top + IRQ.
-// External interface: SPI (4 pins) + AXI4 master + single IRQ output.
+// External interface: SPI (4 pins) + single IRQ output + probe pins.
 
 module dma_top #(
     parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT
@@ -76,14 +76,21 @@ module dma_top #(
     );
 
     movement_top u_movement (
-        .clk        (clk),
-        .rst_n      (rst_core_n),
-        .rm_df_addr (rm_df_addr),
-        .rm_df_valid(fetch_req_valid),
-        .df_ready   (fetch_req_ready),
-        .df_error   (df_error),
-        .dm_done    (dm_done),
-        .axi        (axi_sys)
+        .clk              (clk),
+        .rst_n            (rst_core_n),
+        .rm_df_addr       (rm_df_addr),
+        .rm_df_valid      (fetch_req_valid),
+        .df_ready         (fetch_req_ready),
+        .df_error         (df_error),
+        .dm_done          (dm_done),
+        .probe_df_in_wr_en(probe_df_in_wr_en),
+        .probe_dm_wr_en   (probe_dm_wr_en),
+        .probe_dm_instr_rw(probe_dm_instr_rw)
     );
+
+    assign probe_fetch_req_valid = fetch_req_valid;
+    assign probe_ring_empty      = ring_mgr.ring_empty;
+    assign probe_busy            = ring_mgr.busy;
+    assign probe_rm_df_addr_lo   = rm_df_addr[7:0];
 
 endmodule
