@@ -1,5 +1,0 @@
-1. Currently the data in the SRAM is not being compared
-2. Use Gui to examine signals level to make sure it is actually working
-3. There is a bug regarding irq (could be irq itself or the rest of the system)
-4. Once all of the above are solved, add more test cases (manual)
-5. Let it randomly generate automatic test cases
