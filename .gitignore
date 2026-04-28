@@ -59,3 +59,6 @@ tb_descriptor_fetcher/out/
 work/
 modelsim.ini
 transcript
+syn/*.log
+syn/*.tcl
+syn/rev_1

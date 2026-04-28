@@ -1,0 +1,59 @@
+Walk me through the work flow when I run make sim-all in the sim directory, 
+the key questions are: 
+1. Does the top level being tested include SRAM and System Memory (Both should be synthesizable)
+2. How does the software model handle error, and how does differential testing work for hardware?
+Example: Is is checking whether both hw/sw raised error flag?
+3. What are the error cases tested?
+
+sim-all only checks the contents of system-memory and sram corrupted by error or not
+sim-error-all checks the flags are raised or not
+
+=== ANSWERS ===
+
+1. YES — both are synthesizable.
+   - System memory: rtl/sys_mem.sv — a synthesizable AXI4 subordinate SRAM (registered FSM,
+     no behavioral constructs). It replaced the old sim/model_sys_mem.sv.
+   - On-chip SRAM/BRAM: rtl/bram.sv, instantiated inside dma_top -> movement_top -> u_bram.
+     Uses (* syn_ramstyle = "block_ram" *) to infer block RAM.
+   - TB hierarchy: tb_dma_top -> dma_top (DUT, includes bram) + sys_mem (system memory).
+   - Both TBs (tb_top.sv for sim-all, tb_error_top.sv for sim-error-all) use sys_mem.sv.
+
+2. SOFTWARE MODEL ERROR HANDLING:
+   - When a bad descriptor is detected (e.g. SRAM dst address out of bounds), the Python
+     model (source/ringManager.py) calls ring.signal_df_error(), which:
+       (a) sets the sticky int_status_error flag in the ring manager model, and
+       (b) calls csr.hw_set_error() to latch STATUS.error and IRQ_STATUS.error in the CSR model.
+   - The engine loop (_drain_engine in run_golden.py) checks ring.has_error() each iteration
+     and breaks immediately if set — mirroring the HW gate on fetch_req_valid.
+   - After a csr_irq_clear CSV op, CSR.write() clears the sticky bits and calls
+     ring_mgr.clear_error(), which resets int_status_error — engine resumes from there.
+
+   DIFFERENTIAL TESTING (sim-all / golden flow):
+   - The Python model produces golden_smem.hex and golden_sram.hex (expected final memory).
+   - The HW testbench (tb_top.sv) applies the same CSR stimulus from stim.txt, waits for
+     the ring to drain, then compares u_sysmem.ram[] vs golden_smem.hex word-by-word
+     (check_mem) and dut.u_movement.u_bram.mem[] vs golden_sram.hex (check_sram).
+   - It does NOT check whether individual error flags were raised — only that the final
+     memory state matches what the Python model produced.
+   - sim-error-all (tb_error_top.sv) adds the flag/pin checks: STATUS.error, IRQ_STATUS.error,
+     irq_rm_error pulse observed, fetch_req_valid held low, etc.
+
+3. ERROR CASES TESTED:
+
+   Via sim-all (scenarios/*.csv, memory differential check):
+   - error_dir0_src_oob.csv       : DIR=0 (SRAM->sys), SRAM source address out of bounds.
+   - error_clear_resumes.csv      : Bad desc latches error; csr_irq_clear resumes; good desc executes.
+   - error_repeated_clear.csv     : Multiple error/clear cycles in sequence.
+   - error_chain_good_bad_good.csv: Good desc -> bad desc -> error stop -> clear -> good desc runs.
+
+   Via sim-error-all (tb_error_top.sv, directed CSR/IRQ checks — run separately):
+   - overflow_sets_error          : Out-of-range SRAM dst -> STATUS.error set, IRQ_STATUS.error set,
+                                    irq_rm_error pulse observed.
+   - error_latch_blocks_issue     : After error, head freezes and fetch_req_valid stays low.
+   - error_clear_resumes          : IRQ_CLEAR[1] clears sticky error; good descriptor executes
+                                    (verified by checking bram[0] == expected data).
+   - masked_irq_still_sets_status : irq_en=0 -> STATUS.error and IRQ_STATUS.error still set,
+                                    but irq_rm_error pin does NOT pulse.
+
+   NOTE: sim-all and sim-error-all are independent — running sim-all does NOT run the directed
+   error tests. Both must be run for full coverage.
