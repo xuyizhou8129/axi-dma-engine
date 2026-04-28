@@ -1,0 +1,18 @@
+THINGS TO FIX
+=============
+
+1. [FIXED] error_chain_good_bad_good.csv — incorrect expected-state comment
+   The comment incorrectly said "sram[128] still 0" before IRQ_CLEAR.
+   Root cause: descriptor_fetcher s_error state keeps draining df_out, so
+   desc2 (already fetched by AXI before df_error fired) executes WITHOUT
+   needing IRQ_CLEAR. IRQ_CLEAR only advances head (2→3) and clears flags.
+
+   Changes made:
+   - error_chain_good_bad_good.csv: corrected expected-state comments and
+     updated Purpose section (2) to accurately describe the s_error drain behaviour.
+   - sim/run_golden.py _drain_engine(): fixed to capture pending_count() at
+     enable time and drain all pending descriptors, using
+     ring.fetch_inflight_descriptor() (new bypass method) to continue draining
+     after error fires — matching HW s_error behaviour.
+   - source/ringManager.py: added fetch_inflight_descriptor() and refactored
+     shared logic into _fetch_descriptor_impl().
