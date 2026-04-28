@@ -41,6 +41,13 @@ class CSR:
             self.REG_IRQ_STATUS: 0,
             self.REG_IRQ_CLEAR:  0,
         }
+        # Ring manager handle for the error_clear pulse (mirrors
+        # csr.sv -> ring_mgr.error_clear). Set via attach_ring_manager().
+        self._ring_mgr = None
+
+    def attach_ring_manager(self, ring_mgr):
+        """Wire the ring manager so IRQ_CLEAR[1] generates the error_clear pulse."""
+        self._ring_mgr = ring_mgr
 
     def write(self, offset, data):
         if offset == self.REG_HEAD or offset == self.REG_STATUS:
@@ -52,6 +59,9 @@ class CSR:
             if data & (1 << self.IRQ_ERROR_BIT):
                 self._regs[self.REG_IRQ_STATUS] &= ~(1 << self.IRQ_ERROR_BIT)
                 self._regs[self.REG_STATUS]      &= ~(1 << self.ERROR_BIT)
+                # Mirrors ring_mgr_error_clear pulse (csr.sv:368).
+                if self._ring_mgr is not None:
+                    self._ring_mgr.clear_error()
         elif offset == self.REG_CTRL:
             self._regs[self.REG_CTRL] = data & 0x7  # only bits [2:0] are used
         else:

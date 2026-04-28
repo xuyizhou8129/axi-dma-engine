@@ -1,0 +1,2 @@
+stim_lines=5
+golden_rd=4

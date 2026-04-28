@@ -1,0 +1,7 @@
+op,arg1,arg2,arg3
+# Write 4 consecutive words then read them back as a burst (arlen=3)
+wr,00000000,11223344,
+wr,00000004,55667788,
+wr,00000008,99aabbcc,
+wr,0000000c,ddeeff00,
+rd,00000000,03,

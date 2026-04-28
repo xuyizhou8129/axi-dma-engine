@@ -1,17 +1,9 @@
-# System-level DMA testbench — invoke from any cwd, e.g.:
-#   cd sim && vsim -do dma_sim.do
-#   vsim -do /path/to/axi-dma-engine/sim/dma_sim.do
-#   TB_BATCH=1 vsim -c -do dma_sim.do
-#
-# Prerequisites:  run `make golden` or  python3 run_golden.py scenarios/example.csv out
-# so that out/initial_smem.hex and out/stim.txt exist under sim/out/.
+# Directed DMA error tests — run from sim/: 
+#   TB_BATCH=1 ERR_TEST=overflow_sets_error vsim -c -do dma_error_sim.do
 
 transcript on
 setenv LMC_TIMEUNIT -9
 
-# ModelSim quirk: [info script] inside a macro often resolves to the vsim binary
-# (e.g. /mtitcl/vsim), not the path to this .do file — so we cannot anchor on it.
-# Instead: walk upward from [pwd] until rtl/dma_pkg.sv is found (repo or sim/ cwd).
 proc _dma_sim_find_rtl {} {
     set dir [file normalize [pwd]]
     for {set i 0} {$i < 32} {incr i} {
@@ -27,7 +19,7 @@ proc _dma_sim_find_rtl {} {
 }
 set RTL [_dma_sim_find_rtl]
 if {$RTL eq ""} {
-    error "dma_sim.do: cannot find rtl/dma_pkg.sv above [pwd] — cd to sim/ or the repo root, then run vsim."
+    error "dma_error_sim.do: cannot find rtl/dma_pkg.sv above [pwd]"
 }
 set SIM_DIR [file normalize [file join $RTL ../sim]]
 cd $SIM_DIR
@@ -35,7 +27,6 @@ cd $SIM_DIR
 vlib work
 vmap work work
 
-# --- RTL (dependency order) ---
 vlog -sv -work work ${RTL}/dma_pkg.sv
 vlog -sv -work work ${RTL}/axi_4_if.sv
 vlog -sv -work work ${RTL}/csr_interfaces.sv
@@ -53,18 +44,22 @@ vlog -sv -work work ${RTL}/csr.sv
 vlog -sv -work work ${RTL}/movement_top.sv
 vlog -sv -work work ${RTL}/dma_top.sv
 
-# --- TB + synthesizable system memory ---
 vlog -sv -work work ${RTL}/sys_mem.sv
-vlog -sv -work work tb_top.sv
+vlog -sv -work work tb_error_top.sv
+
+if {[info exists env(ERR_TEST)]} {
+    set ERR_ARG "+ERR_TEST=$env(ERR_TEST)"
+} else {
+    set ERR_ARG "+ERR_TEST=overflow_sets_error"
+}
 
 vsim -t 1ns -voptargs=+acc +notimingchecks -L work \
-    work.tb_dma_top \
-    -wlf dma.wlf
+    work.tb_dma_error_top \
+    $ERR_ARG \
+    -wlf dma_error.wlf
+
+run -all
 
 if {[info exists env(TB_BATCH)] && $env(TB_BATCH) eq "1"} {
-    run -all
     quit -f
-} else {
-    do dma_wave.do
-    run -all
 }

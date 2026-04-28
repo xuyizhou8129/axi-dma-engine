@@ -1,0 +1,8 @@
+op,arg1,arg2,arg3
+# Scattered single-word writes then individual reads (arlen=0)
+wr,00000010,aabbccdd,
+wr,00000020,deadbeef,
+wr,00000040,cafebabe,
+rd,00000010,00,
+rd,00000020,00,
+rd,00000040,00,

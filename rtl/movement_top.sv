@@ -1,6 +1,6 @@
 //Include Descriptor Fetcher, Data Mover, AXI4 Master, SRAM Controller
 //Wire the modules together
-//Interface with the ring manager, System Memmory(AXI4 Master), and SRAM(SRAM Controller)
+//Interface with the ring manager, System Memory(AXI4 Master), and SRAM(SRAM Controller)
 //The AND of the sram_done signal and the axi_done signal is the done signal for the movement top, connected to 
 //the ring manger
 //reuse the interfaces defined in the rtl folder

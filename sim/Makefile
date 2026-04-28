@@ -7,6 +7,7 @@
 PYTHON         ?= python3
 OUT_DIR        ?= out
 SCENARIO       ?= scenarios/example.csv
+ERR_TEST       ?= overflow_sets_error
 SIM_DIR        := $(CURDIR)
 MODELSIM_ENV   ?= /vol/eecs392/env/modelsim.env
 MODELSIM_SHELL ?= tcsh
@@ -20,7 +21,7 @@ else
 GUI_FIX_TCSH :=
 endif
 
-.PHONY: golden sim sim-gui sim-all clean
+.PHONY: golden sim sim-gui sim-all sim-error sim-error-all clean
 
 # Generate golden reference files from the Python model
 golden:
@@ -51,6 +52,38 @@ sim-all:
 	      pass=$$((pass + 1)); \
 	    else \
 	      echo "$$f FAIL $$(date -Iseconds)" >> "$$rep"; \
+	      fail=$$((fail + 1)); \
+	    fi; \
+	  done; \
+	  summ="--- summary: $$pass pass, $$fail fail ---"; \
+	  echo "$$summ" >> "$$rep"; \
+	  echo "$$summ"; \
+	  case "$$rep" in /*) echo "Report: $$rep";; *) echo "Report: $$(pwd)/$$rep";; esac; \
+	  test $$fail -eq 0'
+
+# Batch simulation for directed error tests in tb_error_top.sv.
+# Usage: make sim-error ERR_TEST=overflow_sets_error
+sim-error:
+ifneq ($(strip $(MODELSIM_ENV)),)
+	$(MODELSIM_SHELL) -c 'if ( -f "$(MODELSIM_ENV)" ) source "$(MODELSIM_ENV)"; \
+	    cd "$(SIM_DIR)"; setenv TB_BATCH 1; setenv ERR_TEST "$(ERR_TEST)"; $(VSIM) -c -do dma_error_sim.do'
+else
+	bash -lc 'cd "$(SIM_DIR)" && TB_BATCH=1 ERR_TEST="$(ERR_TEST)" $(VSIM) -c -do dma_error_sim.do'
+endif
+
+# Run all directed error tests and write $(OUT_DIR)/sim-error-report.txt.
+sim-error-all:
+	bash -lc 'cd "$(SIM_DIR)"; mkdir -p "$(OUT_DIR)"; \
+	  rep="$(OUT_DIR)/sim-error-report.txt"; \
+	  echo "sim-error-all started $$(date -Iseconds)" > "$$rep"; \
+	  pass=0; fail=0; \
+	  for tc in overflow_sets_error error_latch_blocks_issue error_clear_resumes masked_irq_still_sets_status; do \
+	    echo "=== sim-error-all: $$tc ==="; \
+	    if $(MAKE) sim-error ERR_TEST="$$tc"; then \
+	      echo "$$tc PASS $$(date -Iseconds)" >> "$$rep"; \
+	      pass=$$((pass + 1)); \
+	    else \
+	      echo "$$tc FAIL $$(date -Iseconds)" >> "$$rep"; \
 	      fail=$$((fail + 1)); \
 	    fi; \
 	  done; \

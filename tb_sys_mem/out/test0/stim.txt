@@ -1,0 +1,6 @@
+# generated from scenarios/test0.csv
+wr 00000000 11223344
+wr 00000004 55667788
+wr 00000008 99aabbcc
+wr 0000000c ddeeff00
+rd 00000000 03
