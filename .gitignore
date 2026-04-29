@@ -62,3 +62,6 @@ transcript
 syn/*.log
 syn/*.tcl
 syn/rev_1
+
+CLAUDE.md
+.claude/
