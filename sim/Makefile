@@ -21,7 +21,7 @@ else
 GUI_FIX_TCSH :=
 endif
 
-.PHONY: golden sim sim-gui sim-all sim-error sim-error-all clean
+.PHONY: golden sim sim-gui sim-all sim-expect-error sim-error sim-error-all clean
 
 # Generate golden reference files from the Python model
 golden:
@@ -36,6 +36,15 @@ else
 	bash -lc 'cd "$(SIM_DIR)" && TB_BATCH=1 $(VSIM) -c -do $(VSIM_DO)'
 endif
 
+# Like sim, but sets EXPECT_ERROR=1 — for scenarios that intentionally trigger irq_rm_error.
+sim-expect-error: golden
+ifneq ($(strip $(MODELSIM_ENV)),)
+	$(MODELSIM_SHELL) -c 'if ( -f "$(MODELSIM_ENV)" ) source "$(MODELSIM_ENV)"; \
+	    cd "$(SIM_DIR)"; setenv TB_BATCH 1; setenv EXPECT_ERROR 1; $(VSIM) -c -do $(VSIM_DO)'
+else
+	bash -lc 'cd "$(SIM_DIR)" && TB_BATCH=1 EXPECT_ERROR=1 $(VSIM) -c -do $(VSIM_DO)'
+endif
+
 # Batch simulation for every scenarios/*.csv. Each iteration runs golden + vsim;
 # OUT_DIR (default out/) is overwritten each time. Writes $(OUT_DIR)/sim-all-report.txt
 # (PASS/FAIL per scenario + timestamps). Exits with status 1 if any scenario failed.
@@ -47,7 +56,12 @@ sim-all:
 	  pass=0; fail=0; \
 	  for f in scenarios/*.csv; do \
 	    echo "=== sim-all: $$f ==="; \
-	    if $(MAKE) sim SCENARIO="$$f"; then \
+	    if grep -q "^# EXPECT_ERROR=1" "$$f"; then \
+	      tgt=sim-expect-error; \
+	    else \
+	      tgt=sim; \
+	    fi; \
+	    if $(MAKE) $$tgt SCENARIO="$$f"; then \
 	      echo "$$f PASS $$(date -Iseconds)" >> "$$rep"; \
 	      pass=$$((pass + 1)); \
 	    else \
@@ -71,13 +85,16 @@ else
 	bash -lc 'cd "$(SIM_DIR)" && TB_BATCH=1 ERR_TEST="$(ERR_TEST)" $(VSIM) -c -do dma_error_sim.do'
 endif
 
-# Run all directed error tests and write $(OUT_DIR)/sim-error-report.txt.
+# Run all directed error tests listed in scenarios/error_tests.txt.
+# Writes $(OUT_DIR)/sim-error-report.txt. Add a new test case name there;
+# no Makefile edit needed — mirrors how sim-all reads scenarios/*.csv.
 sim-error-all:
 	bash -lc 'cd "$(SIM_DIR)"; mkdir -p "$(OUT_DIR)"; \
 	  rep="$(OUT_DIR)/sim-error-report.txt"; \
 	  echo "sim-error-all started $$(date -Iseconds)" > "$$rep"; \
 	  pass=0; fail=0; \
-	  for tc in overflow_sets_error error_latch_blocks_issue error_clear_resumes masked_irq_still_sets_status; do \
+	  while IFS= read -r tc || [ -n "$$tc" ]; do \
+	    [ -z "$$tc" ] && continue; \
 	    echo "=== sim-error-all: $$tc ==="; \
 	    if $(MAKE) sim-error ERR_TEST="$$tc"; then \
 	      echo "$$tc PASS $$(date -Iseconds)" >> "$$rep"; \
@@ -86,7 +103,7 @@ sim-error-all:
 	      echo "$$tc FAIL $$(date -Iseconds)" >> "$$rep"; \
 	      fail=$$((fail + 1)); \
 	    fi; \
-	  done; \
+	  done < scenarios/error_tests.txt; \
 	  summ="--- summary: $$pass pass, $$fail fail ---"; \
 	  echo "$$summ" >> "$$rep"; \
 	  echo "$$summ"; \

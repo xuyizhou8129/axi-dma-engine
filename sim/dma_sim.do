@@ -57,13 +57,19 @@ vlog -sv -work work ${RTL}/dma_top.sv
 vlog -sv -work work ${RTL}/sys_mem.sv
 vlog -sv -work work tb_top.sv
 
+set vsim_plusargs [list]
+if {[info exists env(EXPECT_ERROR)] && $env(EXPECT_ERROR) eq "1"} {
+    lappend vsim_plusargs +EXPECT_ERROR=1
+}
+
 vsim -t 1ns -voptargs=+acc +notimingchecks -L work \
     work.tb_dma_top \
+    {*}$vsim_plusargs \
     -wlf dma.wlf
 
 if {[info exists env(TB_BATCH)] && $env(TB_BATCH) eq "1"} {
     run -all
-    quit -f
+    quit -code [expr {[examine -radix decimal /tb_dma_top/tb_pass] == 1 ? 0 : 1}]
 } else {
     do dma_wave.do
     run -all

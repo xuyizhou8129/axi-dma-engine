@@ -183,10 +183,11 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
 
     def _drain_engine():
         """
-        Run until the ring is empty *or* the sticky error blocks all fetches.
-        Mirrors ring_manager.sv: head advances on issue (so bad descriptors still
-        consume their slot), DF drops bad descriptors instead of forwarding them
-        to the data mover, and DM/AXI/SRAM keep draining the in-flight pipeline.
+        Run until the ring is empty or the sticky error blocks new issues.
+        After an error fires, mirrors descriptor_fetcher s_error behaviour:
+        continues draining all descriptors still pending in the ring using
+        fetch_inflight_descriptor() to bypass the error gate — matching HW
+        where df_out keeps draining even after df_error pulses.
         """
         if not csr.is_enabled():
             return
@@ -194,16 +195,37 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             if ring.is_empty():
                 break
             if ring.has_error():
-                # int_status_error gates fetch_req_valid in HW.
+                # int_status_error gates fetch_req_valid (no new issues).
+                # s_error still drains df_out for descriptors already fetched by AXI.
+                for _ in range(ring.pending_count()):
+                    desc = ring.fetch_inflight_descriptor()
+                    if desc is None:
+                        break
+                    descs_fetched.append(desc.pack())
+                    if not df.is_descriptor_valid(desc):
+                        ring.signal_df_error()
+                        ring.complete()
+                        continue
+                    instr_axi, instr_sram = _desc_to_instr_pair(desc)
+                    dm_axi.enqueue(instr_axi)
+                    dm_sram.enqueue(instr_sram)
+                    dir_bit = desc.w3 & 1
+                    if dir_bit:
+                        _drain_axi_dm(axi_golden, instr_axi)
+                        _drain_sram_dm(sram_ctrl, instr_sram)
+                    else:
+                        _drain_sram_dm(sram_ctrl, instr_sram)
+                        _drain_axi_dm(axi_golden, instr_axi)
+                    ring.complete()
                 break
 
-            # 1. Descriptor Fetcher + AXI fetch path
+            # s_normal: fetch, bounds-check, and execute one descriptor
             desc = ring.fetch_next_descriptor()
             if desc is None:
                 break
             descs_fetched.append(desc.pack())
 
-            # 2. DF bounds check (rtl/descriptor_fetcher.sv s_normal/s_error).
+            # DF bounds check (rtl/descriptor_fetcher.sv s_normal/s_error).
             if not df.is_descriptor_valid(desc):
                 # Drop descriptor: never reaches the data mover. Pulse df_error
                 # which (a) latches sticky CSR error/IRQ_STATUS bits and
@@ -213,12 +235,12 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
                 ring.complete()
                 continue
 
-            # 3. data_mover produces two DM instructions (AXI path vs SRAM path)
+            # data_mover produces two DM instructions (AXI path vs SRAM path)
             instr_axi, instr_sram = _desc_to_instr_pair(desc)
             dm_axi.enqueue(instr_axi)
             dm_sram.enqueue(instr_sram)
 
-            # 4. Drain DM paths in MID-safe order.
+            # Drain DM paths in MID-safe order.
             # DIR=1: AXI read → MID → SRAM write.  DIR=0: SRAM read → MID → AXI write.
             dir_bit = desc.w3 & 1
             if dir_bit:
@@ -228,7 +250,7 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
                 _drain_sram_dm(sram_ctrl, instr_sram)
                 _drain_axi_dm(axi_golden, instr_axi)
 
-            # 5. Advance head (mirrors as_done → ring_manager head increment)
+            # Advance head (mirrors as_done → ring_manager head increment)
             ring.complete()
         else:
             raise RuntimeError("run_scenario: exceeded MAX_ITERS without draining ring")

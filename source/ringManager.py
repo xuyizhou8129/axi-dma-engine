@@ -93,19 +93,8 @@ class RingManager:
     # Consumer — DescriptorFetcher + AXI4MasterGolden (same as HW DF + AXI path)
     # -------------------------------------------------------------------------
 
-    def fetch_next_descriptor(self, max_steps=256):
-        """
-        Issue rm_df-style handle, run golden until descriptor is in df_out, return it.
-        Does not advance head — call complete() after the transfer completes.
-
-        Mirrors ring_manager.sv fetch_req_valid gating: when the sticky error
-        flag is set we refuse to issue, exactly as the HW gate does.
-        """
-        if self.is_empty():
-            return None
-        if self.int_status_error:
-            return None
-
+    def _fetch_descriptor_impl(self, max_steps=256):
+        """Submit the current head's handle to AXI and return the fetched descriptor."""
         head = self.csr.read(self.csr.REG_HEAD) & 0xFFFFFFFF
         rlen = self._ringlen()
         ti = head % rlen
@@ -121,9 +110,34 @@ class RingManager:
                 )
             steps += 1
             if steps > max_steps:
-                raise RuntimeError("fetch_next_descriptor: exceeded max_steps")
+                raise RuntimeError("_fetch_descriptor_impl: exceeded max_steps")
 
         return self.df.take_descriptor()
+
+    def fetch_next_descriptor(self, max_steps=256):
+        """
+        Issue rm_df-style handle, run golden until descriptor is in df_out, return it.
+        Does not advance head — call complete() after the transfer completes.
+
+        Mirrors ring_manager.sv fetch_req_valid gating: when the sticky error
+        flag is set we refuse to issue, exactly as the HW gate does.
+        """
+        if self.is_empty():
+            return None
+        if self.int_status_error:
+            return None
+        return self._fetch_descriptor_impl(max_steps)
+
+    def fetch_inflight_descriptor(self, max_steps=256):
+        """
+        Bypass the int_status_error gate and fetch the next descriptor.
+        Mirrors descriptor_fetcher s_error draining df_out: descriptors already
+        issued to AXI before df_error fired are still forwarded to the data mover.
+        Only call this for descriptors known to be in-flight when the error fired.
+        """
+        if self.is_empty():
+            return None
+        return self._fetch_descriptor_impl(max_steps)
 
     def complete(self):
         """

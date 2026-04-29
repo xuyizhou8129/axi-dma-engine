@@ -92,6 +92,13 @@ module tb_dma_top;
     // -----------------------------------------------------------------------
     logic irq_empty_seen;
     logic irq_error_seen;
+    logic expect_error;
+    logic tb_pass;
+
+    initial begin
+        expect_error = $test$plusargs("EXPECT_ERROR");
+        tb_pass      = 1'b0;
+    end
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -242,8 +249,10 @@ module tb_dma_top;
     task automatic check_irq();
         if (!irq_empty_seen)
             $fatal(1, "check_irq: irq_rm_empty never fired");
-        if (irq_error_seen)
+        if (!expect_error && irq_error_seen)
             $fatal(1, "check_irq: unexpected irq_rm_error");
+        if (expect_error && !irq_error_seen)
+            $fatal(1, "check_irq: EXPECT_ERROR set but irq_rm_error never fired");
         $display("TB: check_irq PASS");
     endtask
 
@@ -320,6 +329,7 @@ module tb_dma_top;
         check_irq();
 
         $display("*** TB PASS ***");
+        tb_pass = 1'b1;
         $finish(0);
     end
 

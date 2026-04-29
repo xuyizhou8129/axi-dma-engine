@@ -1,4 +1,5 @@
 op,arg1,arg2,arg3,arg4
+# EXPECT_ERROR=1
 # =============================================================================
 # Scenario summary (mirrors sim/tb_error_top.sv :: tc_error_clear_resumes)
 #
@@ -15,12 +16,17 @@ op,arg1,arg2,arg3,arg4
 #            sets sticky CSR STATUS.error / IRQ_STATUS.error and ring_mgr
 #            int_status_error → blocks new fetches. Head still advances.
 #
-# Descriptor 1 (GOOD — must execute after IRQ_CLEAR):
+# Descriptor 1 (GOOD — executes in s_error, before IRQ_CLEAR):
 #   SRC_ADDR = 0x00000320 (sys mem word 200), DST_ADDR = 0x00000000 (SRAM word 0)
 #   LEN      = 1, FLAGS = 1 (DIR=1)
-#   Effect: after SW writes IRQ_CLEAR[1]=1, ring_mgr.int_status_error clears,
-#           fetch_req_valid asserts again, desc1 is fetched + executed,
-#           writing system_memory[200] into bram[0].
+#   Effect: both handles are issued into df_in before df_error fires (both
+#           descriptors enqueued before enable, MAX_INFLIGHT=4).
+#           descriptor_fetcher s_error keeps draining df_out, so desc1's
+#           payload is bounds-checked, passes, and forwarded to dm_in
+#           immediately — WITHOUT waiting for IRQ_CLEAR.
+#           IRQ_CLEAR[1]=1 only clears the sticky CSR error bits and
+#           advances head from 1 to 2; bram[0] already holds the
+#           transferred value by that point.
 # =============================================================================
 
 # --- Source word for the GOOD descriptor (sys mem word 200 = byte 0x320) ---
