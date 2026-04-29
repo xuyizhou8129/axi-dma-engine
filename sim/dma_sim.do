@@ -53,8 +53,9 @@ vlog -sv -work work ${RTL}/csr.sv
 vlog -sv -work work ${RTL}/movement_top.sv
 vlog -sv -work work ${RTL}/dma_top.sv
 
-# --- TB + synthesizable system memory ---
+# --- system_top = dma_top + sys_mem, then TB ---
 vlog -sv -work work ${RTL}/sys_mem.sv
+vlog -sv -work work ${RTL}/system_top.sv
 vlog -sv -work work tb_top.sv
 
 set vsim_plusargs [list]

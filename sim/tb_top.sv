@@ -1,13 +1,14 @@
 `timescale 1ns / 1ps
 // ============================================================================
-// tb_dma_top — system-level testbench for dma_top
+// tb_dma_top — system-level testbench for system_top
 //
 // Instantiation hierarchy
 //   tb_dma_top
-//     dma_top  (DUT — rtl/dma_top.sv)
-//       csr, ring_manager, IRQ, movement_top
-//         axi_4_master, sram_controller, descriptor_fetcher, bram, FIFOs
-//     sys_mem (AXI4 synthesizable system memory — rtl/sys_mem.sv)
+//     system_top dut  (rtl/system_top.sv)
+//       dma_top u_dma  (rtl/dma_top.sv)
+//         csr, ring_manager, IRQ, movement_top
+//           axi_4_master, sram_controller, descriptor_fetcher, bram, FIFOs
+//       sys_mem u_sysmem  (rtl/sys_mem.sv)
 //
 // Stimulus flow
 //   1. Assert reset.
@@ -52,39 +53,27 @@ module tb_dma_top;
     // -----------------------------------------------------------------------
     // Interfaces
     // -----------------------------------------------------------------------
-    axi_4_if #(
-        .ADDR_WIDTH(32),
-        .DATA_WIDTH(32)
-    ) axi_sys (.clk(clk), .rst_n(rst_n));
-
     csr_soc_bus_if soc_bus (.clk(clk), .rst_n(rst_n));
 
     // -----------------------------------------------------------------------
-    // DUT
+    // DUT: system_top = dma_top (u_dma) + sys_mem (u_sysmem)
+    // Internal AXI4 bus between them is inside system_top.
     // -----------------------------------------------------------------------
     logic        irq_rm_empty;
     logic        irq_rm_error;
     logic        irq_block;
     logic [1:0]  irq_block_status;
 
-    dma_top dut (
+    system_top #(
+        .MEM_WORDS(MEM_WORDS)
+    ) dut (
         .clk             (clk),
         .rst_n           (rst_n),
         .soc_bus         (soc_bus),
-        .axi_sys         (axi_sys),
         .irq_rm_empty    (irq_rm_empty),
         .irq_rm_error    (irq_rm_error),
         .irq_block       (irq_block),
         .irq_block_status(irq_block_status)
-    );
-
-    // -----------------------------------------------------------------------
-    // Synthesizable system memory (rtl/sys_mem.sv)
-    // -----------------------------------------------------------------------
-    sys_mem #(
-        .MEM_WORDS(MEM_WORDS)
-    ) u_sysmem (
-        .axi(axi_sys)
     );
 
     // -----------------------------------------------------------------------
@@ -186,7 +175,7 @@ module tb_dma_top;
         int i;
         $readmemh("out/initial_smem.hex", smem_init);
         for (i = 0; i < MEM_WORDS; i = i + 1)
-            u_sysmem.ram[i] = smem_init[i];
+            dut.u_sysmem.ram[i] = smem_init[i];
     endtask
 
     // -----------------------------------------------------------------------
@@ -200,7 +189,7 @@ module tb_dma_top;
         int i;
         $readmemh("out/initial_sram.hex", sram_init);
         for (i = 0; i < BRAM_WORDS; i = i + 1)
-            dut.u_movement.u_bram.mem[i] = sram_init[i];
+            dut.u_dma.u_movement.u_bram.mem[i] = sram_init[i];
     endtask
 
     // -----------------------------------------------------------------------
@@ -212,9 +201,9 @@ module tb_dma_top;
         mism = 0;
         $readmemh("out/golden_smem.hex", golden);
         for (i = 0; i < MEM_WORDS; i = i + 1) begin
-            if (golden[i] !== u_sysmem.ram[i]) begin
+            if (golden[i] !== dut.u_sysmem.ram[i]) begin
                 $display("SMEM mismatch @word%0d: got %08x  exp %08x",
-                         i, u_sysmem.ram[i], golden[i]);
+                         i, dut.u_sysmem.ram[i], golden[i]);
                 mism = mism + 1;
             end
         end
@@ -232,9 +221,9 @@ module tb_dma_top;
         mism = 0;
         $readmemh("out/golden_sram.hex", golden);
         for (i = 0; i < BRAM_WORDS; i = i + 1) begin
-            if (golden[i] !== dut.u_movement.u_bram.mem[i]) begin
+            if (golden[i] !== dut.u_dma.u_movement.u_bram.mem[i]) begin
                 $display("SRAM mismatch @word%0d: got %08x  exp %08x",
-                         i, dut.u_movement.u_bram.mem[i], golden[i]);
+                         i, dut.u_dma.u_movement.u_bram.mem[i], golden[i]);
                 mism = mism + 1;
             end
         end
