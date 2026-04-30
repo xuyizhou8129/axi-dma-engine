@@ -1,0 +1,11 @@
+1. Prewriting the Contents of System Memory and SRAM needs to be done
+(We need to tell the hardware in this testcase, what is the initial content of
+SRAM and system memory (data and descriptor ring), we need to send that info before sending stim.txt)
+2. CRC calculation needed for the contents of System Memory and SRAM
+
+Notes:
+Current Logic of UART communication:
+Host sends out a request and start counting towards timeout.
+OS tries to read the first byte of UART port.
+If real content is there, Host start taking the info.
+(I think this works)
