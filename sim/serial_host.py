@@ -11,10 +11,19 @@ Workflow:
   6. Report PASS / FAIL.
 
 Protocol (ASCII, newline-terminated) — MicroBlaze firmware must match:
-  Host  → FPGA:  "W XXXXXXXX YYYYYYYY\\n"   write 32-bit DATA to byte ADDR
-  Host  → FPGA:  "R XXXXXXXX\\n"            read 32-bit word at byte ADDR
-  FPGA  → Host:  "OK\\n"                    ack for a write
-  FPGA  → Host:  "DATA YYYYYYYY\\n"         response for a read (hex, no 0x)
+  Host  → FPGA:  "W XXXXXXXX YYYYYYYY\\n"      write 32-bit DATA to CSR byte offset
+  Host  → FPGA:  "R XXXXXXXX\\n"               read 32-bit word at CSR byte offset
+  Host  → FPGA:  "SMEM_W XXXXXXXX YYYYYYYY\\n" write word to system memory at byte addr
+  Host  → FPGA:  "SRAM_W XXXXXXXX YYYYYYYY\\n" write word to SRAM at byte addr
+  Host  → FPGA:  "SMEM_CRC\\n"                 request CRC32 of all system memory words
+  Host  → FPGA:  "SRAM_CRC\\n"                 request CRC32 of all SRAM words
+  FPGA  → Host:  "OK\\n"                        ack for any write
+  FPGA  → Host:  "DATA YYYYYYYY\\n"             response for R (hex, no 0x)
+  FPGA  → Host:  "CRC YYYYYYYY\\n"              response for *_CRC (hex, no 0x)
+
+CRC32 definition (Python zlib.crc32 compatible, little-endian word packing):
+  input = concatenation of all 32-bit words packed as little-endian bytes
+  crc   = zlib.crc32(input) & 0xFFFFFFFF
 
 Usage:
   python3 serial_host.py [--port /dev/tty.usbserial-XXX] [--baud 115200]
@@ -35,8 +44,10 @@ import argparse
 import csv
 import glob
 import os
+import struct
 import sys
 import time
+import zlib
 
 # Optional import — fail gracefully so the module can be imported without
 # pyserial installed (unit tests / dry-run mode still work).
@@ -60,6 +71,24 @@ STATUS_BUSY_BIT        = 0
 STATUS_RING_EMPTY_BIT  = 1
 STATUS_ERROR_BIT       = 2
 IRQ_ERROR_BIT          = 1
+
+# Helpers
+def _load_hex32(path):
+    """Read a one-word-per-line hex file into a list of 32-bit ints."""
+    words = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                words.append(int(line, 16) & 0xFFFFFFFF)
+    return words
+
+
+def _crc32_words(words):
+    """CRC32 of a list of 32-bit words packed as little-endian bytes (zlib compatible)."""
+    raw = struct.pack("<%dI" % len(words), *words)
+    return zlib.crc32(raw) & 0xFFFFFFFF
+
 
 # Serial port helpers
 def _find_arty_port():
@@ -168,6 +197,95 @@ class DMASerialHost:
         if (irq >> IRQ_ERROR_BIT) & 1:
             raise RuntimeError("IRQ_ERROR is set (IRQ_STATUS=0x%08x)" % irq)
         return irq
+
+    # Memory pre-write protocol (new commands for MicroBlaze firmware)
+    def smem_write(self, byte_addr, data):
+        """Write one 32-bit word to system memory at byte_addr."""
+        self._send("SMEM_W %08x %08x" % (byte_addr & 0xFFFFFFFF, data & 0xFFFFFFFF))
+        resp = self._recv_line()
+        if resp.upper() != "OK":
+            raise RuntimeError("smem_write 0x%08x: unexpected response %r" % (byte_addr, resp))
+
+    def sram_write(self, byte_addr, data):
+        """Write one 32-bit word to SRAM at byte_addr."""
+        self._send("SRAM_W %08x %08x" % (byte_addr & 0xFFFFFFFF, data & 0xFFFFFFFF))
+        resp = self._recv_line()
+        if resp.upper() != "OK":
+            raise RuntimeError("sram_write 0x%08x: unexpected response %r" % (byte_addr, resp))
+
+    def smem_crc(self):
+        """Request CRC32 of all system memory from FPGA. Returns 32-bit int."""
+        self._send("SMEM_CRC")
+        resp = self._recv_line()
+        parts = resp.upper().split()
+        if len(parts) != 2 or parts[0] != "CRC":
+            raise RuntimeError("smem_crc: unexpected response %r" % resp)
+        return int(parts[1], 16)
+
+    def sram_crc(self):
+        """Request CRC32 of all SRAM from FPGA. Returns 32-bit int."""
+        self._send("SRAM_CRC")
+        resp = self._recv_line()
+        parts = resp.upper().split()
+        if len(parts) != 2 or parts[0] != "CRC":
+            raise RuntimeError("sram_crc: unexpected response %r" % resp)
+        return int(parts[1], 16)
+
+
+    # High-level memory preload + CRC verification
+    def send_initial_smem(self, hex_path):
+        """
+        Pre-write system memory from initial_smem.hex before starting the DMA.
+        Only writes non-zero words to save time (hardware resets to 0).
+        """
+        words = _load_hex32(hex_path)
+        count = 0
+        for i, w in enumerate(words):
+            if w != 0:
+                self.smem_write(i * 4, w)
+                count += 1
+        print("SMEM preload: wrote %d non-zero word(s) (%d total)" % (count, len(words)))
+
+    def send_initial_sram(self, hex_path):
+        """
+        Pre-write SRAM from initial_sram.hex before starting the DMA.
+        Only writes non-zero words to save time (hardware resets to 0).
+        """
+        words = _load_hex32(hex_path)
+        count = 0
+        for i, w in enumerate(words):
+            if w != 0:
+                self.sram_write(i * 4, w)
+                count += 1
+        print("SRAM preload: wrote %d non-zero word(s) (%d total)" % (count, len(words)))
+
+    def verify_smem_crc(self, hex_path):
+        """
+        Ask FPGA for its system memory CRC32 and compare against local hex file.
+        Raises RuntimeError on mismatch.
+        """
+        words    = _load_hex32(hex_path)
+        expected = _crc32_words(words)
+        got      = self.smem_crc()
+        if got != expected:
+            raise RuntimeError(
+                "SMEM CRC mismatch: got 0x%08x  expected 0x%08x" % (got, expected)
+            )
+        print("SMEM CRC OK (0x%08x)" % expected)
+
+    def verify_sram_crc(self, hex_path):
+        """
+        Ask FPGA for its SRAM CRC32 and compare against local hex file.
+        Raises RuntimeError on mismatch.
+        """
+        words    = _load_hex32(hex_path)
+        expected = _crc32_words(words)
+        got      = self.sram_crc()
+        if got != expected:
+            raise RuntimeError(
+                "SRAM CRC mismatch: got 0x%08x  expected 0x%08x" % (got, expected)
+            )
+        print("SRAM CRC OK (0x%08x)" % expected)
 
 
 # Golden model runner (local, no FPGA needed)
@@ -335,10 +453,26 @@ def main():
         sys.exit(1)
     print("Opening %s at %d baud ..." % (port, args.baud))
 
+    smem_path = os.path.join(args.out_dir, "initial_smem.hex")
+    sram_path = os.path.join(args.out_dir, "initial_sram.hex")
+
     host = DMASerialHost(port, baud=args.baud)
     try:
+        # 1. Pre-write initial memory contents (descriptor ring + data)
+        host.send_initial_smem(smem_path)
+        host.verify_smem_crc(smem_path)
+
+        # 2. Pre-write initial SRAM contents
+        host.send_initial_sram(sram_path)
+        host.verify_sram_crc(sram_path)
+
+        # 3. Send CSR writes (baseaddr, ringlen, tail, ctrl.enable)
         host.send_stim(stim_path)
+
+        # 4. Wait for DMA to drain the ring
         host.wait_done(poll_interval=args.poll_interval, timeout=args.timeout)
+
+        # 5. Check no error IRQ fired
         host.check_irq()
         print("*** PASS ***")
     except (RuntimeError, TimeoutError) as e:
