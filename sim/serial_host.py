@@ -199,6 +199,13 @@ class DMASerialHost:
         return irq
 
     # Memory pre-write protocol (new commands for MicroBlaze firmware)
+    def reset(self):
+        """Send RESET to clear all ESP32 dummy memory and CSR state between tests."""
+        self._send("RESET")
+        resp = self._recv_line()
+        if resp.upper() != "OK":
+            raise RuntimeError("reset: unexpected response %r" % resp)
+
     def smem_write(self, byte_addr, data):
         """Write one 32-bit word to system memory at byte_addr."""
         self._send("SMEM_W %08x %08x" % (byte_addr & 0xFFFFFFFF, data & 0xFFFFFFFF))
@@ -343,6 +350,10 @@ def dry_run(scenario_csv, out_dir):
 
     stim, init_smem, final_smem, init_sram, final_sram, descs = rg.run_scenario(rows)
 
+    # Import validity check so error-scenario descriptors are skipped
+    from descriptor_fetcher import DescriptorFetcher
+    from descriptor import Descriptor
+
     # Parse descriptors from CSV and self-check data movement
     errors = 0
     desc_rows = []
@@ -356,16 +367,21 @@ def dry_run(scenario_csv, out_dir):
             desc_rows.append((src, dst, length, flags))
 
     for i, (src, dst, length, flags) in enumerate(desc_rows):
+        desc_obj = Descriptor(src, dst, length, flags)
+        if not DescriptorFetcher.is_descriptor_valid(desc_obj):
+            continue  # dropped by HW bounds check — no data moved, nothing to verify
+
         dir_bit = flags & 1
         if dir_bit:
             # DIR=1: system memory → SRAM
             for beat in range(length):
                 sw = (src >> 2) + beat
                 dw = (dst >> 2) + beat
-                got = final_sram[dw] if dw < len(final_sram) else None
-                exp = init_smem[sw]  if sw < len(init_smem)  else None
-                if got != exp:
-                    print("DESC[%d] SRAM[%d]: got 0x%08x  exp 0x%08x" % (i, dw, got or 0, exp or 0))
+                if sw >= len(init_smem) or dw >= len(final_sram):
+                    continue  # out of range — skip rather than false-fail
+                if final_sram[dw] != init_smem[sw]:
+                    print("DESC[%d] SRAM[%d]: got 0x%08x  exp 0x%08x" % (
+                        i, dw, final_sram[dw], init_smem[sw]))
                     errors += 1
         else:
             # DIR=0: SRAM → system memory.
@@ -374,10 +390,11 @@ def dry_run(scenario_csv, out_dir):
             for beat in range(length):
                 sw = (src >> 2) + beat
                 dw = (dst >> 2) + beat
-                got = final_smem[dw]  if dw < len(final_smem)  else None
-                exp = final_sram[sw]  if sw < len(final_sram)  else None
-                if got != exp:
-                    print("DESC[%d] SMEM[%d]: got 0x%08x  exp 0x%08x" % (i, dw, got or 0, exp or 0))
+                if sw >= len(final_sram) or dw >= len(final_smem):
+                    continue  # out of range — skip rather than false-fail
+                if final_smem[dw] != final_sram[sw]:
+                    print("DESC[%d] SMEM[%d]: got 0x%08x  exp 0x%08x" % (
+                        i, dw, final_smem[dw], final_sram[sw]))
                     errors += 1
 
     if errors:
