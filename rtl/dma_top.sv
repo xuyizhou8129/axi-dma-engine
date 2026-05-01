@@ -6,12 +6,11 @@
 // consolidated pin (status_empty|status_error) & irq_en — connect one to the CPU in integration.
 
 module dma_top #(
-    // Numeric default keeps Vivado happy if elaboration order differs; keep equal to dma_pkg::MAX_INFLIGHT.
-    parameter int MAX_INFLIGHT = 4
+    parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT
 ) (
     input logic clk,
     input logic rst_n,
-    csr_soc_bus_if soc_bus,
+    csr_soc_bus_if.soc soc_bus,
     axi_4_if.master axi_sys,
 
     // Legacy RM pulses (irq_en-gated inside ring_manager)
