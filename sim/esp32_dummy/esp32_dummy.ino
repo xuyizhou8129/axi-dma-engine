@@ -35,9 +35,7 @@
 
 #include <Arduino.h>
 
-// ---------------------------------------------------------------------------
 // Memory sizing (matches run_golden.py / dma_pkg.sv defaults)
-// ---------------------------------------------------------------------------
 #define SMEM_WORDS  1024
 #define SRAM_WORDS  1024
 #define CSR_REGS    16    // 16 x 32-bit slots covering byte offsets 0x00..0x3C
@@ -55,10 +53,8 @@ static uint32_t csr[CSR_REGS];
 #define CSR_STATUS_IDX   5
 #define CSR_STATUS_DONE  0x00000002u   // ring_empty=1, busy=0
 
-// ---------------------------------------------------------------------------
 // CRC32 — matches Python zlib.crc32 (CRC-32/ISO-HDLC)
 // Initial value 0, input/output reflected, final XOR 0xFFFFFFFF.
-// ---------------------------------------------------------------------------
 static uint32_t crc32_update(uint32_t crc, const uint8_t *buf, size_t len) {
     crc = ~crc;
     while (len--) {
@@ -84,9 +80,7 @@ static uint32_t words_crc32(const uint32_t *words, size_t n) {
     return crc;
 }
 
-// ---------------------------------------------------------------------------
 // Helpers
-// ---------------------------------------------------------------------------
 static uint32_t word_at_byte(const uint32_t *arr, size_t arr_words,
                               uint32_t byte_addr) {
     uint32_t idx = byte_addr >> 2;
@@ -100,9 +94,7 @@ static void set_word_at_byte(uint32_t *arr, size_t arr_words,
     if (idx < arr_words) arr[idx] = val;
 }
 
-// ---------------------------------------------------------------------------
 // Command handler
-// ---------------------------------------------------------------------------
 static void handle_command(const String &line) {
     // Tokenise (up to 3 tokens)
     String tok[3];
@@ -174,9 +166,7 @@ static void handle_command(const String &line) {
     }
 }
 
-// ---------------------------------------------------------------------------
 // Arduino entry points
-// ---------------------------------------------------------------------------
 void setup() {
     memset(smem,    0, sizeof(smem));
     memset(sram_mem, 0, sizeof(sram_mem));
