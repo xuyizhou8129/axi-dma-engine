@@ -6,7 +6,7 @@
 // consolidated pin (status_empty|status_error) & irq_en — connect one to the CPU in integration.
 
 module dma_top #(
-    parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT
+    parameter int MAX_INFLIGHT = 4  // keep equal to dma_pkg::MAX_INFLIGHT
 ) (
     input logic clk,
     input logic rst_n,
