@@ -41,12 +41,16 @@ set RTL_SOURCES [list \
 add_files -norecurse $RTL_SOURCES
 set_property file_type SystemVerilog [get_files *.sv]
 
+# Keep the explicit file order above: packages → interfaces → modules.
+# 'DisplayOnly' prevents Vivado from re-sorting files and ensures dma_pkg
+# is compiled before any module that references dma_pkg::<symbol>.
+set_property source_mgmt_mode DisplayOnly [current_project]
+
 # ---- Add constraints ----
 add_files -fileset constrs_1 -norecurse $REPO_ROOT/vivado/constraints.xdc
 
 # ---- Set top ----
 set_property top vivado_config [current_fileset]
-update_compile_order -fileset sources_1
 
 puts "Project created: $PROJ_DIR/$PROJ_NAME.xpr"
 puts "Top module: vivado_config  |  Part: $PART"

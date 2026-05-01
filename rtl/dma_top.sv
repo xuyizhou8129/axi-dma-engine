@@ -10,7 +10,7 @@ module dma_top #(
 ) (
     input logic clk,
     input logic rst_n,
-    csr_soc_bus_if.soc soc_bus,
+    csr_soc_bus_if soc_bus,
     axi_4_if.master axi_sys,
 
     // Legacy RM pulses (irq_en-gated inside ring_manager)
