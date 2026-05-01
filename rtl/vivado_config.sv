@@ -127,7 +127,7 @@ module vivado_config #(
     ) u_dma_top (
         .clk              (clk),
         .rst_n            (rst_n),
-        .soc_bus          (soc_bus.soc),
+        .soc_bus          (soc_bus),
         .axi_sys          (axi_sys.master),
         .irq_rm_empty     (irq_rm_empty),
         .irq_rm_error     (irq_rm_error),
