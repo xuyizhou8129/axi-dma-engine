@@ -30,7 +30,13 @@ module movement_top #(
     output logic                    dm_done,       // one-cycle pulse to RM when a movement completes
 
     // System memory (AXI4)
-    axi_4_if.master axi
+    axi_4_if.master axi,
+
+    // BRAM init port — threaded from bram up to dma_top / vivado_config
+    input  logic [$clog2(BRAM_SIZE)-1:0] bram_init_addr,
+    input  logic                         bram_init_wr_en,
+    input  logic [DATA_WIDTH-1:0]        bram_init_din,
+    output logic [DATA_WIDTH-1:0]        bram_init_dout
 );
 
     localparam int BRAM_DATA_WIDTH = DATA_WIDTH;
@@ -192,12 +198,17 @@ module movement_top #(
         .BRAM_DATA_WIDTH(BRAM_DATA_WIDTH),
         .BRAM_SIZE      (BRAM_SIZE)
     ) u_bram (
-        .clock   (clk),
-        .rd_addr (bram_rd_addr),
-        .wr_addr (bram_wr_addr),
-        .wr_en   (bram_wr_en),
-        .din     (bram_din),
-        .dout    (bram_dout)
+        .clock         (clk),
+        .rd_addr       (bram_rd_addr),
+        .wr_addr       (bram_wr_addr),
+        .wr_en         (bram_wr_en),
+        .din           (bram_din),
+        .dout          (bram_dout),
+        // Init port — driven by mem_access_ctrl via dma_top ports
+        .init_addr     (bram_init_addr),
+        .init_wr_en    (bram_init_wr_en),
+        .init_din      (bram_init_din),
+        .init_dout     (bram_init_dout)
     );
 
     // -------------------------------------------------------------------------

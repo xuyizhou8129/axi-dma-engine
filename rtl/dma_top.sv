@@ -6,7 +6,9 @@
 // consolidated pin (status_empty|status_error) & irq_en — connect one to the CPU in integration.
 
 module dma_top #(
-    parameter int MAX_INFLIGHT = 4  // keep equal to dma_pkg::MAX_INFLIGHT
+    parameter int MAX_INFLIGHT = 4,  // keep equal to dma_pkg::MAX_INFLIGHT
+    parameter int BRAM_SIZE    = dma_pkg::BRAM_SIZE,
+    parameter int DATA_WIDTH   = dma_pkg::DATA_WIDTH
 ) (
     input logic clk,
     input logic rst_n,
@@ -19,7 +21,13 @@ module dma_top #(
 
     // IRQ.sv: interrupt pin and raw status bits [error, empty]
     output logic       irq_block,
-    output logic [1:0] irq_block_status
+    output logic [1:0] irq_block_status,
+
+    // BRAM init port — threaded from bram up through movement_top to vivado_config
+    input  logic [$clog2(BRAM_SIZE)-1:0] bram_init_addr,
+    input  logic                         bram_init_wr_en,
+    input  logic [DATA_WIDTH-1:0]        bram_init_din,
+    output logic [DATA_WIDTH-1:0]        bram_init_dout
 );
 
     csr_ring_manager_if ring_mgr (.clk(clk), .rst_n(rst_n));
@@ -68,14 +76,18 @@ module dma_top #(
     );
 
     movement_top u_movement (
-        .clk         (clk),
-        .rst_n       (rst_core_n),
-        .rm_df_addr  (rm_df_addr),
-        .rm_df_valid (fetch_req_valid),
-        .df_ready    (fetch_req_ready),
-        .df_error    (df_error),
-        .dm_done     (dm_done),
-        .axi         (axi_sys)
+        .clk            (clk),
+        .rst_n          (rst_core_n),
+        .rm_df_addr     (rm_df_addr),
+        .rm_df_valid    (fetch_req_valid),
+        .df_ready       (fetch_req_ready),
+        .df_error       (df_error),
+        .dm_done        (dm_done),
+        .axi            (axi_sys),
+        .bram_init_addr (bram_init_addr),
+        .bram_init_wr_en(bram_init_wr_en),
+        .bram_init_din  (bram_init_din),
+        .bram_init_dout (bram_init_dout)
     );
 
 endmodule

@@ -14,10 +14,29 @@ module sys_mem #(
     parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH,
     parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH
 ) (
-    axi_4_if.slave axi
+    axi_4_if.slave axi,
+
+    // New init port — used by mem_access_ctrl for preload and readback
+    input  logic                    init_wr_en,
+    input  logic [ADDR_WIDTH-1:0]   init_addr,
+    input  logic [DATA_WIDTH-1:0]   init_wdata,
+    output logic [DATA_WIDTH-1:0]   init_rdata
 );
 
     logic [DATA_WIDTH-1:0] ram[0:MEM_WORDS-1];
+
+    // -------------------------------------------------------------------------
+    // Init port logic — direct SRAM-style access for MicroBlaze preload/readback
+    // -------------------------------------------------------------------------
+    logic [ADDR_WIDTH-1:0] init_read_addr;
+
+    assign init_rdata = ram[init_read_addr >> 2];  // registered read (1-cycle latency, same as bram)
+
+    always_ff @(posedge axi.clk) begin
+        init_read_addr <= init_addr;
+        if (init_wr_en)
+            ram[init_addr >> 2] <= init_wdata;
+    end
 
     // -------------------------------------------------------------------------
     // Read FSM
