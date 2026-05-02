@@ -1,0 +1,6 @@
+The purpose of the sim_new_pipeline folder is to reuse the sim folder and its pipeline to test out whether 
+the dma system (from csr to sram and sys_mem) is still functionally correct, new_top.sv is the new top_level
+To validate you work is correct, cd sim and make sim-all. If everything still passes, that means
+the previous fix did not blow up the internal structure
+
+The new ports that are added to sram and sys_mem are designed to connect to external, so no need to connect them now
