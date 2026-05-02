@@ -10,7 +10,7 @@
 
 module vivado_config #(
     parameter int MAX_INFLIGHT = 4,
-    parameter int MEM_WORDS    = 1024,
+    parameter int MEM_WORDS    = 256,
     parameter int BRAM_SIZE    = dma_pkg::BRAM_SIZE,
     parameter int DATA_WIDTH   = dma_pkg::DATA_WIDTH,
     parameter int ADDR_WIDTH   = dma_pkg::ADDR_WIDTH
@@ -137,6 +137,7 @@ module vivado_config #(
         .irq_rm_error     (irq_rm_error),
         .irq_block        (irq_block),
         .irq_block_status (irq_block_status),
+        .init_done        (init_done),
         .bram_init_addr   (bram_init_addr),
         .bram_init_wr_en  (bram_init_wr_en),
         .bram_init_din    (bram_init_din),

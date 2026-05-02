@@ -23,6 +23,7 @@ module sys_mem #(
     output logic [DATA_WIDTH-1:0]   init_rdata
 );
 
+    (* ram_style = "distributed" *)
     logic [DATA_WIDTH-1:0] ram[0:MEM_WORDS-1];
 
     // -------------------------------------------------------------------------

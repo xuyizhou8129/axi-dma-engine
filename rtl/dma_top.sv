@@ -24,6 +24,7 @@ module dma_top #(
     output logic [1:0] irq_block_status,
 
     // BRAM init port — threaded from bram up through movement_top to vivado_config
+    input  logic                         init_done,
     input  logic [$clog2(BRAM_SIZE)-1:0] bram_init_addr,
     input  logic                         bram_init_wr_en,
     input  logic [DATA_WIDTH-1:0]        bram_init_din,
@@ -76,18 +77,19 @@ module dma_top #(
     );
 
     movement_top u_movement (
-        .clk            (clk),
-        .rst_n          (rst_core_n),
-        .rm_df_addr     (rm_df_addr),
-        .rm_df_valid    (fetch_req_valid),
-        .df_ready       (fetch_req_ready),
-        .df_error       (df_error),
-        .dm_done        (dm_done),
-        .axi            (axi_sys),
-        .bram_init_addr (bram_init_addr),
-        .bram_init_wr_en(bram_init_wr_en),
-        .bram_init_din  (bram_init_din),
-        .bram_init_dout (bram_init_dout)
+        .clk             (clk),
+        .rst_n           (rst_core_n),
+        .rm_df_addr      (rm_df_addr),
+        .rm_df_valid     (fetch_req_valid),
+        .df_ready        (fetch_req_ready),
+        .df_error        (df_error),
+        .dm_done         (dm_done),
+        .axi             (axi_sys),
+        .init_done       (init_done),
+        .bram_init_addr  (bram_init_addr),
+        .bram_init_wr_en (bram_init_wr_en),
+        .bram_init_din   (bram_init_din),
+        .bram_init_dout  (bram_init_dout)
     );
 
 endmodule

@@ -32,7 +32,8 @@ module movement_top #(
     // System memory (AXI4)
     axi_4_if.master axi,
 
-    // BRAM init port — threaded from bram up to dma_top / vivado_config
+    // BRAM init port — driven by mem_access_ctrl, muxed with DMA access based on init_done
+    input  logic                         init_done,
     input  logic [$clog2(BRAM_SIZE)-1:0] bram_init_addr,
     input  logic                         bram_init_wr_en,
     input  logic [DATA_WIDTH-1:0]        bram_init_din,
@@ -194,21 +195,28 @@ module movement_top #(
         .dm_in_dout      (dm_in_dout_sram)
     );
 
+    // Mux: MicroBlaze controls bram when !init_done, DMA controls when init_done
+    logic [BRAM_ADDR_WIDTH-1:0] bram_rd_addr_mux;
+    logic [BRAM_ADDR_WIDTH-1:0] bram_wr_addr_mux;
+    logic                       bram_wr_en_mux;
+    logic [BRAM_DATA_WIDTH-1:0] bram_din_mux;
+
+    assign bram_rd_addr_mux = init_done ? bram_rd_addr  : bram_init_addr;
+    assign bram_wr_addr_mux = init_done ? bram_wr_addr  : bram_init_addr;
+    assign bram_wr_en_mux   = init_done ? bram_wr_en    : bram_init_wr_en;
+    assign bram_din_mux     = init_done ? bram_din       : bram_init_din;
+    assign bram_init_dout   = bram_dout;
+
     bram #(
         .BRAM_DATA_WIDTH(BRAM_DATA_WIDTH),
         .BRAM_SIZE      (BRAM_SIZE)
     ) u_bram (
-        .clock         (clk),
-        .rd_addr       (bram_rd_addr),
-        .wr_addr       (bram_wr_addr),
-        .wr_en         (bram_wr_en),
-        .din           (bram_din),
-        .dout          (bram_dout),
-        // Init port — driven by mem_access_ctrl via dma_top ports
-        .init_addr     (bram_init_addr),
-        .init_wr_en    (bram_init_wr_en),
-        .init_din      (bram_init_din),
-        .init_dout     (bram_init_dout)
+        .clock   (clk),
+        .rd_addr (bram_rd_addr_mux),
+        .wr_addr (bram_wr_addr_mux),
+        .wr_en   (bram_wr_en_mux),
+        .din     (bram_din_mux),
+        .dout    (bram_dout)
     );
 
     // -------------------------------------------------------------------------
