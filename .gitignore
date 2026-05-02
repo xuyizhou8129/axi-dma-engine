@@ -72,3 +72,5 @@ logs/
 
 .claude/
 CLAUDE.md
+
+copy_for_debugging/
