@@ -111,12 +111,12 @@ module sys_mem #(
 
     always_ff @(posedge axi.clk or negedge axi.rst_n) begin
         if (!axi.rst_n) begin
-            w_state    <= W_IDLE;
-            w_addr     <= '0;
+            w_state     <= W_IDLE;
+            w_addr      <= '0;
             w_last_beat <= '0;
-            w_beat     <= '0;
-            axi.bvalid <= 1'b0;
-            axi.bresp  <= 2'b00;
+            w_beat      <= '0;
+            axi.bvalid  <= 1'b0;
+            axi.bresp   <= 2'b00;
         end else begin
             case (w_state)
                 W_IDLE: begin
@@ -131,8 +131,6 @@ module sys_mem #(
                 W_DATA: begin
                     axi.bvalid <= 1'b0;
                     if (axi.wvalid && axi.wready) begin
-                        if (((w_addr >> 2) + w_beat) < MEM_WORDS)
-                            ram[(w_addr >> 2) + w_beat] <= axi.wdata;
                         if (axi.wlast)
                             w_state <= W_RESP;
                         else
@@ -147,10 +145,21 @@ module sys_mem #(
                 end
                 default: w_state <= W_IDLE;
             endcase
-            // Init write merged here — single always_ff drives all ram[] writes
-            if (init_wr_en)
-                ram[init_addr >> 2] <= init_wdata;
         end
+    end
+
+    // AXI write port — own process, no async reset, for BRAM inference
+    always_ff @(posedge axi.clk) begin
+        if (w_state == W_DATA && axi.wvalid && axi.wready) begin
+            if (((w_addr >> 2) + w_beat) < MEM_WORDS)
+                ram[(w_addr >> 2) + w_beat] <= axi.wdata;
+        end
+    end
+
+    // Init write port — own process for true dual-port BRAM inference
+    always_ff @(posedge axi.clk) begin
+        if (init_wr_en)
+            ram[init_addr >> 2] <= init_wdata;
     end
 
 endmodule : sys_mem

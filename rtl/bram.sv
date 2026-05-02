@@ -33,12 +33,13 @@ module bram
   // New init read path
   assign init_dout = mem[init_read_addr];
 
+  // Each write port in its own process — required for Vivado true dual-port BRAM inference
   always_ff @(posedge clock) begin
-    // Existing write path (unchanged)
     read_addr <= rd_addr;
     if (wr_en) mem[wr_addr] <= din;
+  end
 
-    // New init write path
+  always_ff @(posedge clock) begin
     init_read_addr <= init_addr;
     if (init_wr_en) mem[init_addr] <= init_din;
   end
