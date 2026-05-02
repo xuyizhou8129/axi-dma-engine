@@ -34,15 +34,9 @@ module sys_mem #(
 
     assign init_rdata = ram[init_word_addr_r];
 
-    // Port B read: register the truncated word address (no async reset — clean for BRAM inference)
+    // Register the truncated word address for init reads (1-cycle latency)
     always_ff @(posedge axi.clk) begin
         init_word_addr_r <= init_addr[MEM_WORD_ADDR_WIDTH+1:2];
-    end
-
-    // Port B write: separate always_ff so Vivado can infer TDP Block RAM
-    always_ff @(posedge axi.clk) begin
-        if (init_wr_en)
-            ram[init_addr[MEM_WORD_ADDR_WIDTH+1:2]] <= init_wdata;
     end
 
     // -------------------------------------------------------------------------
@@ -156,6 +150,8 @@ module sys_mem #(
                 end
                 default: w_state <= W_IDLE;
             endcase
+            if (init_wr_en)
+                ram[init_addr[MEM_WORD_ADDR_WIDTH+1:2]] <= init_wdata;
         end
     end
 
