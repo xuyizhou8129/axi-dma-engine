@@ -1,0 +1,6 @@
+# generated from two_desc_chain_mixed_dir.csv
+csr_write 00 00000000
+csr_write 04 00000004
+csr_write 0c 00000001
+csr_write 0c 00000002
+csr_write 10 00000005
