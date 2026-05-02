@@ -14,7 +14,7 @@ CMD_REQ_RESULTS  = 0x05
 CMD_ACK          = 0xAA
 CMD_NACK         = 0xEE
 
-PORT = '/dev/ttyUSB1'
+PORT = 'COM5'
 BAUD = 9600
 
 # Wait for 5 byte ACK (SYNC + ACK byte)
