@@ -43,7 +43,7 @@ module descriptor_fetcher #(
     output logic [DESC_WIDTH-1:0]  dm_in_din,
 
     // Ring manager <-> DF (see rtl/rm_df_if.sv)
-    rm_df_if.df rm_df
+    rm_df_if.slave rm_df
 );
 
     localparam int RW_BIT  = dma_pkg::instr_rw_bit(INSTR_WIDTH);

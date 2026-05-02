@@ -2,8 +2,8 @@ module csr #(
     parameter int AXIL_ADDR_WIDTH = dma_pkg::AXIL_ADDR_WIDTH,
     parameter int AXIL_DATA_WIDTH = dma_pkg::AXIL_DATA_WIDTH
 ) (
-    csr_soc_bus_if.csr          soc_bus,
-    csr_ring_manager_if.csr     ring_mgr,
+    csr_soc_bus_if.slave           soc_bus,
+    csr_ring_manager_if.master     ring_mgr,
     // One-cycle pulses when IRQ_CLEAR write-1-to-clear commits (for IRQ.sv)
     output logic                irq_clear_pulse_empty,
     output logic                irq_clear_pulse_error

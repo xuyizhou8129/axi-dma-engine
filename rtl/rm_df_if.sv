@@ -11,7 +11,7 @@ interface rm_df_if ();
     logic           fetch_req_ready;  // Asserted by DF when it can accept a new request
     logic           df_error;         // Asserted by DF for one cycle when the fetched descriptor faults
 
-    modport rm (
+    modport master (
         output rm_df_addr,
         output fetch_req_valid,
 
@@ -19,7 +19,7 @@ interface rm_df_if ();
         input  df_error
     );
 
-    modport df (
+    modport slave (
         input  rm_df_addr,
         input  fetch_req_valid,
 

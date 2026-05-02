@@ -9,7 +9,7 @@
 // them without issue.
 
 module vivado_config #(
-    parameter int MAX_INFLIGHT = dma_pkg::MAX_INFLIGHT,
+    parameter int MAX_INFLIGHT = 4,
     parameter int MEM_WORDS    = 1024
 ) (
     input  logic        clk,

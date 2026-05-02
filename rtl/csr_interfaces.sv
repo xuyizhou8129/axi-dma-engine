@@ -31,7 +31,7 @@ interface csr_soc_bus_if (
     logic                  irq_error;
 
     // CSR block is AXI4-Lite slave from the SoC perspective.
-    modport csr (
+    modport slave (
         input  clk, rst_n,
         input  awaddr, awprot, awvalid,
         output awready,
@@ -46,7 +46,7 @@ interface csr_soc_bus_if (
         output irq, irq_empty, irq_error
     );
 
-    modport soc (
+    modport master (
         input  clk, rst_n,
         output awaddr, awprot, awvalid,
         input  awready,
@@ -82,13 +82,13 @@ interface csr_ring_manager_if (
     logic        irq_empty_set;
     logic        error_set;
 
-    modport csr (
+    modport master (
         input  clk, rst_n,
         output baseaddr, ringlen, tail, enable, reset, irq_en, error_clear,
         input  head, busy, ring_empty, irq_empty_set, error_set
     );
 
-    modport ring_manager (
+    modport slave (
         input  clk, rst_n,
         input  baseaddr, ringlen, tail, enable, reset, irq_en, error_clear,
         output head, busy, ring_empty, irq_empty_set, error_set

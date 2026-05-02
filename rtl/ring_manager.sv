@@ -9,7 +9,7 @@ module ring_manager #(
     parameter MAX_INFLIGHT = 4 // maximum number of requests in flight (arbitrarily chosen)
 )(
     // CSR interface
-    csr_ring_manager_if.ring_manager csr_rm,
+    csr_ring_manager_if.slave csr_rm,
 
     // Descriptor Fetcher
     output logic     [31:0]  rm_df_addr,      // send address to fetch to DF
