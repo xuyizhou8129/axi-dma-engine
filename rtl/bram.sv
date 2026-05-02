@@ -22,8 +22,8 @@ module bram
 
   // 8x8 two-dimensional memory array
   // syn_ramstyle directs Synplify to infer block RAM (e.g., M9K on Cyclone IV)
-  (* syn_ramstyle = "block_ram" *)
-  logic [BRAM_SIZE-1:0][BRAM_DATA_WIDTH-1:0] mem;
+  (* ram_style = "block" *)
+  logic [BRAM_DATA_WIDTH-1:0] mem [0:BRAM_SIZE-1];
   logic [BRAM_ADDR_WIDTH-1:0] read_addr;
   logic [BRAM_ADDR_WIDTH-1:0] init_read_addr;
 
