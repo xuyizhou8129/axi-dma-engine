@@ -152,8 +152,8 @@ module movement_top #(
     // -------------------------------------------------------------------------
     localparam int BRAM_ADDR_WIDTH = $clog2(BRAM_SIZE);
 
-    logic [BRAM_ADDR_WIDTH-1:0] bram_rd_addr;
-    logic [BRAM_ADDR_WIDTH-1:0] bram_wr_addr;
+    logic [BRAM_ADDR_WIDTH-1:0] bram_addr;
+    logic                       bram_en;
     logic                       bram_wr_en;
     logic [BRAM_DATA_WIDTH-1:0] bram_din;
     logic [BRAM_DATA_WIDTH-1:0] bram_dout;
@@ -176,8 +176,8 @@ module movement_top #(
     ) u_sram (
         .clock           (clk),
         .reset           (reset),
-        .read_addr       (bram_rd_addr),
-        .write_addr      (bram_wr_addr),
+        .addr            (bram_addr),
+        .en              (bram_en),
         .wr_en           (bram_wr_en),
         .din             (bram_din),
         .dout            (bram_dout),
@@ -198,17 +198,18 @@ module movement_top #(
         .BRAM_DATA_WIDTH(BRAM_DATA_WIDTH),
         .BRAM_SIZE      (BRAM_SIZE)
     ) u_bram (
-        .clock         (clk),
-        .rd_addr       (bram_rd_addr),
-        .wr_addr       (bram_wr_addr),
-        .wr_en         (bram_wr_en),
-        .din           (bram_din),
-        .dout          (bram_dout),
-        // Init port — driven by mem_access_ctrl via dma_top ports
-        .init_addr     (bram_init_addr),
-        .init_wr_en    (bram_init_wr_en),
-        .init_din      (bram_init_din),
-        .init_dout     (bram_init_dout)
+        .clka          (clk),
+        .clkb          (clk),
+        .wea           (bram_wr_en),
+        .web           (bram_init_wr_en),
+        .ena           (bram_en),
+        .enb           (1'b1),
+        .addra         (bram_addr),
+        .addrb         (bram_init_addr),
+        .dina          (bram_din),
+        .dinb          (bram_init_din),
+        .douta         (bram_dout),
+        .doutb         (bram_init_dout)
     );
 
     // -------------------------------------------------------------------------

@@ -194,19 +194,24 @@ add wave -noupdate -group SRAM_Controller_instance -radix hex /tb_dma_top/dut/u_
 add wave -noupdate -group SRAM_Controller_instance -radix unsigned /tb_dma_top/dut/u_movement/u_sram/cur_len
 add wave -noupdate -group SRAM_Controller_instance /tb_dma_top/dut/u_movement/u_sram/cur_write
 add wave -noupdate -group SRAM_Controller_instance -radix unsigned /tb_dma_top/dut/u_movement/u_sram/beat_idx
-add wave -noupdate -group SRAM_Controller_instance -radix unsigned /tb_dma_top/dut/u_movement/u_sram/read_addr
-add wave -noupdate -group SRAM_Controller_instance -radix unsigned /tb_dma_top/dut/u_movement/u_sram/write_addr
+add wave -noupdate -group SRAM_Controller_instance -radix unsigned /tb_dma_top/dut/u_movement/u_sram/addr
+add wave -noupdate -group SRAM_Controller_instance /tb_dma_top/dut/u_movement/u_sram/en
 add wave -noupdate -group SRAM_Controller_instance /tb_dma_top/dut/u_movement/u_sram/wr_en
 add wave -noupdate -group SRAM_Controller_instance -radix hex /tb_dma_top/dut/u_movement/u_sram/din
 
 # =============================================================================
 # BRAM — rtl/bram.sv (u_bram)
 # =============================================================================
-add wave -noupdate -group SRAM_instance -radix unsigned /tb_dma_top/dut/u_movement/u_bram/rd_addr
-add wave -noupdate -group SRAM_instance -radix unsigned /tb_dma_top/dut/u_movement/u_bram/wr_addr
-add wave -noupdate -group SRAM_instance /tb_dma_top/dut/u_movement/u_bram/wr_en
-add wave -noupdate -group SRAM_instance -radix hex /tb_dma_top/dut/u_movement/u_bram/din
-add wave -noupdate -group SRAM_instance -radix hex /tb_dma_top/dut/u_movement/u_bram/dout
+add wave -noupdate -group SRAM_instance -radix unsigned /tb_dma_top/dut/u_movement/u_bram/addra
+add wave -noupdate -group SRAM_instance -radix unsigned /tb_dma_top/dut/u_movement/u_bram/addrb
+add wave -noupdate -group SRAM_instance /tb_dma_top/dut/u_movement/u_bram/ena
+add wave -noupdate -group SRAM_instance /tb_dma_top/dut/u_movement/u_bram/enb
+add wave -noupdate -group SRAM_instance /tb_dma_top/dut/u_movement/u_bram/wea
+add wave -noupdate -group SRAM_instance /tb_dma_top/dut/u_movement/u_bram/web
+add wave -noupdate -group SRAM_instance -radix hex /tb_dma_top/dut/u_movement/u_bram/dina
+add wave -noupdate -group SRAM_instance -radix hex /tb_dma_top/dut/u_movement/u_bram/dinb
+add wave -noupdate -group SRAM_instance -radix hex /tb_dma_top/dut/u_movement/u_bram/douta
+add wave -noupdate -group SRAM_instance -radix hex /tb_dma_top/dut/u_movement/u_bram/doutb
 add wave -noupdate -group SRAM_instance -radix hex {/tb_dma_top/dut/u_movement/u_bram/mem[0]}
 add wave -noupdate -group SRAM_instance -radix hex {/tb_dma_top/dut/u_movement/u_bram/mem[1]}
 

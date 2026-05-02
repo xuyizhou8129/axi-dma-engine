@@ -4,36 +4,41 @@ module bram
 	parameter BRAM_SIZE = dma_pkg::BRAM_SIZE,
 	localparam BRAM_ADDR_WIDTH = $clog2(BRAM_SIZE)
 ) (
-	input logic clock,
+	input logic clka,
+	input logic clkb,
 
-	// Existing port — used by sram_controller during DMA operation
-	input logic [BRAM_ADDR_WIDTH-1:0] rd_addr,
-	input logic [BRAM_ADDR_WIDTH-1:0] wr_addr,
-	input logic wr_en,
-	input logic [BRAM_DATA_WIDTH-1:0] din,
-	output logic [BRAM_DATA_WIDTH-1:0] dout,
+	input logic wea,
+	input logic web,
+	input logic ena,
+	input logic enb,
 
-	// Init port — used by mem_access_ctrl for preload and readback
-	input logic [BRAM_ADDR_WIDTH-1:0] init_addr,
-	input logic init_wr_en,
-	input logic [BRAM_DATA_WIDTH-1:0] init_din,
-	output logic [BRAM_DATA_WIDTH-1:0] init_dout
+	input logic [BRAM_ADDR_WIDTH-1:0] addra,
+	input logic [BRAM_ADDR_WIDTH-1:0] addrb,
+
+	input logic [BRAM_DATA_WIDTH-1:0] dina,
+	input logic [BRAM_DATA_WIDTH-1:0] dinb,
+	output logic [BRAM_DATA_WIDTH-1:0] douta,
+	output logic [BRAM_DATA_WIDTH-1:0] doutb
 );
 
 	(* ram_style = "block" *)
 	logic [BRAM_DATA_WIDTH-1:0] mem [0:BRAM_SIZE-1];
 
-	always_ff @(posedge clock) begin
-		dout <= mem[rd_addr];
-		if (wr_en) begin
-			mem[wr_addr] <= din;
+	always_ff @(posedge clka) begin
+		if (ena) begin
+			douta <= mem[addra];
+			if (wea) begin
+				mem[addra] <= dina;
+			end
 		end
 	end
 
-	always_ff @(posedge clock) begin
-		init_dout <= mem[init_addr];
-		if (init_wr_en) begin
-			mem[init_addr] <= init_din;
+	always_ff @(posedge clkb) begin
+		if (enb) begin
+			doutb <= mem[addrb];
+			if (web) begin
+				mem[addrb] <= dinb;
+			end
 		end
 	end
 

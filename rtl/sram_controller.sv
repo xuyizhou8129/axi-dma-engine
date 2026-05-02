@@ -22,10 +22,10 @@ module sram_controller #(
     input logic reset,
     
     // interface with sram(bram)
-    output  logic [BRAM_ADDR_WIDTH-1:0] read_addr,
-    output  logic [BRAM_ADDR_WIDTH-1:0] write_addr, // maybe change later
+    output  logic [BRAM_ADDR_WIDTH-1:0] addr,
+    output  logic en,
     output  logic wr_en,
-    output  logic [BRAM_DATA_WIDTH-1:0] din, 
+    output  logic [BRAM_DATA_WIDTH-1:0] din,
     input logic [BRAM_DATA_WIDTH-1:0] dout,
 
     // interfvace with axi4master
@@ -77,8 +77,6 @@ module sram_controller #(
         end
     end
 
-    assign write_addr = cur_addr[BRAM_ADDR_WIDTH-1:0];
-    
     // State machine logic
     always_comb begin
         // defaults
@@ -93,9 +91,10 @@ module sram_controller #(
         mid_din     = '0;
         mid_rd_en   = 1'b0;
         wr_en       = 1'b0;
+        en          = 1'b0;
         din         = '0;
         sram_done   = 1'b0;
-        read_addr   = '0;
+        addr        = '0;
 
         case (state)
             s_idle: begin
@@ -113,7 +112,8 @@ module sram_controller #(
                 end else begin
                     // Pre-fetch: present first read address so BRAM dout is ready on first s_reading cycle
                     state_c    = s_reading;
-                    read_addr  = dm_in_dout[31:2];
+                    en         = 1'b1;
+                    addr       = dm_in_dout[BRAM_ADDR_WIDTH+1:2];
                     cur_addr_c = {2'b0, dm_in_dout[31:2]} + 1'b1;
                     beat_idx_c = '0;
                 end
@@ -123,7 +123,9 @@ module sram_controller #(
                 if (!mid_empty) begin
                     mid_rd_en  = 1'b1;
                     wr_en      = 1'b1;
+                    en         = 1'b1;
                     din        = mid_dout[BRAM_DATA_WIDTH-1:0];
+                    addr       = cur_addr[BRAM_ADDR_WIDTH-1:0];
                     cur_addr_c = cur_addr + 1'b1;
                     beat_idx_c = beat_idx + 1'b1;
                     
@@ -136,9 +138,10 @@ module sram_controller #(
                 if (!mid_full) begin
                     mid_wr_en  = 1'b1;
                     mid_din    = {{(DATA_WIDTH-BRAM_DATA_WIDTH){1'b0}}, dout};
+                    en         = 1'b1;
+                    addr       = cur_addr[BRAM_ADDR_WIDTH-1:0];
                     cur_addr_c = cur_addr + 1'b1;
                     beat_idx_c = beat_idx + 1'b1;
-                    read_addr  = cur_addr;
 
                     if (beat_idx == (cur_len - 1'b1) || cur_len == '0) begin
                         state_c = s_wait_axi4master;
