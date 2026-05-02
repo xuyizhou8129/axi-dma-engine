@@ -83,7 +83,7 @@ def main():
 
     # Parse and send stim.txt
     print("Parsing and sending stim.txt...")
-    parse_stimulus('../sim/out/stim.txt', ser)
+    parse_stimulus('stim.txt', ser)
     
     # Tell DMA to run
     print("\nSending RUN DMA Command...")
