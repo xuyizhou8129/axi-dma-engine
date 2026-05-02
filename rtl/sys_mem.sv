@@ -23,11 +23,12 @@ module sys_mem #(
     output logic [DATA_WIDTH-1:0]   init_rdata
 );
 
+    (* ram_style = "distributed" *)
     logic [DATA_WIDTH-1:0] ram[0:MEM_WORDS-1];
 
     // -------------------------------------------------------------------------
     // Init port logic — direct SRAM-style access for MicroBlaze preload/readback
-    // -------------------------------------------------------------------------
+    // -------------------------------------s------------------------------------
     logic [ADDR_WIDTH-1:0] init_read_addr;
 
     assign init_rdata = ram[init_read_addr >> 2];  // registered read (1-cycle latency, same as bram)
@@ -148,7 +149,7 @@ module sys_mem #(
         end
     end
 
-    // AXI write port — own process, no async reset, for BRAM inference
+    // AXI write port — own process, no async reset
     always_ff @(posedge axi.clk) begin
         if (w_state == W_DATA && axi.wvalid && axi.wready) begin
             if (((w_addr >> 2) + w_beat) < MEM_WORDS)
@@ -156,7 +157,7 @@ module sys_mem #(
         end
     end
 
-    // Init write port — own process for true dual-port BRAM inference
+    // Init write port — own process
     always_ff @(posedge axi.clk) begin
         if (init_wr_en)
             ram[init_addr >> 2] <= init_wdata;
