@@ -33,12 +33,14 @@ module bram
   // New init read path
   assign init_dout = mem[init_read_addr];
 
+  // Port A: DMA controller path
   always_ff @(posedge clock) begin
-    // Existing write path (unchanged)
     read_addr <= rd_addr;
     if (wr_en) mem[wr_addr] <= din;
+  end
 
-    // New init write path
+  // Port B: init (backdoor) path
+  always_ff @(posedge clock) begin
     init_read_addr <= init_addr;
     if (init_wr_en) mem[init_addr] <= init_din;
   end

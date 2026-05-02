@@ -28,12 +28,21 @@ module sys_mem #(
     // -------------------------------------------------------------------------
     // Init port logic — direct SRAM-style access for MicroBlaze preload/readback
     // -------------------------------------------------------------------------
-    logic [ADDR_WIDTH-1:0] init_read_addr;
+    localparam int MEM_WORD_ADDR_WIDTH = $clog2(MEM_WORDS);
 
-    assign init_rdata = ram[init_read_addr >> 2];  // registered read (1-cycle latency, same as bram)
+    logic [MEM_WORD_ADDR_WIDTH-1:0] init_word_addr_r;
 
+    assign init_rdata = ram[init_word_addr_r];
+
+    // Port B read: register the truncated word address (no async reset — clean for BRAM inference)
     always_ff @(posedge axi.clk) begin
-        init_read_addr <= init_addr;
+        init_word_addr_r <= init_addr[MEM_WORD_ADDR_WIDTH+1:2];
+    end
+
+    // Port B write: separate always_ff so Vivado can infer TDP Block RAM
+    always_ff @(posedge axi.clk) begin
+        if (init_wr_en)
+            ram[init_addr[MEM_WORD_ADDR_WIDTH+1:2]] <= init_wdata;
     end
 
     // -------------------------------------------------------------------------
@@ -147,9 +156,6 @@ module sys_mem #(
                 end
                 default: w_state <= W_IDLE;
             endcase
-            // Init write merged here — single always_ff drives all ram[] writes
-            if (init_wr_en)
-                ram[init_addr >> 2] <= init_wdata;
         end
     end
 
