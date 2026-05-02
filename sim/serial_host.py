@@ -1,41 +1,49 @@
 #!/usr/bin/env python3
 """
-Python serial host for DMA FPGA verification on Arty A7.
+Python serial host for DMA FPGA verification on Arty A7 + MicroBlaze.
 
 Workflow:
   1. Run run_golden.py to generate out/stim.txt and golden hex files.
   2. Open the serial port connected to the Arty A7's FTDI USB-UART chip.
-  3. Send each CSR write from stim.txt to the MicroBlaze firmware over UART.
-  4. Poll CSR_STATUS until the DMA ring reports empty and not busy.
-  5. Read back CSR_IRQ_STATUS to check for errors.
+  3. Pre-write system memory and SRAM via binary protocol.
+  4. Send each CSR write from stim.txt to the MicroBlaze firmware over UART.
+  5. Trigger DMA via CMD_RUN_DMA.
   6. Report PASS / FAIL.
 
-Protocol (ASCII, newline-terminated) — MicroBlaze firmware must match:
-  Host  → FPGA:  "W XXXXXXXX YYYYYYYY\\n"      write 32-bit DATA to CSR byte offset
-  Host  → FPGA:  "R XXXXXXXX\\n"               read 32-bit word at CSR byte offset
-  Host  → FPGA:  "SMEM_W XXXXXXXX YYYYYYYY\\n" write word to system memory at byte addr
-  Host  → FPGA:  "SRAM_W XXXXXXXX YYYYYYYY\\n" write word to SRAM at byte addr
-  Host  → FPGA:  "SMEM_CRC\\n"                 request CRC32 of all system memory words
-  Host  → FPGA:  "SRAM_CRC\\n"                 request CRC32 of all SRAM words
-  FPGA  → Host:  "OK\\n"                        ack for any write
-  FPGA  → Host:  "DATA YYYYYYYY\\n"             response for R (hex, no 0x)
-  FPGA  → Host:  "CRC YYYYYYYY\\n"              response for *_CRC (hex, no 0x)
+Binary Protocol — matches vitis_workspace/hellow_world/src/protocol.h (Vivado branch):
 
-CRC32 definition (Python zlib.crc32 compatible, little-endian word packing):
-  input = concatenation of all 32-bit words packed as little-endian bytes
-  crc   = zlib.crc32(input) & 0xFFFFFFFF
+  Host → FPGA packet:
+    [Sync Word : 4 bytes LE] = 0xDEADBEEF
+    [Opcode    : 1 byte    ]
+    [Address   : 4 bytes LE]
+    [Length    : 4 bytes LE] = byte count of payload
+    [Payload   : Length bytes]
+
+  FPGA → Host ACK:
+    [Sync Word : 4 bytes LE] = 0xDEADBEEF
+    [ACK/NACK  : 1 byte    ] = 0xAA (ACK) or 0xEE (NACK)
+
+  Opcodes:
+    CMD_WRITE_SRAM   = 0x01   write payload bytes to SRAM at Address
+    CMD_WRITE_SYSMEM = 0x02   write payload bytes to system memory at Address
+    CMD_WRITE_CSR    = 0x03   write payload bytes to CSR at Address
+    CMD_RUN_DMA      = 0x04   trigger DMA engine (no payload)
+    CMD_REQ_RESULTS  = 0x05   (reserved — not yet implemented in firmware)
+
+  Note: CMD_REQ_RESULTS, CSR reads, CRC verification, and DMA-done polling are
+  not yet implemented in the MicroBlaze firmware. Those methods raise
+  NotImplementedError until the firmware is updated.
 
 Usage:
-  python3 serial_host.py [--port /dev/tty.usbserial-XXX] [--baud 115200]
+  python3 serial_host.py [--port /dev/tty.usbserial-XXX] [--baud 9600]
+                         [--csr-base 0x40000000]
+                         [--smem-base 0x00000000] [--sram-base 0x00010000]
                          [--scenario scenarios/example.csv] [--out-dir out]
-                         [--timeout 30] [--poll-interval 0.1]
   python3 serial_host.py --list-ports
 
 CSR register byte offsets (matches csr.py / dma_pkg.sv):
   BASEADDR   0x00   RINGLEN  0x04   HEAD  0x08   TAIL  0x0C
   CTRL       0x10   STATUS   0x14   IRQ_STATUS 0x18
-
-STATUS bits:  [0] busy  [1] ring_empty  [2] error
 """
 
 from __future__ import print_function
@@ -48,6 +56,17 @@ import struct
 import sys
 import time
 import zlib
+
+# Binary protocol constants — must match protocol.h in Vivado branch
+PACKET_SYNC_WORD = 0xDEADBEEF
+CMD_WRITE_SRAM   = 0x01
+CMD_WRITE_SYSMEM = 0x02
+CMD_WRITE_CSR    = 0x03
+CMD_RUN_DMA      = 0x04
+CMD_REQ_RESULTS  = 0x05
+CMD_ACK          = 0xAA
+CMD_NACK         = 0xEE
+HEADER_SIZE      = 13  # 4 (sync) + 1 (opcode) + 4 (addr) + 4 (len)
 
 # Optional import — fail gracefully so the module can be imported without
 # pyserial installed (unit tests / dry-run mode still work).
@@ -111,12 +130,18 @@ def list_ports():
 
 # Protocol implementation
 class DMASerialHost:
-    """Send/receive over the ASCII protocol described in the module docstring."""
+    """Send/receive over the binary protocol defined in protocol.h (Vivado branch)."""
 
-    def __init__(self, port, baud=115200, timeout=2.0):
+    def __init__(self, port, baud=9600, timeout=2.0,
+                 csr_base_addr=0x40000000,
+                 smem_base_addr=0x00000000,
+                 sram_base_addr=0x00010000):
         if not _SERIAL_AVAILABLE:
             raise RuntimeError("pyserial is not installed. Run: pip install pyserial")
         self.ser = serial.Serial(port, baudrate=baud, timeout=timeout)
+        self.csr_base_addr  = csr_base_addr
+        self.smem_base_addr = smem_base_addr
+        self.sram_base_addr = sram_base_addr
         time.sleep(0.1)  # let FTDI settle
         self.ser.reset_input_buffer()
 
@@ -124,39 +149,82 @@ class DMASerialHost:
         if self.ser and self.ser.is_open:
             self.ser.close()
 
-    def _send(self, line):
-        self.ser.write((line + "\n").encode())
+    @staticmethod
+    def _build_packet(opcode, address, payload=b""):
+        """Pack a binary protocol packet: sync + opcode + addr + len + payload."""
+        header = struct.pack("<IBII", PACKET_SYNC_WORD, opcode, address, len(payload))
+        return header + payload
 
-    def _recv_line(self, timeout=2.0):
-        """Read one newline-terminated response line."""
+    def _send_packet(self, opcode, address, payload=b""):
+        self.ser.write(self._build_packet(opcode, address, payload))
+
+    def _wait_for_ack(self, timeout=2.0):
+        """
+        Scan incoming bytes for PACKET_SYNC_WORD then read the ACK/NACK byte.
+        Returns True on ACK, raises RuntimeError on NACK or timeout.
+        """
         deadline = time.time() + timeout
-        buf = b""
+        sync_val = 0
         while time.time() < deadline:
-            ch = self.ser.read(1)
-            if ch:
-                buf += ch
-                if ch == b"\n":
-                    return buf.decode(errors="replace").strip()
-        raise TimeoutError("No response from FPGA within %.1fs" % timeout)
+            b = self.ser.read(1)
+            if not b:
+                continue
+            sync_val = ((sync_val >> 8) | (b[0] << 24)) & 0xFFFFFFFF
+            if sync_val == PACKET_SYNC_WORD:
+                resp = self.ser.read(1)
+                if not resp:
+                    raise TimeoutError("Timeout reading ACK byte from FPGA")
+                if resp[0] == CMD_ACK:
+                    return True
+                raise RuntimeError("FPGA returned NACK (0x%02x)" % resp[0])
+        raise TimeoutError("No ACK from FPGA within %.1fs" % timeout)
 
+    # ----------------------------------------------------------------
+    # CSR access
+    # ----------------------------------------------------------------
     def csr_write(self, byte_offset, data):
-        """Send W command and wait for OK."""
-        self._send("W %08x %08x" % (byte_offset & 0xFFFFFFFF, data & 0xFFFFFFFF))
-        resp = self._recv_line()
-        if resp.upper() != "OK":
-            raise RuntimeError("csr_write 0x%02x: unexpected response %r" % (byte_offset, resp))
+        """Write a 32-bit value to a CSR register (absolute address = csr_base + offset)."""
+        addr    = (self.csr_base_addr + byte_offset) & 0xFFFFFFFF
+        payload = struct.pack("<I", data & 0xFFFFFFFF)
+        self._send_packet(CMD_WRITE_CSR, addr, payload)
+        self._wait_for_ack()
 
     def csr_read(self, byte_offset):
-        """Send R command and return the 32-bit value."""
-        self._send("R %08x" % (byte_offset & 0xFFFFFFFF))
-        resp = self._recv_line()
-        # Expect "DATA YYYYYYYY"
-        parts = resp.upper().split()
-        if len(parts) != 2 or parts[0] != "DATA":
-            raise RuntimeError("csr_read 0x%02x: unexpected response %r" % (byte_offset, resp))
-        return int(parts[1], 16)
+        """CSR reads are not yet implemented in the MicroBlaze firmware."""
+        raise NotImplementedError(
+            "csr_read: CMD_REQ_RESULTS is not yet implemented in the MicroBlaze firmware. "
+            "Update firmware to respond with register data, then implement here."
+        )
 
+    # ----------------------------------------------------------------
+    # Memory writes
+    # ----------------------------------------------------------------
+    def smem_write(self, byte_addr, data):
+        """Write one 32-bit word to system memory (absolute addr = smem_base + byte_addr)."""
+        addr    = (self.smem_base_addr + byte_addr) & 0xFFFFFFFF
+        payload = struct.pack("<I", data & 0xFFFFFFFF)
+        self._send_packet(CMD_WRITE_SYSMEM, addr, payload)
+        self._wait_for_ack()
+
+    def sram_write(self, byte_addr, data):
+        """Write one 32-bit word to SRAM (absolute addr = sram_base + byte_addr)."""
+        addr    = (self.sram_base_addr + byte_addr) & 0xFFFFFFFF
+        payload = struct.pack("<I", data & 0xFFFFFFFF)
+        self._send_packet(CMD_WRITE_SRAM, addr, payload)
+        self._wait_for_ack()
+
+    # ----------------------------------------------------------------
+    # DMA trigger
+    # ----------------------------------------------------------------
+    def run_dma(self):
+        """Send CMD_RUN_DMA to trigger the DMA engine."""
+        self._send_packet(CMD_RUN_DMA, 0x00000000)
+        self._wait_for_ack()
+        print("DMA trigger ACK'd")
+
+    # ----------------------------------------------------------------
     # High-level DMA operations
+    # ----------------------------------------------------------------
     def send_stim(self, stim_path):
         """Parse stim.txt and issue all CSR writes."""
         count = 0
@@ -174,77 +242,36 @@ class DMASerialHost:
         print("Sent %d CSR write(s) from %s" % (count, os.path.basename(stim_path)))
 
     def wait_done(self, poll_interval=0.1, timeout=30.0):
-        """Poll CSR_STATUS until ring_empty=1 and busy=0, or timeout."""
-        deadline = time.time() + timeout
-        polls = 0
-        while time.time() < deadline:
-            status = self.csr_read(CSR_STATUS)
-            ring_empty = bool((status >> STATUS_RING_EMPTY_BIT) & 1)
-            busy       = bool((status >> STATUS_BUSY_BIT) & 1)
-            error      = bool((status >> STATUS_ERROR_BIT) & 1)
-            polls += 1
-            if error:
-                raise RuntimeError("DMA reported error (STATUS=0x%08x)" % status)
-            if ring_empty and not busy:
-                print("DMA complete after %d status poll(s)" % polls)
-                return status
-            time.sleep(poll_interval)
-        raise TimeoutError("DMA did not complete within %.0fs" % timeout)
+        """Requires CSR reads — not yet implemented in firmware. Raises NotImplementedError."""
+        raise NotImplementedError(
+            "wait_done: requires csr_read (CMD_REQ_RESULTS), which is not yet implemented "
+            "in the MicroBlaze firmware. The firmware CMD_RUN_DMA has a TODO for completion polling."
+        )
 
     def check_irq(self):
-        """Read IRQ_STATUS and fail if error IRQ is set."""
-        irq = self.csr_read(CSR_IRQ_STATUS)
-        if (irq >> IRQ_ERROR_BIT) & 1:
-            raise RuntimeError("IRQ_ERROR is set (IRQ_STATUS=0x%08x)" % irq)
-        return irq
-
-    # Memory pre-write protocol (new commands for MicroBlaze firmware)
-    def reset(self):
-        """Send RESET to clear all ESP32 dummy memory and CSR state between tests."""
-        self._send("RESET")
-        resp = self._recv_line()
-        if resp.upper() != "OK":
-            raise RuntimeError("reset: unexpected response %r" % resp)
-
-    def smem_write(self, byte_addr, data):
-        """Write one 32-bit word to system memory at byte_addr."""
-        self._send("SMEM_W %08x %08x" % (byte_addr & 0xFFFFFFFF, data & 0xFFFFFFFF))
-        resp = self._recv_line()
-        if resp.upper() != "OK":
-            raise RuntimeError("smem_write 0x%08x: unexpected response %r" % (byte_addr, resp))
-
-    def sram_write(self, byte_addr, data):
-        """Write one 32-bit word to SRAM at byte_addr."""
-        self._send("SRAM_W %08x %08x" % (byte_addr & 0xFFFFFFFF, data & 0xFFFFFFFF))
-        resp = self._recv_line()
-        if resp.upper() != "OK":
-            raise RuntimeError("sram_write 0x%08x: unexpected response %r" % (byte_addr, resp))
+        """Requires CSR reads — not yet implemented in firmware. Raises NotImplementedError."""
+        raise NotImplementedError(
+            "check_irq: requires csr_read (CMD_REQ_RESULTS), which is not yet implemented "
+            "in the MicroBlaze firmware."
+        )
 
     def smem_crc(self):
-        """Request CRC32 of all system memory from FPGA. Returns 32-bit int."""
-        self._send("SMEM_CRC")
-        resp = self._recv_line()
-        parts = resp.upper().split()
-        if len(parts) != 2 or parts[0] != "CRC":
-            raise RuntimeError("smem_crc: unexpected response %r" % resp)
-        return int(parts[1], 16)
+        """Not yet implemented in firmware. Raises NotImplementedError."""
+        raise NotImplementedError(
+            "smem_crc: no corresponding firmware command. Implement CMD_REQ_RESULTS in firmware first."
+        )
 
     def sram_crc(self):
-        """Request CRC32 of all SRAM from FPGA. Returns 32-bit int."""
-        self._send("SRAM_CRC")
-        resp = self._recv_line()
-        parts = resp.upper().split()
-        if len(parts) != 2 or parts[0] != "CRC":
-            raise RuntimeError("sram_crc: unexpected response %r" % resp)
-        return int(parts[1], 16)
+        """Not yet implemented in firmware. Raises NotImplementedError."""
+        raise NotImplementedError(
+            "sram_crc: no corresponding firmware command. Implement CMD_REQ_RESULTS in firmware first."
+        )
 
-
-    # High-level memory preload + CRC verification
+    # ----------------------------------------------------------------
+    # High-level memory preload
+    # ----------------------------------------------------------------
     def send_initial_smem(self, hex_path):
-        """
-        Pre-write system memory from initial_smem.hex before starting the DMA.
-        Only writes non-zero words to save time (hardware resets to 0).
-        """
+        """Pre-write system memory from initial_smem.hex. Only non-zero words sent."""
         words = _load_hex32(hex_path)
         count = 0
         for i, w in enumerate(words):
@@ -254,10 +281,7 @@ class DMASerialHost:
         print("SMEM preload: wrote %d non-zero word(s) (%d total)" % (count, len(words)))
 
     def send_initial_sram(self, hex_path):
-        """
-        Pre-write SRAM from initial_sram.hex before starting the DMA.
-        Only writes non-zero words to save time (hardware resets to 0).
-        """
+        """Pre-write SRAM from initial_sram.hex. Only non-zero words sent."""
         words = _load_hex32(hex_path)
         count = 0
         for i, w in enumerate(words):
@@ -267,32 +291,12 @@ class DMASerialHost:
         print("SRAM preload: wrote %d non-zero word(s) (%d total)" % (count, len(words)))
 
     def verify_smem_crc(self, hex_path):
-        """
-        Ask FPGA for its system memory CRC32 and compare against local hex file.
-        Raises RuntimeError on mismatch.
-        """
-        words    = _load_hex32(hex_path)
-        expected = _crc32_words(words)
-        got      = self.smem_crc()
-        if got != expected:
-            raise RuntimeError(
-                "SMEM CRC mismatch: got 0x%08x  expected 0x%08x" % (got, expected)
-            )
-        print("SMEM CRC OK (0x%08x)" % expected)
+        """Not yet supported by firmware — see smem_crc()."""
+        raise NotImplementedError("verify_smem_crc: firmware does not support memory readback yet.")
 
     def verify_sram_crc(self, hex_path):
-        """
-        Ask FPGA for its SRAM CRC32 and compare against local hex file.
-        Raises RuntimeError on mismatch.
-        """
-        words    = _load_hex32(hex_path)
-        expected = _crc32_words(words)
-        got      = self.sram_crc()
-        if got != expected:
-            raise RuntimeError(
-                "SRAM CRC mismatch: got 0x%08x  expected 0x%08x" % (got, expected)
-            )
-        print("SRAM CRC OK (0x%08x)" % expected)
+        """Not yet supported by firmware — see sram_crc()."""
+        raise NotImplementedError("verify_sram_crc: firmware does not support memory readback yet.")
 
 
 # Golden model runner (local, no FPGA needed)
@@ -431,14 +435,18 @@ def dry_run_all(scenarios_dir, out_dir):
 # Main
 def main():
     parser = argparse.ArgumentParser(
-        description="Serial host for DMA FPGA verification (Arty A7 + MicroBlaze)"
+        description="Serial host for DMA FPGA verification (Arty A7 + MicroBlaze, binary protocol)"
     )
     parser.add_argument("--port",          help="Serial port (e.g. /dev/tty.usbserial-XXX). Auto-detected if omitted.")
-    parser.add_argument("--baud",          type=int, default=115200)
+    parser.add_argument("--baud",          type=int, default=9600)
+    parser.add_argument("--csr-base",      type=lambda x: int(x, 0), default=0x40000000, dest="csr_base",
+                        help="AXI base address of the DMA CSR block (default 0x40000000)")
+    parser.add_argument("--smem-base",     type=lambda x: int(x, 0), default=0x00000000, dest="smem_base",
+                        help="AXI base address of system memory (default 0x00000000)")
+    parser.add_argument("--sram-base",     type=lambda x: int(x, 0), default=0x00010000, dest="sram_base",
+                        help="AXI base address of on-chip SRAM/BRAM (default 0x00010000)")
     parser.add_argument("--scenario",      default="scenarios/example.csv", help="Scenario CSV to run")
     parser.add_argument("--out-dir",       default="out", dest="out_dir")
-    parser.add_argument("--timeout",       type=float, default=30.0, help="Seconds to wait for DMA completion")
-    parser.add_argument("--poll-interval", type=float, default=0.1,  dest="poll_interval")
     parser.add_argument("--list-ports",    action="store_true", dest="list_ports", help="List available serial ports and exit")
     parser.add_argument("--dry-run",       action="store_true", dest="dry_run",    help="Run golden model only, no FPGA")
     parser.add_argument("--dry-run-all",   action="store_true", dest="dry_run_all",help="Dry-run all scenarios/*.csv")
@@ -469,29 +477,33 @@ def main():
         print("ERROR: No serial port found. Connect the Arty A7 or pass --port.")
         sys.exit(1)
     print("Opening %s at %d baud ..." % (port, args.baud))
+    print("CSR base=0x%08x  SMEM base=0x%08x  SRAM base=0x%08x" % (
+        args.csr_base, args.smem_base, args.sram_base))
 
     smem_path = os.path.join(args.out_dir, "initial_smem.hex")
     sram_path = os.path.join(args.out_dir, "initial_sram.hex")
 
-    host = DMASerialHost(port, baud=args.baud)
+    host = DMASerialHost(port, baud=args.baud,
+                         csr_base_addr=args.csr_base,
+                         smem_base_addr=args.smem_base,
+                         sram_base_addr=args.sram_base)
     try:
         # 1. Pre-write initial memory contents (descriptor ring + data)
         host.send_initial_smem(smem_path)
-        host.verify_smem_crc(smem_path)
 
         # 2. Pre-write initial SRAM contents
         host.send_initial_sram(sram_path)
-        host.verify_sram_crc(sram_path)
 
         # 3. Send CSR writes (baseaddr, ringlen, tail, ctrl.enable)
         host.send_stim(stim_path)
 
-        # 4. Wait for DMA to drain the ring
-        host.wait_done(poll_interval=args.poll_interval, timeout=args.timeout)
+        # 4. Trigger DMA engine
+        host.run_dma()
 
-        # 5. Check no error IRQ fired
-        host.check_irq()
-        print("*** PASS ***")
+        # NOTE: DMA completion polling (wait_done) and IRQ/CRC verification
+        # require CMD_REQ_RESULTS to be implemented in the MicroBlaze firmware.
+        print("*** Stimulus sent. DMA triggered. ***")
+        print("    (Completion polling not yet supported — check DMA status via Vitis debug or UART prints.)")
     except (RuntimeError, TimeoutError) as e:
         print("*** FAIL: %s ***" % e)
         sys.exit(1)
