@@ -107,6 +107,10 @@ int main() {
                     xil_printf("Wrote SRAM block at 0x%08x\r\n", dest_addr);
                     send_ack(CMD_ACK);
                 }
+                else if (opcode == CMD_WRITE_SYSMEM) {
+                    xil_printf("Wrote System Memory block at 0x%08x\r\n", dest_addr);
+                    send_ack(CMD_ACK);
+                }
                 else {
                     send_ack(CMD_NACK); // Unknown command
                 }
