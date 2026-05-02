@@ -24,24 +24,17 @@ module bram
   // syn_ramstyle directs Synplify to infer block RAM (e.g., M9K on Cyclone IV)
   (* ram_style = "block" *)
   logic [BRAM_DATA_WIDTH-1:0] mem [0:BRAM_SIZE-1];
-  logic [BRAM_ADDR_WIDTH-1:0] read_addr;
-  logic [BRAM_ADDR_WIDTH-1:0] init_read_addr;
 
-  // Existing read path (unchanged)
-  assign dout = mem[read_addr];
-
-  // New init read path
-  assign init_dout = mem[init_read_addr];
-
-  // Each write port in its own process — required for Vivado true dual-port BRAM inference
+  // Port A (DMA): Vivado simple dual-port template — register output data, not address
   always_ff @(posedge clock) begin
-    read_addr <= rd_addr;
     if (wr_en) mem[wr_addr] <= din;
+    dout <= mem[rd_addr];
   end
 
+  // Port B (Init): each port in its own process for true dual-port BRAM inference
   always_ff @(posedge clock) begin
-    init_read_addr <= init_addr;
     if (init_wr_en) mem[init_addr] <= init_din;
+    init_dout <= mem[init_addr];
   end
 
 endmodule
