@@ -7,18 +7,18 @@
 //     dma_top  (DUT — rtl/dma_top.sv)
 //       csr, ring_manager, IRQ, movement_top
 //         axi_4_master, sram_controller, descriptor_fetcher, bram, FIFOs
-//     model_sys_mem (AXI4 behavioural system memory)
+//     sys_mem (AXI4 system memory)
 //
 // Stimulus flow
 //   1. Assert reset.
-//   2. model_sys_mem loads initial_smem.hex (via +MEMHEX= plusarg or default path).
+//   2. load_initial_smem() loads out/initial_smem.hex through sys_mem init port.
 //      load_initial_sram() loads out/initial_sram.hex into dut BRAM (matches run_golden.py).
 //   3. load_stim() reads out/stim.txt and issues CSR writes through axil_write().
 //      Each line is either:
 //        csr_write <byte_offset_hex> <data_hex>
 //        (# comment — ignored)
 //   4. Wait up to TIMEOUT cycles for ring_empty status.
-//   5. check_mem()   — compare model_sys_mem.ram[] against out/golden_smem.hex
+//   5. check_mem()   — compare sys_mem.ram[] against out/golden_smem.hex
 //   6. check_sram()  — compare dut BRAM mem[] against out/golden_sram.hex (Python model)
 //   7. check_irq()   — verify at least one irq_rm_empty pulse was observed
 //
@@ -66,6 +66,7 @@ module tb_dma_top;
     logic        irq_rm_error;
     logic        irq_block;
     logic [1:0]  irq_block_status;
+    logic [31:0] bram_init_dout_unused;
 
     dma_top dut (
         .clk             (clk),
@@ -75,16 +76,30 @@ module tb_dma_top;
         .irq_rm_empty    (irq_rm_empty),
         .irq_rm_error    (irq_rm_error),
         .irq_block       (irq_block),
-        .irq_block_status(irq_block_status)
+        .irq_block_status(irq_block_status),
+        .init_done       (1'b1),
+        .bram_init_addr  ('0),
+        .bram_init_wr_en (1'b0),
+        .bram_init_din   ('0),
+        .bram_init_dout  (bram_init_dout_unused)
     );
 
     // -----------------------------------------------------------------------
-    // Behavioural system memory
+    // System memory
     // -----------------------------------------------------------------------
-    model_sys_mem #(
+    logic        sysmem_init_wr_en;
+    logic [31:0] sysmem_init_addr;
+    logic [31:0] sysmem_init_wdata;
+    logic [31:0] sysmem_init_rdata;
+
+    sys_mem #(
         .MEM_WORDS(MEM_WORDS)
     ) u_sysmem (
-        .axi(axi_sys)
+        .axi        (axi_sys),
+        .init_wr_en (sysmem_init_wr_en),
+        .init_addr  (sysmem_init_addr),
+        .init_wdata (sysmem_init_wdata),
+        .init_rdata (sysmem_init_rdata)
     );
 
     // -----------------------------------------------------------------------
@@ -168,6 +183,31 @@ module tb_dma_top;
         end
         $fclose(fh);
         $display("TB: applied %0d CSR write(s) from %s", n, path);
+    endtask
+
+    task automatic sysmem_init_idle();
+        sysmem_init_wr_en = 1'b0;
+        sysmem_init_addr  = '0;
+        sysmem_init_wdata = '0;
+    endtask
+
+    // -----------------------------------------------------------------------
+    // Preload system memory from initial_smem.hex through sys_mem init port
+    // -----------------------------------------------------------------------
+    task automatic load_initial_smem();
+        logic [31:0] smem_init [0:MEM_WORDS-1];
+        int i;
+        $readmemh("out/initial_smem.hex", smem_init);
+
+        for (i = 0; i < MEM_WORDS; i = i + 1) begin
+            sysmem_init_addr  = i[31:0] << 2;
+            sysmem_init_wdata = smem_init[i];
+            sysmem_init_wr_en = 1'b1;
+            @(posedge clk);
+        end
+
+        sysmem_init_idle();
+        @(posedge clk);
     endtask
 
     // -----------------------------------------------------------------------
@@ -274,17 +314,19 @@ module tb_dma_top;
     // Main test sequence
     // -----------------------------------------------------------------------
     initial begin
-        // Initialise AXI-Lite to idle
+        // Initialise AXI-Lite and memory init port to idle
         axil_idle();
+        sysmem_init_idle();
         rst_n = 1'b0;
 
-        // Release reset after a few cycles; model_sys_mem loads MEMHEX on first clk
+        // Release reset after a few cycles
         repeat (RESET_CYCLES) @(posedge clk);
         rst_n = 1'b1;
         @(posedge clk);
 
-        // Give model_sys_mem one cycle to set ram_preloaded
+        // Preload external memories before DMA starts
         repeat (4) @(posedge clk);
+        load_initial_smem();
 
         // Match Python SRAM image before DMA (zeros + any CSV "sram" rows)
         load_initial_sram();

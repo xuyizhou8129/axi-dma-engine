@@ -3,4 +3,5 @@ the dma system (from csr to sram and sys_mem) is still functionally correct, new
 To validate you work is correct, cd sim and make sim-all. If everything still passes, that means
 the previous fix did not blow up the internal structure
 
+Do not change the bram.sv and sys_mem.sv cuz these are newly implemented, also do not change the logic of the modules
 The new ports that are added to sram and sys_mem are designed to connect to external, so no need to connect them now
