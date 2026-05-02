@@ -34,8 +34,6 @@ module sys_mem #(
 
     always_ff @(posedge axi.clk) begin
         init_read_addr <= init_addr;
-        if (init_wr_en)
-            ram[init_addr >> 2] <= init_wdata;
     end
 
     // -------------------------------------------------------------------------
@@ -149,6 +147,9 @@ module sys_mem #(
                 end
                 default: w_state <= W_IDLE;
             endcase
+            // Init write merged here — single always_ff drives all ram[] writes
+            if (init_wr_en)
+                ram[init_addr >> 2] <= init_wdata;
         end
     end
 
