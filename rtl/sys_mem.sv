@@ -10,7 +10,7 @@
 //   ADDR_WIDTH - AXI address bus width
 
 module sys_mem #(
-    parameter int MEM_WORDS  = 256,
+    parameter int MEM_WORDS  = 64,
     parameter int DATA_WIDTH = dma_pkg::DATA_WIDTH,
     parameter int ADDR_WIDTH = dma_pkg::ADDR_WIDTH
 ) (
