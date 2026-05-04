@@ -54,8 +54,6 @@ module ring_manager #(
     // Pulse outputs: fire one cycle; CSR latches them into sticky status/IRQ bits
     assign csr_rm.irq_empty_set = !was_empty && csr_rm.ring_empty; // non-empty → empty transition
     assign csr_rm.error_set     = df_error;                        // df_error is already a pulse
-    assign irq_empty            = csr_rm.irq_en && csr_rm.irq_empty_set;
-    assign irq_error            = csr_rm.irq_en && csr_rm.error_set;
 
 
     always_comb begin
@@ -101,12 +99,16 @@ module ring_manager #(
             was_empty          <= 1'b1; // buffer starts empty
             int_status_error   <= 1'b0;
             sw_rst_enable      <= 1'b0;
+            irq_empty          <= 1'b0;
+            irq_error          <= 1'b0;
         end else begin
             csr_rm.head        <= head_ptr_next;
             inflight_count     <= inflight_count_next;
             was_empty          <= csr_rm.ring_empty;
             int_status_error   <= int_status_error_next;
             sw_rst_enable      <= sw_rst_enable_next;
+            irq_empty          <= csr_rm.irq_en && csr_rm.irq_empty_set;
+            irq_error          <= csr_rm.irq_en && csr_rm.error_set;
         end
 
     end

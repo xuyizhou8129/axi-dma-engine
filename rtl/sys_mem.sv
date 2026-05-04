@@ -32,12 +32,26 @@ module sys_mem #(
     localparam int MEM_WORD_ADDR_WIDTH = $clog2(MEM_WORDS);
 
     logic [MEM_WORD_ADDR_WIDTH-1:0] init_word_addr_r;
+    logic [MEM_WORD_ADDR_WIDTH-1:0] init_write_addr_r;
+    logic [DATA_WIDTH-1:0]          init_wdata_r;
+    logic                           init_wr_en_r;
 
     assign init_rdata = ram[init_word_addr_r];
 
-    // Register the truncated word address for init reads (1-cycle latency)
+    // Keep init addressing local to this module so the AXI-Lite address register
+    // does not directly drive every distributed RAM write-enable decode path.
     always_ff @(posedge axi.clk) begin
-        init_word_addr_r <= init_addr[MEM_WORD_ADDR_WIDTH+1:2];
+        if (!axi.rst_n) begin
+            init_word_addr_r  <= '0;
+            init_write_addr_r <= '0;
+            init_wdata_r      <= '0;
+            init_wr_en_r      <= 1'b0;
+        end else begin
+            init_word_addr_r  <= init_addr[MEM_WORD_ADDR_WIDTH+1:2];
+            init_write_addr_r <= init_addr[MEM_WORD_ADDR_WIDTH+1:2];
+            init_wdata_r      <= init_wdata;
+            init_wr_en_r      <= init_wr_en;
+        end
     end
 
     // -------------------------------------------------------------------------
@@ -83,6 +97,9 @@ module sys_mem #(
     logic [DATA_WIDTH-1:0] rdata_w;
     logic                  rvalid_w;
     logic                  rlast_w;
+    logic [ADDR_WIDTH-1:0] r_word_idx;
+
+    assign r_word_idx = (r_addr >> 2) + ADDR_WIDTH'(r_beat);
 
     always_comb begin
         rdata_w  = '0;
@@ -90,8 +107,8 @@ module sys_mem #(
         rlast_w  = 1'b0;
         if (r_state == R_ISSUE) begin
             rvalid_w = 1'b1;
-            if (((r_addr >> 2) + r_beat) < MEM_WORDS)
-                rdata_w = ram[(r_addr >> 2) + r_beat];
+            if (r_word_idx < ADDR_WIDTH'(MEM_WORDS))
+                rdata_w = ram[r_word_idx[MEM_WORD_ADDR_WIDTH-1:0]];
             rlast_w  = (r_beat == r_last_beat);
         end
     end
@@ -107,8 +124,11 @@ module sys_mem #(
     typedef enum logic [1:0] { W_IDLE, W_DATA, W_RESP } wst_t;
     wst_t w_state;
     logic [ADDR_WIDTH-1:0] w_addr;
+    logic [ADDR_WIDTH-1:0] w_word_idx;
     logic [7:0] w_last_beat;
     logic [7:0] w_beat;
+
+    assign w_word_idx = (w_addr >> 2) + ADDR_WIDTH'(w_beat);
 
     assign axi.awready = (w_state == W_IDLE);
     assign axi.wready  = (w_state == W_DATA);
@@ -135,8 +155,8 @@ module sys_mem #(
                 W_DATA: begin
                     axi.bvalid <= 1'b0;
                     if (axi.wvalid && axi.wready) begin
-                        if (((w_addr >> 2) + w_beat) < MEM_WORDS)
-                            ram[(w_addr >> 2) + w_beat] <= axi.wdata;
+                        if (w_word_idx < ADDR_WIDTH'(MEM_WORDS))
+                            ram[w_word_idx[MEM_WORD_ADDR_WIDTH-1:0]] <= axi.wdata;
                         if (axi.wlast)
                             w_state <= W_RESP;
                         else
@@ -151,8 +171,8 @@ module sys_mem #(
                 end
                 default: w_state <= W_IDLE;
             endcase
-            if (init_wr_en)
-                ram[init_addr[MEM_WORD_ADDR_WIDTH+1:2]] <= init_wdata;
+            if (init_wr_en_r)
+                ram[init_write_addr_r] <= init_wdata_r;
         end
     end
 

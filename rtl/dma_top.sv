@@ -76,7 +76,10 @@ module dma_top #(
         .irq         (irq_block)
     );
 
-    movement_top u_movement (
+    movement_top #(
+        .BRAM_SIZE  (BRAM_SIZE),
+        .DATA_WIDTH (DATA_WIDTH)
+    ) u_movement (
         .clk             (clk),
         .rst_n           (rst_core_n),
         .rm_df_addr      (rm_df_addr),
