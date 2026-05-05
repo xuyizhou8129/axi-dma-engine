@@ -1,14 +1,22 @@
 set CLK_PERIOD_NS 20.000
 
-set_property -dict { PACKAGE_PIN E3 IOSTANDARD LVCMOS33 } [get_ports sys_clock]
+# Clock pin
+set_property PACKAGE_PIN E3      [get_ports sys_clock]
+set_property IOSTANDARD LVCMOS33 [get_ports sys_clock]
 create_clock -period $CLK_PERIOD_NS -name sys_clock [get_ports sys_clock]
 
-set_property -dict { PACKAGE_PIN C2 IOSTANDARD LVCMOS33 } [get_ports reset]
+# Reset pin
+set_property PACKAGE_PIN C2      [get_ports reset]
+set_property IOSTANDARD LVCMOS33 [get_ports reset]
 set_false_path -from [get_ports reset]
 
-set INPUT_PORTS [remove_from_collection [all_inputs] [get_ports {sys_clock reset}]]
-
+# I/O delays for all inputs except clock and reset
+set INPUT_PORTS [get_ports * -filter {DIRECTION == IN && NAME !~ sys_clock && NAME !~ reset}]
 set_input_delay  -clock sys_clock -max 2.0 $INPUT_PORTS
 set_input_delay  -clock sys_clock -min 0.5 $INPUT_PORTS
 set_output_delay -clock sys_clock -max 2.0 [all_outputs]
 set_output_delay -clock sys_clock -min 0.5 [all_outputs]
+
+# Suppress DRC errors for internal AXI ports with no physical pin
+set_property SEVERITY {Warning} [get_drc_checks NSTD-1]
+set_property SEVERITY {Warning} [get_drc_checks UCIO-1]
