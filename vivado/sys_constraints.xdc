@@ -1,4 +1,4 @@
-set CLK_PERIOD_NS 20.000
+set CLK_PERIOD_NS 10.000
 
 # Clock pin
 set_property PACKAGE_PIN E3      [get_ports sys_clock]
@@ -16,6 +16,10 @@ set_input_delay  -clock sys_clock -max 2.0 $INPUT_PORTS
 set_input_delay  -clock sys_clock -min 0.5 $INPUT_PORTS
 set_output_delay -clock sys_clock -max 2.0 [all_outputs]
 set_output_delay -clock sys_clock -min 0.5 [all_outputs]
+
+# UART is asynchronous by nature - exempt from timing analysis
+set_false_path -from [get_clocks clk_out1_design_1_clk_wiz_1_0] -to [get_ports usb_uart_txd]
+set_false_path -from [get_ports usb_uart_rxd] -to [get_clocks clk_out1_design_1_clk_wiz_1_0]
 
 # Suppress DRC errors for internal AXI ports with no physical pin
 set_property SEVERITY {Warning} [get_drc_checks NSTD-1]
