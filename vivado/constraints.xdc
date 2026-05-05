@@ -15,19 +15,13 @@ set_property -dict { PACKAGE_PIN C2 IOSTANDARD LVCMOS33 } [get_ports rst_n]
 set_false_path -from [get_ports rst_n]
 
 # ---- I/O timing relative to clk ----
-# Do not apply board I/O delays to the clock/reset ports themselves.
-set INPUT_PORTS  [remove_from_collection [all_inputs]  [get_ports {clk rst_n}]]
-set OUTPUT_PORTS [all_outputs]
-
-if {[sizeof_collection $INPUT_PORTS] > 0} {
-    set_input_delay  -clock clk -max 2.0 $INPUT_PORTS
-    set_input_delay  -clock clk -min 0.5 $INPUT_PORTS
-}
-
-if {[sizeof_collection $OUTPUT_PORTS] > 0} {
-    set_output_delay -clock clk -max 2.0 $OUTPUT_PORTS
-    set_output_delay -clock clk -min 0.5 $OUTPUT_PORTS
-}
+# clk and rst_n are already covered by create_clock / set_false_path above;
+# applying set_input_delay to them as well is harmless and avoids the need
+# for remove_from_collection / if-guards, which are not valid XDC syntax.
+set_input_delay  -clock clk -max 2.0 [all_inputs]
+set_input_delay  -clock clk -min 0.5 [all_inputs]
+set_output_delay -clock clk -max 2.0 [all_outputs]
+set_output_delay -clock clk -min 0.5 [all_outputs]
 
 # Note:
 # vivado_config exposes wide AXI-Lite buses as top-level ports. Those buses do
