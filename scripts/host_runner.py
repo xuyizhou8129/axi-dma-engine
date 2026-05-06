@@ -41,7 +41,7 @@ def build_packet(opcode, address, payload=bytes()):
     header = struct.pack('<IBII', PACKET_SYNC_WORD, opcode, address, len(payload))
     return header + payload
 
-def parse_stimulus(filename, ser, csr_base_addr=0x40000000):
+def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
     with open(filename, 'r') as f:
         for line_num, line in enumerate(f):
             line = line.strip()
@@ -59,6 +59,22 @@ def parse_stimulus(filename, ser, csr_base_addr=0x40000000):
                 
                 print(f"Sending CSR Write: Addr {hex(addr)}, Val {hex(value)}")
                 pkt = build_packet(CMD_WRITE_CSR, addr, payload)
+                ser.write(pkt)
+                
+                if wait_for_ack(ser):
+                    print("  -> ACK'd")
+                else:
+                    print("  -> FAILED")
+                    sys.exit(1)
+            elif parts[0] == 'sysmem_write' or parts[0] == 'sram_write':
+                # e.g., sysmem_write 00000000 DEADBEEF
+                addr = int(parts[1], 16)
+                value = int(parts[2], 16)
+                payload = struct.pack('<I', value)
+                
+                opcode = CMD_WRITE_SYSMEM if parts[0] == 'sysmem_write' else CMD_WRITE_SRAM
+                print(f"Sending {parts[0]}: Addr {hex(addr)}, Val {hex(value)}")
+                pkt = build_packet(opcode, addr, payload)
                 ser.write(pkt)
                 
                 if wait_for_ack(ser):

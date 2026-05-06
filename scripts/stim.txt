@@ -1,3 +1,8 @@
+# Setup memory
+sysmem_write 00000000 12345678
+sysmem_write 00000004 AAAABBBB
+sram_write 00000000 87654321
+sram_write 00000004 BBBBCCCC
 # generated from two_desc_chain_mixed_dir.csv
 csr_write 00 00000000
 csr_write 04 00000004
