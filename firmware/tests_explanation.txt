@@ -1,0 +1,5 @@
+The call_back test is a manual put in arbitrary data and read out data what are supposed to be moved to,
+It has been passed on our Vitis environment
+The uart_read_write is supposed to be a further test using uart from host as stimulations instead of arbitrary poke,
+the local computer runs a python script host_runner.py to send uart signals over to Microblaze, which then preload the values in sys_mem
+and sram based on the uart message
