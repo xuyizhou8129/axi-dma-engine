@@ -4,7 +4,7 @@
 // Test read and write to sram and sysmem from microblaze
 
 // Replace with the base address from Vivado Address Editor
-#define MEM_ACCESS_CTRL_BASE  0x44A00000
+#define MEM_ACCESS_CTRL_BASE  0x60000000
 
 // Register offsets (from mem_access_ctrl.sv)
 #define REG_INIT_ADDR  0x00
