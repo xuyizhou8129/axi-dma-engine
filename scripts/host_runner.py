@@ -61,7 +61,7 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                 pkt = build_packet(CMD_WRITE_CSR, addr, payload)
                 ser.write(pkt)
                 
-                if wait_for_ack(ser):
+                # if wait_for_ack(ser):
                     print("  -> ACK'd")
                 else:
                     print("  -> FAILED")

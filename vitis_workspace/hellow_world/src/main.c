@@ -133,6 +133,22 @@ int main() {
                     xil_printf("Wrote SysMem 0x%08x\r\n", dest_addr);
                     send_ack(CMD_ACK);
                 }
+                else if (opcode == CMD_READ_SRAM) {
+                    REG_WRITE(REG_INIT_ADDR, dest_addr);
+                    REG_WRITE(REG_SRAM_RD, 1);
+                    u32 val = REG_READ(REG_RDATA);
+                    xil_printf("Read SRAM 0x%08x\r\n", dest_addr);
+                    send_ack(CMD_ACK);
+                    uart_write_u32(val);
+                }
+                else if (opcode == CMD_READ_SYSMEM) {
+                    REG_WRITE(REG_INIT_ADDR, dest_addr);
+                    REG_WRITE(REG_MEM_RD, 1);
+                    u32 val = REG_READ(REG_RDATA);
+                    xil_printf("Read SysMem 0x%08x\r\n", dest_addr);
+                    send_ack(CMD_ACK);
+                    uart_write_u32(val);
+                }
                 else {
                     send_ack(CMD_NACK); // Unknown command
                 }

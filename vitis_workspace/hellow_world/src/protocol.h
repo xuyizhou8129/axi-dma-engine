@@ -12,6 +12,8 @@
 #define CMD_WRITE_CSR     0x03
 #define CMD_RUN_DMA       0x04
 #define CMD_REQ_RESULTS   0x05
+#define CMD_READ_SRAM     0x06
+#define CMD_READ_SYSMEM   0x07
 #define CMD_ACK           0xAA
 #define CMD_NACK          0xEE
 
