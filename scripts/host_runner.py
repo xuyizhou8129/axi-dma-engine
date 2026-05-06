@@ -61,7 +61,7 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                 pkt = build_packet(CMD_WRITE_CSR, addr, payload)
                 ser.write(pkt)
                 
-                # if wait_for_ack(ser):
+                if wait_for_ack(ser):
                     print("  -> ACK'd")
                 else:
                     print("  -> FAILED")
@@ -81,6 +81,24 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                     print("  -> ACK'd")
                 else:
                     print("  -> FAILED")
+                    sys.exit(1)
+            elif parts[0] == 'sysmem_read' or parts[0] == 'sram_read':
+                addr = int(parts[1], 16)
+                opcode = 0x07 if parts[0] == 'sysmem_read' else 0x06
+                
+                print(f"Sending {parts[0]}: Addr {hex(addr)}")
+                pkt = build_packet(opcode, addr, bytes())
+                ser.write(pkt)
+                
+                if wait_for_ack(ser):
+                    data_bytes = ser.read(4)
+                    if len(data_bytes) == 4:
+                        val = struct.unpack('<I', data_bytes)[0]
+                        print(f"  -> SUCCESS: Read Value = {hex(val)}")
+                    else:
+                        print("  -> FAILED to read returning data")
+                else:
+                    print("  -> FAILED ACK")
                     sys.exit(1)
 
 def main():

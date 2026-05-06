@@ -9,3 +9,9 @@ csr_write 04 00000004
 csr_write 0c 00000001
 csr_write 0c 00000002
 csr_write 10 00000005
+
+# Test reading the memory back
+sysmem_read 00000000
+sysmem_read 00000004
+sram_read 00000000
+sram_read 00000004
