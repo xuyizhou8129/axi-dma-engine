@@ -105,14 +105,14 @@ module tb_dma_top;
 
     initial begin
         start_cycle  = '0;
-        stop_cycle   = '0;
         timing_armed = 1'b0;
-        timing_done  = 1'b0;
     end
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             cycle_count <= '0;
+            stop_cycle  <= '0;
+            timing_done <= 1'b0;
         end else begin
             cycle_count <= cycle_count + 1;
             // Latch first cycle of ring_empty && !busy after timing armed.
