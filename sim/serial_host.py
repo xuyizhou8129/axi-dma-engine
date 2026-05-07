@@ -312,7 +312,7 @@ def run_golden(scenario_csv, out_dir):
     with open(scenario_csv, newline="") as f:
         rows = list(_csv.reader(f))
 
-    stim, init_smem, final_smem, init_sram, final_sram, descs = rg.run_scenario(rows)
+    stim, init_smem, final_smem, init_sram, final_sram, descs, _bytes, _ndesc = rg.run_scenario(rows)
     os.makedirs(out_dir, exist_ok=True)
 
     # stim.txt
@@ -352,7 +352,7 @@ def dry_run(scenario_csv, out_dir):
     with open(scenario_csv, newline="") as f:
         rows = list(_csv.reader(f))
 
-    stim, init_smem, final_smem, init_sram, final_sram, descs = rg.run_scenario(rows)
+    stim, init_smem, final_smem, init_sram, final_sram, descs, _bytes, _ndesc = rg.run_scenario(rows)
 
     # Import validity check so error-scenario descriptors are skipped
     from descriptor_fetcher import DescriptorFetcher

@@ -37,9 +37,11 @@ module tb_dma_top;
     localparam int  RESET_CYCLES   = 8;
 
     // CSR register byte offsets (matches dma_pkg.sv / csr.py)
+    localparam logic [31:0] CSR_CTRL       = 32'h10;
     localparam logic [31:0] CSR_STATUS     = 32'h14;
     localparam logic [31:0] CSR_IRQ_STATUS = 32'h18;
     localparam logic [1:0]  RING_EMPTY_BIT = 2'd1;   // STATUS[1]
+    localparam int          CTRL_ENABLE_BIT = 0;
 
     // -----------------------------------------------------------------------
     // Clock / reset
@@ -89,6 +91,40 @@ module tb_dma_top;
         tb_pass      = 1'b0;
     end
 
+    // -----------------------------------------------------------------------
+    // Throughput timing: free-running cycle counter + start/stop capture.
+    // start_cycle = cycle the CTRL.ENABLE write is accepted by the AXI-Lite
+    //               slave (awready & wready high).
+    // stop_cycle  = first cycle ring is empty AND not busy after start.
+    // -----------------------------------------------------------------------
+    longint unsigned cycle_count;
+    longint unsigned start_cycle;
+    longint unsigned stop_cycle;
+    logic            timing_armed;
+    logic            timing_done;
+
+    initial begin
+        start_cycle  = '0;
+        stop_cycle   = '0;
+        timing_armed = 1'b0;
+        timing_done  = 1'b0;
+    end
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cycle_count <= '0;
+        end else begin
+            cycle_count <= cycle_count + 1;
+            // Latch first cycle of ring_empty && !busy after timing armed.
+            if (timing_armed && !timing_done &&
+                dut.u_dma.ring_mgr.ring_empty &&
+                !dut.u_dma.ring_mgr.busy) begin
+                stop_cycle  <= cycle_count;
+                timing_done <= 1'b1;
+            end
+        end
+    end
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             irq_empty_seen <= 1'b0;
@@ -103,6 +139,10 @@ module tb_dma_top;
     // AXI-Lite driver tasks (single-beat, no burst)
     // -----------------------------------------------------------------------
     task automatic axil_write(input logic [31:0] addr, input logic [31:0] data);
+        logic kick;
+        // A "kick" is a write to CTRL with ENABLE=1 — that is the instruction
+        // we time from. Capture the cycle AW/W are accepted.
+        kick = (addr == CSR_CTRL) && data[CTRL_ENABLE_BIT] && !timing_armed;
         // Write address
         soc_bus.awaddr  = addr;
         soc_bus.awprot  = 3'b000;
@@ -114,6 +154,10 @@ module tb_dma_top;
         @(posedge clk);
         // Hold AW/W until accepted
         while (!(soc_bus.awready && soc_bus.wready)) @(posedge clk);
+        if (kick) begin
+            start_cycle  = cycle_count;
+            timing_armed = 1'b1;
+        end
         soc_bus.awvalid = 1'b0;
         soc_bus.wvalid  = 1'b0;
         // Wait for write response
@@ -264,6 +308,61 @@ module tb_dma_top;
     endtask
 
     // -----------------------------------------------------------------------
+    // Throughput report
+    //
+    // Reads out/throughput_info.txt (written by run_golden.py) for the total
+    // payload byte count, then reports cycles between the CTRL.ENABLE accept
+    // and the first ring_empty && !busy edge.
+    // -----------------------------------------------------------------------
+    task automatic report_throughput();
+        int          fh;
+        reg [2047:0] line;
+        string       key;
+        longint      val;
+        longint unsigned total_bytes;
+        longint unsigned clk_ns;
+        longint unsigned cycles;
+        real             bytes_per_cycle;
+        real             mbps;
+
+        total_bytes = 0;
+        clk_ns      = 10;  // default 100 MHz; overridden by file
+
+        fh = $fopen("out/throughput_info.txt", "r");
+        if (fh == 0) begin
+            $display("TB: throughput  (out/throughput_info.txt missing — skipping)");
+            return;
+        end
+        while (!$feof(fh)) begin
+            if ($fgets(line, fh) == 0) continue;
+            if (line[2047:2040] == 8'h23) continue; // '#'
+            if ($sscanf(line, "%s %0d", key, val) == 2) begin
+                if (key == "total_payload_bytes") total_bytes = val;
+                else if (key == "clk_period_ns")  clk_ns      = val;
+            end
+        end
+        $fclose(fh);
+
+        if (!timing_armed) begin
+            $display("TB: throughput  (no CTRL.ENABLE kick observed — skipping)");
+            return;
+        end
+        if (!timing_done) begin
+            $display("TB: throughput  (ring never reached empty&&!busy — skipping)");
+            return;
+        end
+
+        cycles          = stop_cycle - start_cycle;
+        bytes_per_cycle = (cycles == 0) ? 0.0 : real'(total_bytes) / real'(cycles);
+        // MB/s = bytes / time_s = bytes / (cycles * clk_ns * 1e-9) / 1e6
+        //      = bytes_per_cycle * 1e3 / clk_ns
+        mbps = (clk_ns == 0) ? 0.0 : bytes_per_cycle * 1000.0 / real'(clk_ns);
+
+        $display("TB: throughput  bytes=%0d  cycles=%0d  start=%0d  stop=%0d  bytes/cycle=%0.3f  MB/s=%0.2f",
+                 total_bytes, cycles, start_cycle, stop_cycle, bytes_per_cycle, mbps);
+    endtask
+
+    // -----------------------------------------------------------------------
     // AXI-Lite idle initialisation
     // -----------------------------------------------------------------------
     task automatic axil_idle();
@@ -316,6 +415,9 @@ module tb_dma_top;
 
         // Verify completion IRQ fired
         check_irq();
+
+        // Report end-to-end throughput (CTRL.ENABLE → ring empty && !busy)
+        report_throughput();
 
         $display("*** TB PASS ***");
         tb_pass = 1'b1;

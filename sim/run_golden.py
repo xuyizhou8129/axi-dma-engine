@@ -172,6 +172,8 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
     descs_fetched = []
     initial_smem = None
     initial_sram = None
+    total_payload_bytes = 0
+    desc_count = 0
 
     def _snapshot_initial():
         # Captured the first time the engine is enabled, matching what the TB
@@ -298,6 +300,9 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             # Emit the updated tail so the TB can mirror it via AXI-Lite
             tail = csr.read(csr.REG_TAIL)
             stim_lines.append("csr_write %02x %08x" % (csr.REG_TAIL, tail))
+            # Throughput accounting: LEN low 8 bits = beat count, beat = 4B (DATA_WIDTH=32)
+            total_payload_bytes += (w2 & 0xFF) * 4
+            desc_count += 1
 
         elif op == "enable":
             ctrl = csr.read(csr.REG_CTRL) | (1 << CSR.ENABLE_BIT) | (1 << CSR.IRQ_EN_BIT)
@@ -328,6 +333,8 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
         initial_sram,
         list(sram.mem),
         descs_fetched,
+        total_payload_bytes,
+        desc_count,
     )
 
 
@@ -354,7 +361,8 @@ def main():
     with open(csv_path, newline="") as f:
         rows = list(csv.reader(f))
 
-    stim, init_smem, final_smem, init_sram, final_sram, descs = run_scenario(rows)
+    (stim, init_smem, final_smem, init_sram, final_sram, descs,
+     total_payload_bytes, desc_count) = run_scenario(rows)
 
     # stim.txt — CSR writes for the SV testbench
     stim_path = os.path.join(out_dir, "stim.txt")
@@ -378,6 +386,12 @@ def main():
     with open(os.path.join(out_dir, "summary.txt"), "w") as f:
         f.write("descriptors_fetched=%d\n" % len(descs))
         f.write("stim_lines=%d\n" % len(stim))
+
+    # Throughput info — consumed by tb_top.sv to report bytes/cycle
+    with open(os.path.join(out_dir, "throughput_info.txt"), "w") as f:
+        f.write("total_payload_bytes %d\n" % total_payload_bytes)
+        f.write("descriptor_count %d\n" % desc_count)
+        f.write("clk_period_ns 10\n")
 
     print("Wrote:  %s" % stim_path)
     print("Golden: descs=%d  smem=%d words  sram=%d words" % (
