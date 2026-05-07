@@ -68,6 +68,8 @@ sim-all:
 	      echo "$$f FAIL $$(date -Iseconds)" >> "$$rep"; \
 	      fail=$$((fail + 1)); \
 	    fi; \
+	    tput=$$(grep "TB: throughput" transcript 2>/dev/null | tail -1); \
+	    if [ -n "$$tput" ]; then echo "  $$tput" >> "$$rep"; fi; \
 	  done; \
 	  summ="--- summary: $$pass pass, $$fail fail ---"; \
 	  echo "$$summ" >> "$$rep"; \
