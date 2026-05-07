@@ -1,0 +1,61 @@
+op,arg1,arg2,arg3,arg4
+# EXPECT_ERROR=1
+# =============================================================================
+# Scenario summary — repeated IRQ_CLEAR writes with all-inflight descriptors
+#
+# Purpose:
+#   Verify that IRQ_CLEAR can be written multiple times without corrupting
+#   CSR state, and that the three bad descriptors and one good descriptor
+#   are all processed correctly in a single s_error drain pass.
+#   Catches bugs where:
+#     - repeated IRQ_CLEAR writes corrupt head/tail or CSR flags
+#     - signal_df_error() called multiple times within one s_error drain
+#       leaves int_status_error in a bad state after the final clear
+#     - head pointer skips or repeats across multiple bad descriptors
+#
+# Descriptor ring:
+#   REG_BASEADDR = 0x100, RINGLEN = 8, four descriptors.
+#   All four descriptors are enqueued before enable, so all four handles
+#   are issued into df_in in consecutive cycles after enable fires.
+#   MAX_INFLIGHT=4 means all are in-flight when df_error first pulses.
+#
+# Descriptors (all DIR=1):
+#   0: SRC=0  DST=0x00040000 LEN=4  FLAGS=1   (DST OOB)
+#   1: SRC=0  DST=0x00050000 LEN=4  FLAGS=1   (DST OOB, different addr)
+#   2: SRC=0  DST=0x000F0000 LEN=8  FLAGS=1   (DST OOB)
+#   3: SRC=0x00000400  DST=0x00000400  LEN=1  FLAGS=1   (GOOD)
+#       sysmem[256]=DEADC0DE  →  sram[256]=DEADC0DE
+#
+# Sequence (software model):
+#   enable  → s_normal: fetch desc0, drop, latch error (head=1)
+#             s_error:  fetch desc1 (inflight), drop (head=2)
+#                       fetch desc2 (inflight), drop (head=3)
+#                       fetch desc3 (inflight), bounds-check passes,
+#                       execute transfer, complete (head=4) — all before any clear
+#   csr_irq_clear=0x2  → clears sticky CSR error bits; ring already empty, no-op
+#   csr_irq_clear=0x2  → same, no-op
+#   csr_irq_clear=0x2  → same, no-op
+#
+# Final state: sram[256]=DEADC0DE, head=tail=4, no sticky error, ring empty.
+# The three IRQ_CLEAR writes exercise the clear path without triggering new work.
+# =============================================================================
+
+smem,256,deadc0de,,
+
+csr_baseaddr,00000100,,
+csr_ringlen,8,,
+
+# Three bad descriptors back-to-back
+desc,00000000,00040000,00000004,00000001
+desc,00000000,00050000,00000004,00000001
+desc,00000000,000F0000,00000008,00000001
+# One good descriptor at the end
+desc,00000400,00000400,00000001,00000001
+
+enable,,,,
+
+# All four descriptors already processed in s_error drain above.
+# These three clears exercise the IRQ_CLEAR path on an already-empty ring.
+csr_irq_clear,00000002,,
+csr_irq_clear,00000002,,
+csr_irq_clear,00000002,,

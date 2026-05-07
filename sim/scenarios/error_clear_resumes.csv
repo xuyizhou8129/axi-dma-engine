@@ -1,0 +1,50 @@
+op,arg1,arg2,arg3,arg4
+# EXPECT_ERROR=1
+# =============================================================================
+# Scenario summary (mirrors sim/tb_error_top.sv :: tc_error_clear_resumes)
+#
+# Descriptor ring in system memory:
+#   Ring starts at byte address 0x00000100 (REG_BASEADDR).
+#   Each descriptor is 16 bytes (4 words). Ring length is 4 slots.
+#
+# Number of descriptors in this scenario: 2
+#
+# Descriptor 0 (BAD — triggers DF SRAM-bounds error):
+#   SRC_ADDR = 0x00000000, DST_ADDR = 0x00040000 (SRAM word 0x10000 > MAX_SRAM_ADDR=0xFFFF)
+#   LEN      = 4, FLAGS = 1 (DIR=1: sys mem -> SRAM)
+#   Effect:  descriptor_fetcher pulses df_error, drops the descriptor,
+#            sets sticky CSR STATUS.error / IRQ_STATUS.error and ring_mgr
+#            int_status_error → blocks new fetches. Head still advances.
+#
+# Descriptor 1 (GOOD — executes in s_error, before IRQ_CLEAR):
+#   SRC_ADDR = 0x00000320 (sys mem word 200), DST_ADDR = 0x00000000 (SRAM word 0)
+#   LEN      = 1, FLAGS = 1 (DIR=1)
+#   Effect: both handles are issued into df_in before df_error fires (both
+#           descriptors enqueued before enable, MAX_INFLIGHT=4).
+#           descriptor_fetcher s_error keeps draining df_out, so desc1's
+#           payload is bounds-checked, passes, and forwarded to dm_in
+#           immediately — WITHOUT waiting for IRQ_CLEAR.
+#           IRQ_CLEAR[1]=1 only clears the sticky CSR error bits and
+#           advances head from 1 to 2; bram[0] already holds the
+#           transferred value by that point.
+# =============================================================================
+
+# --- Source word for the GOOD descriptor (sys mem word 200 = byte 0x320) ---
+smem,200,cafebabe,,
+
+# --- Configure ring ---
+csr_baseaddr,00000100,,
+csr_ringlen,4,,
+
+# desc0: BAD (DST out of SRAM)
+desc,00000000,00040000,00000004,00000001
+# desc1: GOOD
+desc,00000320,00000000,00000001,00000001
+
+# --- Enable DMA. Engine fetches desc0, drops it, latches error, then stalls. ---
+enable,,,,
+
+# --- SW handles the error: write IRQ_CLEAR[1]=1.
+#     Sticky CSR error bits clear; ring_mgr error_clear pulse fires;
+#     int_status_error clears; engine resumes and runs desc1.
+csr_irq_clear,00000002,,

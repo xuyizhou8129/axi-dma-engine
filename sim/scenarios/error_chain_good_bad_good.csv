@@ -1,0 +1,61 @@
+op,arg1,arg2,arg3,arg4
+# EXPECT_ERROR=1
+# =============================================================================
+# Scenario summary — chained [GOOD, BAD, GOOD] with mid-chain error + clear
+#
+# Purpose:
+#   Validates two correctness guarantees at once:
+#     (1) A good descriptor that issued *before* the bad one is allowed to
+#         finish — DM/AXI/SRAM never pause, only new issues are gated.
+#     (2) A good descriptor *after* the bad one executes WITHOUT waiting for
+#         IRQ_CLEAR if its handle was already issued into df_in before df_error
+#         fired.  With MAX_INFLIGHT=4 and three descriptors, all handles are
+#         issued in consecutive cycles — long before df_error arrives (which
+#         takes many AXI cycles).  descriptor_fetcher s_error keeps draining
+#         df_out, so desc2's payload (already fetched by AXI) is bounds-checked,
+#         passes, and forwarded to dm_in immediately.
+#         IRQ_CLEAR[1] is still required to clear the sticky error and advance
+#         head from 2 to 3, but NOT to execute desc2.
+#
+# Descriptor ring:
+#   REG_BASEADDR = 0x100, RINGLEN = 4, three descriptors.
+#
+# NOTE: ring base = 0x100, ringlen = 4 → descriptor table occupies sysmem
+# words 64..79.  All source data placed clear of that region (word 100+).
+#
+# Descriptor 0 (GOOD, DIR=1):  sys mem word 100..101 -> SRAM word 64..65
+#   SRC=0x00000190  DST=0x00000100  LEN=2  FLAGS=1
+#   sysmem[100]=AABBCCDD, sysmem[101]=11223344  →  sram[64]=AABBCCDD, sram[65]=11223344
+#
+# Descriptor 1 (BAD,  DIR=1):  DST OOB
+#   SRC=0x00000000  DST=0x00040000  LEN=4  FLAGS=1
+#
+# Descriptor 2 (GOOD, DIR=1):  sys mem word 128 -> SRAM word 128
+#   SRC=0x00000200  DST=0x00000200  LEN=1  FLAGS=1
+#   sysmem[128]=CAFEBABE  →  sram[128]=CAFEBABE
+#
+# Expected post-enable (before clear): sram[64]=AABBCCDD, sram[65]=11223344,
+#   sram[128]=CAFEBABE (desc2 already executed in s_error), head=2, error latched.
+# Expected post-clear: head=3, error cleared, ring empty.
+#   (sram[128] already CAFEBABE — IRQ_CLEAR only advances head and clears flags)
+# =============================================================================
+
+# --- Source data for desc0 and desc2 (all outside ring region [64..79]) ---
+smem,100,aabbccdd,,
+smem,101,11223344,,
+smem,128,cafebabe,,
+
+csr_baseaddr,00000100,,
+csr_ringlen,4,,
+
+# desc0 (GOOD): src word 100 (byte 0x190) → sram word 64 (byte 0x100)
+desc,00000190,00000100,00000002,00000001
+# desc1 (BAD)
+desc,00000000,00040000,00000004,00000001
+# desc2 (GOOD, runs in s_error before IRQ_CLEAR): src word 128 (byte 0x200) → sram word 128
+desc,00000200,00000200,00000001,00000001
+
+enable,,,,
+
+# Clear sticky error and advance head to 3 (desc2 already executed in s_error).
+csr_irq_clear,00000002,,

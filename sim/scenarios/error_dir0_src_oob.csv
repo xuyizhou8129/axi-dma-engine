@@ -1,0 +1,33 @@
+op,arg1,arg2,arg3,arg4
+# EXPECT_ERROR=1
+# =============================================================================
+# Scenario summary — DIR=0 (SRAM -> sys mem) with out-of-bounds SRC
+#
+# Purpose:
+#   The descriptor_fetcher bounds check picks the SRAM-side address based on
+#   DIR.  For DIR=1 it inspects DST; for DIR=0 it inspects SRC (rtl/
+#   descriptor_fetcher.sv:75).  This scenario exercises the DIR=0 selection
+#   path so a future regression that mis-wires the mux (e.g. always uses DST)
+#   would slip past existing tests but trip this one.
+#
+# Descriptor ring:
+#   REG_BASEADDR = 0x100, RINGLEN = 2, one descriptor.
+#
+# Descriptor 0 (BAD, DIR=0):
+#   SRC_ADDR = 0x00040000  (SRAM word 0x10000 = 65536 > MAX_SRAM_ADDR 0xFFFF)
+#   DST_ADDR = 0x00000000  (sys mem; ignored by bounds check)
+#   LEN      = 4
+#   FLAGS    = 0           (DIR=0: SRAM -> sys mem)
+#
+# Expected: descriptor_fetcher pulses df_error, drops desc0, latches sticky
+#   STATUS.error / IRQ_STATUS.error, ring stalls.  Final SRAM/sysmem are
+#   unchanged from initial state (no transfer ever reached the data mover).
+# =============================================================================
+
+csr_baseaddr,00000100,,
+csr_ringlen,2,,
+
+# desc0: BAD — SRAM-side (SRC) is OOB while DIR=0
+desc,00040000,00000000,00000004,00000000
+
+enable,,,,

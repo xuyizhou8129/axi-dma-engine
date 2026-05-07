@@ -13,6 +13,8 @@ CSV row format  (op, arg1, arg2, arg3, arg4):
   csr_ringlen,<decimal_len>                   configure REG_RINGLEN
   desc,<src>,<dst>,<len>,<flags>             enqueue descriptor (SRC/DST/LEN/FLAGS per docs/descriptor_struct.md)
   enable                                      assert CTRL.ENABLE and start the model event loop
+  csr_irq_clear,<hex_mask>                    write IRQ_CLEAR (W1C); bit[1] clears the sticky DMA error
+                                              and resumes ring fetches (mirrors HW error_clear pulse)
 
 Artifacts written to out_dir/:
   initial_smem.hex   system memory image loaded by model_sys_mem at sim start
@@ -144,6 +146,11 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
       (stim_lines, initial_smem, final_smem, initial_sram, final_sram, descs_fetched)
     where each mem list is a list of 32-bit ints and descs_fetched is a list of
     packed 128-bit ints.
+
+    CSV ops are processed in order. The HW event loop runs after `enable` and
+    again after every `csr_irq_clear` so error_clear writes can resume work
+    that the previous loop had to abandon (mirrors RTL gating of fetch_req_valid
+    by ring_mgr.int_status_error).
     """
     # --- Build shared model objects ---
     sysmem = SystemMemory(smem_words)
@@ -162,8 +169,95 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
     ring       = RingManager(sysmem, csr, df, axi_golden)
 
     stim_lines = []
+    descs_fetched = []
+    initial_smem = None
+    initial_sram = None
 
-    # --- Process CSV rows (SW setup phase) ---
+    def _snapshot_initial():
+        # Captured the first time the engine is enabled, matching what the TB
+        # backdoors into memory at sim start.
+        nonlocal initial_smem, initial_sram
+        if initial_smem is None:
+            initial_smem = list(sysmem.mem)
+            initial_sram = list(sram.mem)
+
+    def _drain_engine():
+        """
+        Run until the ring is empty or the sticky error blocks new issues.
+        After an error fires, mirrors descriptor_fetcher s_error behaviour:
+        continues draining all descriptors still pending in the ring using
+        fetch_inflight_descriptor() to bypass the error gate — matching HW
+        where df_out keeps draining even after df_error pulses.
+        """
+        if not csr.is_enabled():
+            return
+        for _ in range(MAX_ITERS):
+            if ring.is_empty():
+                break
+            if ring.has_error():
+                # int_status_error gates fetch_req_valid (no new issues).
+                # s_error still drains df_out for descriptors already fetched by AXI.
+                for _ in range(ring.pending_count()):
+                    desc = ring.fetch_inflight_descriptor()
+                    if desc is None:
+                        break
+                    descs_fetched.append(desc.pack())
+                    if not df.is_descriptor_valid(desc):
+                        ring.signal_df_error()
+                        ring.complete()
+                        continue
+                    instr_axi, instr_sram = _desc_to_instr_pair(desc)
+                    dm_axi.enqueue(instr_axi)
+                    dm_sram.enqueue(instr_sram)
+                    dir_bit = desc.w3 & 1
+                    if dir_bit:
+                        _drain_axi_dm(axi_golden, instr_axi)
+                        _drain_sram_dm(sram_ctrl, instr_sram)
+                    else:
+                        _drain_sram_dm(sram_ctrl, instr_sram)
+                        _drain_axi_dm(axi_golden, instr_axi)
+                    ring.complete()
+                break
+
+            # s_normal: fetch, bounds-check, and execute one descriptor
+            desc = ring.fetch_next_descriptor()
+            if desc is None:
+                break
+            descs_fetched.append(desc.pack())
+
+            # DF bounds check (rtl/descriptor_fetcher.sv s_normal/s_error).
+            if not df.is_descriptor_valid(desc):
+                # Drop descriptor: never reaches the data mover. Pulse df_error
+                # which (a) latches sticky CSR error/IRQ_STATUS bits and
+                # (b) sets ring_mgr.int_status_error → blocks new issues.
+                # Head still advances because in HW it advanced at issue time.
+                ring.signal_df_error()
+                ring.complete()
+                continue
+
+            # data_mover produces two DM instructions (AXI path vs SRAM path)
+            instr_axi, instr_sram = _desc_to_instr_pair(desc)
+            dm_axi.enqueue(instr_axi)
+            dm_sram.enqueue(instr_sram)
+
+            # Drain DM paths in MID-safe order.
+            # DIR=1: AXI read → MID → SRAM write.  DIR=0: SRAM read → MID → AXI write.
+            dir_bit = desc.w3 & 1
+            if dir_bit:
+                _drain_axi_dm(axi_golden, instr_axi)
+                _drain_sram_dm(sram_ctrl, instr_sram)
+            else:
+                _drain_sram_dm(sram_ctrl, instr_sram)
+                _drain_axi_dm(axi_golden, instr_axi)
+
+            # Advance head (mirrors as_done → ring_manager head increment)
+            ring.complete()
+        else:
+            raise RuntimeError("run_scenario: exceeded MAX_ITERS without draining ring")
+
+    MAX_ITERS = 1000
+
+    # --- Process CSV rows; run the engine when SW kicks/resumes it ---
     for row in rows:
         parsed = _parse_row(row)
         if parsed is None:
@@ -209,52 +303,23 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             ctrl = csr.read(csr.REG_CTRL) | (1 << CSR.ENABLE_BIT) | (1 << CSR.IRQ_EN_BIT)
             csr.write(csr.REG_CTRL, ctrl)
             stim_lines.append("csr_write %02x %08x" % (csr.REG_CTRL, ctrl))
+            _snapshot_initial()
+            _drain_engine()
+
+        elif op == "csr_irq_clear":
+            mask = int(args[0], 16) & 0xFFFFFFFF
+            csr.write(csr.REG_IRQ_CLEAR, mask)
+            stim_lines.append("csr_write %02x %08x" % (csr.REG_IRQ_CLEAR, mask))
+            # Resume any work that was blocked by the sticky error.
+            _drain_engine()
 
         else:
             raise ValueError("unknown CSV op: %r" % op)
 
-    # --- Snapshot state after SW setup (this is what the TB will see at sim start) ---
-    initial_smem = list(sysmem.mem)
-    initial_sram = list(sram.mem)
-    descs_fetched = []
-
-    if not csr.is_enabled():
-        # DMA never enabled; return with empty event-loop results
-        return stim_lines, initial_smem, list(sysmem.mem), initial_sram, list(sram.mem), descs_fetched
-
-    # --- Event loop (HW phase) ---
-    # Mirrors ring_manager.sv: while head != tail, fetch descriptor and run movement.
-    MAX_ITERS = 1000
-    for _ in range(MAX_ITERS):
-        if ring.is_empty():
-            break
-
-        # 1. Descriptor Fetcher + AXI fetch path
-        desc = ring.fetch_next_descriptor()
-        if desc is None:
-            break
-        descs_fetched.append(desc.pack())
-
-        # 2. data_mover produces two DM instructions (AXI path vs SRAM path)
-        instr_axi, instr_sram = _desc_to_instr_pair(desc)
-        dm_axi.enqueue(instr_axi)
-        dm_sram.enqueue(instr_sram)
-
-        # 3–4. Drain DM paths in MID-safe order (matches _desc_to_instr_pair read/write split)
-        # DIR=1: AXI read → MID → SRAM write.  DIR=0: SRAM read → MID → AXI write.
-        dir_bit = desc.w3 & 1
-        if dir_bit:
-            _drain_axi_dm(axi_golden, instr_axi)
-            _drain_sram_dm(sram_ctrl, instr_sram)
-        else:
-            _drain_sram_dm(sram_ctrl, instr_sram)
-            _drain_axi_dm(axi_golden, instr_axi)
-
-        # 5. Advance head (mirrors as_done → ring_manager head increment)
-        ring.complete()
-
-    else:
-        raise RuntimeError("run_scenario: exceeded MAX_ITERS without draining ring")
+    # If the scenario never enabled the engine, snapshots are still meaningful.
+    if initial_smem is None:
+        initial_smem = list(sysmem.mem)
+        initial_sram = list(sram.mem)
 
     return (
         stim_lines,

@@ -38,6 +38,15 @@ class RingManager:
         self.csr = csr
         self.df = descriptor_fetcher
         self.golden = axi_golden
+        # Sticky error flag mirroring ring_manager.sv int_status_error.
+        # Set by signal_df_error() (df_error pulse), cleared by clear_error()
+        # (CSR error_clear pulse from IRQ_CLEAR[1] write).
+        self.int_status_error = False
+        # Wire ourselves into the CSR so IRQ_CLEAR[1] reaches us.
+        try:
+            self.csr.attach_ring_manager(self)
+        except AttributeError:
+            pass  # older CSR build without the hook
 
     def _ringlen(self):
         r = self.csr.ringlen() & 0xFFFFFFFF
@@ -84,14 +93,8 @@ class RingManager:
     # Consumer — DescriptorFetcher + AXI4MasterGolden (same as HW DF + AXI path)
     # -------------------------------------------------------------------------
 
-    def fetch_next_descriptor(self, max_steps=256):
-        """
-        Issue rm_df-style handle, run golden until descriptor is in df_out, return it.
-        Does not advance head — call complete() after the transfer completes.
-        """
-        if self.is_empty():
-            return None
-
+    def _fetch_descriptor_impl(self, max_steps=256):
+        """Submit the current head's handle to AXI and return the fetched descriptor."""
         head = self.csr.read(self.csr.REG_HEAD) & 0xFFFFFFFF
         rlen = self._ringlen()
         ti = head % rlen
@@ -107,13 +110,43 @@ class RingManager:
                 )
             steps += 1
             if steps > max_steps:
-                raise RuntimeError("fetch_next_descriptor: exceeded max_steps")
+                raise RuntimeError("_fetch_descriptor_impl: exceeded max_steps")
 
         return self.df.take_descriptor()
+
+    def fetch_next_descriptor(self, max_steps=256):
+        """
+        Issue rm_df-style handle, run golden until descriptor is in df_out, return it.
+        Does not advance head — call complete() after the transfer completes.
+
+        Mirrors ring_manager.sv fetch_req_valid gating: when the sticky error
+        flag is set we refuse to issue, exactly as the HW gate does.
+        """
+        if self.is_empty():
+            return None
+        if self.int_status_error:
+            return None
+        return self._fetch_descriptor_impl(max_steps)
+
+    def fetch_inflight_descriptor(self, max_steps=256):
+        """
+        Bypass the int_status_error gate and fetch the next descriptor.
+        Mirrors descriptor_fetcher s_error draining df_out: descriptors already
+        issued to AXI before df_error fired are still forwarded to the data mover.
+        Only call this for descriptors known to be in-flight when the error fired.
+        """
+        if self.is_empty():
+            return None
+        return self._fetch_descriptor_impl(max_steps)
 
     def complete(self):
         """
         Advance head after descriptor work finishes (mirrors as_done / REG_HEAD update).
+
+        In RTL the head pointer actually advances on issue (fetch_req_valid &&
+        fetch_req_ready), so a bad descriptor — even though it is dropped at
+        the descriptor fetcher — still consumes its ring slot. We model that
+        by calling complete() for both successful and dropped descriptors.
         """
         if self.is_empty():
             raise RuntimeError("No pending descriptor to complete")
@@ -123,6 +156,25 @@ class RingManager:
         hi = head % rlen
         new_head = (hi + 1) % rlen
         self.csr.hw_set_head(new_head)
+
+    # -------------------------------------------------------------------------
+    # Error path (mirrors ring_manager.sv int_status_error + CSR error_clear)
+    # -------------------------------------------------------------------------
+
+    def signal_df_error(self):
+        """
+        Mirror df_error pulse: set sticky internal error and propagate the
+        error_set pulse to CSR (latches STATUS.error and IRQ_STATUS.error).
+        """
+        self.int_status_error = True
+        self.csr.hw_set_error()
+
+    def clear_error(self):
+        """Mirror error_clear pulse from CSR (IRQ_CLEAR[1] write)."""
+        self.int_status_error = False
+
+    def has_error(self):
+        return self.int_status_error
 
     # -------------------------------------------------------------------------
     # Status
