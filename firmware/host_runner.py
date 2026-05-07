@@ -2,6 +2,7 @@ import serial
 import struct
 import time
 import sys
+import os
 
 # Firmware Protocol Definitions matches protocol.h
 PACKET_SYNC_WORD = 0xDEADBEEF
@@ -115,9 +116,10 @@ def main():
     # Optional: Read off the "Firmware Ready" message
     print(ser.read_all().decode(errors='ignore'))
 
-    # Parse and send stim.txt
-    print("Parsing and sending stim.txt...")
-    parse_stimulus('stim.txt', ser)
+    # Parse and send stim.txt (always looks next to this script file)
+    stim_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
+    print(f"Parsing and sending {stim_path}...")
+    parse_stimulus(stim_path, ser)
     
     # Tell DMA to run
     print("\nSending RUN DMA Command...")
