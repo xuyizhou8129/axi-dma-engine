@@ -11,8 +11,8 @@ csr_write 10 00000000    # CTRL=0 (release reset)
 csr_write 2c 00000003    # IRQ_CLEAR W1C both bits
 
 # --- Step 1: Write source data into sys_mem ---
-sram_write 00000100 00000000
-sysmem_write 00000040 CAFEBEEF
+sram_write 00000100 BEEFCAFE
+sysmem_write 00000040 BEEFFEED
 
 # --- Step 2: Write Descriptor 0 into sys_mem at ring base (BASEADDR = 0) ---
 # SRC_ADDR = sys_mem 0x40
