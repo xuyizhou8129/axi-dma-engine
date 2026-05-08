@@ -217,6 +217,27 @@ class DMASerialHost:
         self._wait_for_ack()
 
     # ----------------------------------------------------------------
+    # Single-word reads (for debug spot-checks)
+    # ----------------------------------------------------------------
+    def read_smem(self, byte_addr):
+        addr = (self.smem_base_addr + byte_addr) & 0xFFFFFFFF
+        self._send_packet(CMD_READ_SYSMEM, addr)
+        self._wait_for_ack()
+        data = self.ser.read(4)
+        if len(data) != 4:
+            raise TimeoutError("Timeout reading SMEM word")
+        return struct.unpack("<I", data)[0]
+
+    def read_sram(self, byte_addr):
+        addr = (self.sram_base_addr + byte_addr) & 0xFFFFFFFF
+        self._send_packet(CMD_READ_SRAM, addr)
+        self._wait_for_ack()
+        data = self.ser.read(4)
+        if len(data) != 4:
+            raise TimeoutError("Timeout reading SRAM word")
+        return struct.unpack("<I", data)[0]
+
+    # ----------------------------------------------------------------
     # DMA trigger
     # ----------------------------------------------------------------
     def run_dma(self):
@@ -541,8 +562,21 @@ def main():
         # 4. Send all writes from stim.txt (sysmem_write, sram_write, csr_write).
         host.send_stim(stim_path)
 
+        # [DBG] Spot-check key sysmem locations after stim writes.
+        print("[DBG] SMEM after stim (descriptor ring @ 0x000, data @ 0x100):")
+        for off in [0x000, 0x004, 0x008, 0x00C, 0x100, 0x104, 0x108, 0x10C]:
+            print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
+
         # 5. Trigger DMA and wait for completion (polled inside firmware).
         host.run_dma()
+
+        # [DBG] Spot-check SRAM destination and SMEM source after DMA.
+        print("[DBG] SRAM after DMA (expected data @ 0x100):")
+        for off in [0x100, 0x104, 0x108, 0x10C]:
+            print("  SRAM[0x%03x] = 0x%08x" % (off, host.read_sram(off)))
+        print("[DBG] SMEM after DMA (source should be unchanged @ 0x100):")
+        for off in [0x100, 0x104, 0x108, 0x10C]:
+            print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
 
         # 6. Request CRC32 from firmware and compare against golden.
         got_smem_crc = host.smem_crc(0, len(smem_words) * 4)
