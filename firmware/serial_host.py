@@ -138,9 +138,9 @@ class DMASerialHost:
     """Send/receive over the binary protocol defined in protocol.h (Vivado branch)."""
 
     def __init__(self, port, baud=9600, timeout=2.0,
-                 csr_base_addr=0x40000000,
+                 csr_base_addr=0x80000000,
                  smem_base_addr=0x00000000,
-                 sram_base_addr=0x00010000):
+                 sram_base_addr=0x00000000):
         if not _SERIAL_AVAILABLE:
             raise RuntimeError("pyserial is not installed. Run: pip install pyserial")
         self.ser = serial.Serial(port, baudrate=baud, timeout=timeout)
@@ -499,12 +499,12 @@ def main():
     )
     parser.add_argument("--port",          help="Serial port (e.g. /dev/tty.usbserial-XXX). Auto-detected if omitted.")
     parser.add_argument("--baud",          type=int, default=9600)
-    parser.add_argument("--csr-base",      type=lambda x: int(x, 0), default=0x40000000, dest="csr_base",
-                        help="AXI base address of the DMA CSR block (default 0x40000000)")
+    parser.add_argument("--csr-base",      type=lambda x: int(x, 0), default=0x80000000, dest="csr_base",
+                        help="AXI base address of the DMA CSR block (default 0x80000000)")
     parser.add_argument("--smem-base",     type=lambda x: int(x, 0), default=0x00000000, dest="smem_base",
                         help="AXI base address of system memory (default 0x00000000)")
-    parser.add_argument("--sram-base",     type=lambda x: int(x, 0), default=0x00010000, dest="sram_base",
-                        help="AXI base address of on-chip SRAM/BRAM (default 0x00010000)")
+    parser.add_argument("--sram-base",     type=lambda x: int(x, 0), default=0x00000000, dest="sram_base",
+                        help="AXI base address of on-chip SRAM/BRAM (default 0x00000000)")
     parser.add_argument("--scenario",      default=_default_scenario, help="Scenario CSV to run")
     parser.add_argument("--out-dir",       default="out", dest="out_dir")
     parser.add_argument("--list-ports",    action="store_true", dest="list_ports", help="List available serial ports and exit")
