@@ -5,6 +5,11 @@
 #   sys_mem 0x0040        : Source test data
 #   SRAM    0x0100        : DMA destination (byte address)
 
+# --- Step 0: Clear DMA state (avoid stale HEAD / sticky error bits) ---
+csr_write 10 00000002    # CTRL.RESET=1
+csr_write 10 00000000    # CTRL=0 (release reset)
+csr_write 2c 00000003    # IRQ_CLEAR W1C both bits
+
 # --- Step 1: Write source data into sys_mem ---
 sram_write 00000100 00000000
 sysmem_write 00000040 BEEFBEEF
