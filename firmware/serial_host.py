@@ -245,10 +245,10 @@ class DMASerialHost:
     # ----------------------------------------------------------------
     # DMA trigger
     # ----------------------------------------------------------------
-    def run_dma(self):
+    def run_dma(self, timeout=30.0):
         """Send CMD_RUN_DMA to trigger the DMA engine."""
         self._send_packet(CMD_RUN_DMA, 0x00000000)
-        self._wait_for_ack()
+        self._wait_for_ack(timeout=timeout)
         print("DMA trigger ACK'd")
 
     # ----------------------------------------------------------------
@@ -415,27 +415,19 @@ def dry_run(scenario_csv, out_dir):
 
     stim, init_smem, final_smem, init_sram, final_sram, descs = rg.run_scenario(rows)
 
-    # Import validity check so error-scenario descriptors are skipped
-    from descriptor_fetcher import DescriptorFetcher
-    from descriptor import Descriptor
-
     # Parse descriptors from CSV and self-check data movement
     errors = 0
     desc_rows = []
     for row in rows:
         if row and row[0].strip().lower() == "desc":
             args = [c.strip() for c in row[1:]]
-            src  = int(args[0], 16)
-            dst  = int(args[1], 16)
-            length = int(args[2], 16) & 0xFF   # LEN[7:0] = beat count
+            src    = int(args[0], 16)
+            dst    = int(args[1], 16)
+            length = int(args[2], 16) & 0xFF
             flags  = int(args[3], 16)
             desc_rows.append((src, dst, length, flags))
 
     for i, (src, dst, length, flags) in enumerate(desc_rows):
-        desc_obj = Descriptor(src, dst, length, flags)
-        if not DescriptorFetcher.is_descriptor_valid(desc_obj):
-            continue  # dropped by HW bounds check — no data moved, nothing to verify
-
         dir_bit = flags & 1
         if dir_bit:
             # DIR=1: system memory → SRAM
