@@ -561,7 +561,18 @@ def main():
                          smem_base_addr=args.smem_base,
                          sram_base_addr=args.sram_base)
     try:
-        # 4. Send all writes from stim.txt (sysmem_write, sram_write, csr_write).
+        # 4a. Clear memories to known-zero state so leftover data from previous
+        #     tests doesn't corrupt the full-memory CRC comparison.
+        init_smem = _load_hex32(os.path.join(args.out_dir, "initial_smem.hex"))
+        init_sram = _load_hex32(os.path.join(args.out_dir, "initial_sram.hex"))
+        print("Clearing SMEM (%d words)..." % len(init_smem))
+        for i, w in enumerate(init_smem):
+            host.smem_write(i * 4, w)
+        print("Clearing SRAM (%d words)..." % len(init_sram))
+        for i, w in enumerate(init_sram):
+            host.sram_write(i * 4, w)
+
+        # 4b. Send CSR writes from stim.txt (memory already initialized above).
         host.send_stim(stim_path)
 
         # [DBG] Spot-check key sysmem locations after stim writes.

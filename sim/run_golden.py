@@ -220,7 +220,8 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
         elif op == "enable":
             ctrl = csr.read(csr.REG_CTRL) | (1 << CSR.ENABLE_BIT) | (1 << CSR.IRQ_EN_BIT)
             csr.write(csr.REG_CTRL, ctrl)
-            stim_lines.append("csr_write %02x %08x" % (csr.REG_CTRL, ctrl))
+            # Do not emit csr_write for CTRL — CMD_RUN_DMA handles ENABLE
+            # after asserting REG_INIT_DONE, so the DMA doesn't start prematurely.
 
         else:
             raise ValueError("unknown CSV op: %r" % op)
