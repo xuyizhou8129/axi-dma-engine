@@ -50,7 +50,7 @@ sysmem_write 00000018 00000004
 sysmem_write 0000001C 00000001
 # Desc 2 @ sysmem 0x20 : sysmem[0x120] -> SRAM[0x120]
 sysmem_write 00000020 00000120
-sysmem_write 000000G4 00000120
+sysmem_write 0FFFFFFF 00000120
 sysmem_write 00000028 00000004
 sysmem_write 0000002C 00000001
 # Desc 3 @ sysmem 0x30 : sysmem[0x130] -> SRAM[0x130]
