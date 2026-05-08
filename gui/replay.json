@@ -1,0 +1,63 @@
+[
+  {
+    "type": "write_sysmem",
+    "addr": 0,
+    "value": 305419896
+  },
+  {
+    "type": "write_sysmem",
+    "addr": 4,
+    "value": 2863315899
+  },
+  {
+    "type": "write_sram",
+    "addr": 0,
+    "value": 2271560481
+  },
+  {
+    "type": "write_sram",
+    "addr": 4,
+    "value": 3149647052
+  },
+  {
+    "type": "write_csr",
+    "addr": 0,
+    "value": 0
+  },
+  {
+    "type": "write_csr",
+    "addr": 4,
+    "value": 4
+  },
+  {
+    "type": "write_csr",
+    "addr": 12,
+    "value": 1
+  },
+  {
+    "type": "write_csr",
+    "addr": 12,
+    "value": 2
+  },
+  {
+    "type": "write_csr",
+    "addr": 16,
+    "value": 5
+  },
+  {
+    "type": "read_sysmem",
+    "addr": 0
+  },
+  {
+    "type": "read_sysmem",
+    "addr": 4
+  },
+  {
+    "type": "read_sram",
+    "addr": 0
+  },
+  {
+    "type": "read_sram",
+    "addr": 4
+  }
+]
