@@ -489,6 +489,8 @@ def main():
     parser.add_argument("--dry-run-all",   action="store_true", dest="dry_run_all",help="Dry-run all sim/scenarios/*.csv")
     args = parser.parse_args()
 
+    args.scenario = os.path.abspath(args.scenario)
+    args.out_dir  = os.path.abspath(args.out_dir)
     os.chdir(_here)
 
     if args.list_ports:
