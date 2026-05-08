@@ -38,6 +38,50 @@ static u32 sram_read(u32 byte_addr) {
     return REG_READ(REG_RDATA);
 }
 
+/* CRC32-IEEE (zlib-compatible): poly 0xEDB88320 (reflected), init 0xFFFFFFFF,
+ * final XOR 0xFFFFFFFF. Matches Python zlib.crc32(...) when bytes are fed in
+ * the same order. */
+static u32 crc32_table[256];
+
+static void crc32_init_table(void) {
+    for (u32 i = 0; i < 256; i++) {
+        u32 c = i;
+        for (int j = 0; j < 8; j++) {
+            c = (c & 1u) ? (0xEDB88320u ^ (c >> 1)) : (c >> 1);
+        }
+        crc32_table[i] = c;
+    }
+}
+
+/* Update CRC with one 32-bit word, processed LE byte-first (matches host's
+ * struct.pack("<%dI", ...) packing of words to bytes). */
+static u32 crc32_word_le(u32 crc, u32 word) {
+    u8 b;
+    b = (u8)( word        & 0xFF); crc = crc32_table[(crc ^ b) & 0xFF] ^ (crc >> 8);
+    b = (u8)((word >>  8) & 0xFF); crc = crc32_table[(crc ^ b) & 0xFF] ^ (crc >> 8);
+    b = (u8)((word >> 16) & 0xFF); crc = crc32_table[(crc ^ b) & 0xFF] ^ (crc >> 8);
+    b = (u8)((word >> 24) & 0xFF); crc = crc32_table[(crc ^ b) & 0xFF] ^ (crc >> 8);
+    return crc;
+}
+
+static u32 crc32_sram_range(u32 start_byte_addr, u32 byte_length) {
+    u32 crc = 0xFFFFFFFFu;
+    u32 word_count = byte_length / 4;
+    for (u32 w = 0; w < word_count; w++) {
+        crc = crc32_word_le(crc, sram_read(start_byte_addr + w * 4));
+    }
+    return crc ^ 0xFFFFFFFFu;
+}
+
+static u32 crc32_sysmem_range(u32 start_byte_addr, u32 byte_length) {
+    u32 crc = 0xFFFFFFFFu;
+    u32 word_count = byte_length / 4;
+    for (u32 w = 0; w < word_count; w++) {
+        crc = crc32_word_le(crc, sysmem_read(start_byte_addr + w * 4));
+    }
+    return crc ^ 0xFFFFFFFFu;
+}
+
 typedef enum {
     STATE_WAIT_SYNC,
     STATE_READ_HEADER,
@@ -76,6 +120,7 @@ void send_ack(u8 ack_type) {
 }
 
 int main(void) {
+    crc32_init_table();
     xil_printf("MicroBlaze DMA Validation Firmware Ready.\r\n");
 
     ParserState state = STATE_WAIT_SYNC;
@@ -155,15 +200,14 @@ int main(void) {
                     case CMD_RUN_DMA: {
                         xil_printf("Triggering DMA...\r\n");
 
-                        /* Hand memory ownership over to the DMA so it can fetch
-                         * descriptors and move data. */
+                        /* Hand memory ownership over to the DMA. */
                         REG_WRITE(REG_INIT_DONE, 1);
 
                         /* Set ENABLE while preserving other CTRL bits (e.g. IRQ_EN). */
                         u32 ctrl = Xil_In32(CSR_ACCESS_BASE + CSR_REG_CTRL);
                         Xil_Out32(CSR_ACCESS_BASE + CSR_REG_CTRL, ctrl | CTRL_ENABLE);
 
-                        /* Done = ring empty AND not busy. Bail out on error or timeout. */
+                        /* Done = ring empty AND not busy. Bail on error or timeout. */
                         u32 status = 0;
                         u32 i;
                         for (i = 0; i < 10000000; i++) {
@@ -195,6 +239,36 @@ int main(void) {
                         xil_printf("Read 0x%08x from SYSMEM[0x%08x]\r\n", val, dest_addr);
                         send_ack(CMD_ACK);
                         uart_write_u32(val);
+                        break;
+                    }
+
+                    /* CRC32 over [dest_addr, dest_addr + payload_word) words.
+                     * Returns ACK frame followed by 4-byte LE CRC. */
+                    case CMD_CRC_SRAM: {
+                        if (payload_len >= 4) {
+                            u32 byte_len = payload_word;
+                            u32 crc = crc32_sram_range(dest_addr, byte_len);
+                            xil_printf("CRC SRAM[0x%08x..+0x%x] = 0x%08x\r\n",
+                                       dest_addr, byte_len, crc);
+                            send_ack(CMD_ACK);
+                            uart_write_u32(crc);
+                        } else {
+                            send_ack(CMD_NACK);
+                        }
+                        break;
+                    }
+
+                    case CMD_CRC_SYSMEM: {
+                        if (payload_len >= 4) {
+                            u32 byte_len = payload_word;
+                            u32 crc = crc32_sysmem_range(dest_addr, byte_len);
+                            xil_printf("CRC SYSMEM[0x%08x..+0x%x] = 0x%08x\r\n",
+                                       dest_addr, byte_len, crc);
+                            send_ack(CMD_ACK);
+                            uart_write_u32(crc);
+                        } else {
+                            send_ack(CMD_NACK);
+                        }
                         break;
                     }
 

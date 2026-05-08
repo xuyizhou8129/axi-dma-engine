@@ -48,6 +48,8 @@
 #define CMD_REQ_RESULTS   0x05
 #define CMD_READ_SRAM     0x06
 #define CMD_READ_SYSMEM   0x07
+#define CMD_CRC_SRAM      0x08
+#define CMD_CRC_SYSMEM    0x09
 #define CMD_ACK           0xAA
 #define CMD_NACK          0xEE
 

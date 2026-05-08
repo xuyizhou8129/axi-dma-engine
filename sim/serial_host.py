@@ -64,6 +64,8 @@ CMD_WRITE_SYSMEM = 0x02
 CMD_WRITE_CSR    = 0x03
 CMD_RUN_DMA      = 0x04
 CMD_REQ_RESULTS  = 0x05
+CMD_CRC_SRAM     = 0x08
+CMD_CRC_SYSMEM   = 0x09
 CMD_ACK          = 0xAA
 CMD_NACK         = 0xEE
 HEADER_SIZE      = 13  # 4 (sync) + 1 (opcode) + 4 (addr) + 4 (len)
@@ -255,17 +257,29 @@ class DMASerialHost:
             "in the MicroBlaze firmware."
         )
 
-    def smem_crc(self):
-        """Not yet implemented in firmware. Raises NotImplementedError."""
-        raise NotImplementedError(
-            "smem_crc: no corresponding firmware command. Implement CMD_REQ_RESULTS in firmware first."
-        )
+    def smem_crc(self, byte_addr, byte_length):
+        """CRC32 over [byte_addr, byte_addr+byte_length) words in system memory.
+        Returns the 32-bit zlib-compatible CRC reported by the firmware."""
+        addr    = (self.smem_base_addr + byte_addr) & 0xFFFFFFFF
+        payload = struct.pack("<I", byte_length & 0xFFFFFFFF)
+        self._send_packet(CMD_CRC_SYSMEM, addr, payload)
+        self._wait_for_ack()
+        data = self.ser.read(4)
+        if len(data) != 4:
+            raise TimeoutError("Timeout reading CRC bytes from FPGA")
+        return struct.unpack("<I", data)[0]
 
-    def sram_crc(self):
-        """Not yet implemented in firmware. Raises NotImplementedError."""
-        raise NotImplementedError(
-            "sram_crc: no corresponding firmware command. Implement CMD_REQ_RESULTS in firmware first."
-        )
+    def sram_crc(self, byte_addr, byte_length):
+        """CRC32 over [byte_addr, byte_addr+byte_length) words in SRAM.
+        Returns the 32-bit zlib-compatible CRC reported by the firmware."""
+        addr    = (self.sram_base_addr + byte_addr) & 0xFFFFFFFF
+        payload = struct.pack("<I", byte_length & 0xFFFFFFFF)
+        self._send_packet(CMD_CRC_SRAM, addr, payload)
+        self._wait_for_ack()
+        data = self.ser.read(4)
+        if len(data) != 4:
+            raise TimeoutError("Timeout reading CRC bytes from FPGA")
+        return struct.unpack("<I", data)[0]
 
     # ----------------------------------------------------------------
     # High-level memory preload
@@ -291,12 +305,24 @@ class DMASerialHost:
         print("SRAM preload: wrote %d non-zero word(s) (%d total)" % (count, len(words)))
 
     def verify_smem_crc(self, hex_path):
-        """Not yet supported by firmware — see smem_crc()."""
-        raise NotImplementedError("verify_smem_crc: firmware does not support memory readback yet.")
+        """Compute zlib.crc32 of hex_path's words and compare to firmware-reported SMEM CRC."""
+        words    = _load_hex32(hex_path)
+        expected = _crc32_words(words)
+        got      = self.smem_crc(0, len(words) * 4)
+        if got != expected:
+            raise RuntimeError(
+                "SMEM CRC mismatch: expected 0x%08x, got 0x%08x" % (expected, got))
+        return True
 
     def verify_sram_crc(self, hex_path):
-        """Not yet supported by firmware — see sram_crc()."""
-        raise NotImplementedError("verify_sram_crc: firmware does not support memory readback yet.")
+        """Compute zlib.crc32 of hex_path's words and compare to firmware-reported SRAM CRC."""
+        words    = _load_hex32(hex_path)
+        expected = _crc32_words(words)
+        got      = self.sram_crc(0, len(words) * 4)
+        if got != expected:
+            raise RuntimeError(
+                "SRAM CRC mismatch: expected 0x%08x, got 0x%08x" % (expected, got))
+        return True
 
 
 # Golden model runner (local, no FPGA needed)
