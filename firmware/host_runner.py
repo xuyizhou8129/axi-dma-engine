@@ -24,11 +24,10 @@ CMD_NACK          = 0xEE
 PORT = 'COM5'
 BAUD = 9600
 
-# stim.txt test parameters (must match stim.txt)
-STIM_SRC_SYSMEM_ADDR = 0x00000040
-STIM_DST_SRAM_ADDR   = 0x00000100
-STIM_TRANSFER_WORDS  = 1
-STIM_EXPECTED_DATA   = [0xCAFECAFE]
+# CSR offsets (from csr_spec.md)
+CSR_OFF_BASEADDR = 0x00
+CSR_OFF_RINGLEN  = 0x04
+CSR_OFF_TAIL     = 0x0C
 
 
 def wait_for_ack(ser):
@@ -49,13 +48,11 @@ def wait_for_ack(ser):
 
 
 def build_packet(opcode, address, payload=bytes()):
-    # format: <I (4 byte sync LittleEndian), B (1 byte opcode), I (4 byte addr), I (4 byte length)
     header = struct.pack('<IBII', PACKET_SYNC_WORD, opcode, address, len(payload))
     return header + payload
 
 
 def read_memory(ser, opcode, addr):
-    """Send a single-word read command; return the u32 value or None on failure."""
     ser.write(build_packet(opcode, addr))
     if wait_for_ack(ser):
         data = ser.read(4)
@@ -66,7 +63,6 @@ def read_memory(ser, opcode, addr):
 
 
 def request_crc(ser, opcode, addr, byte_len):
-    """Request CRC32 over [addr, addr+byte_len); return u32 CRC or None on failure."""
     payload = struct.pack('<I', byte_len)
     ser.write(build_packet(opcode, addr, payload))
     if wait_for_ack(ser):
@@ -84,108 +80,156 @@ def compute_crc32(words):
 
 
 def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
+    """Send all directives from stim.txt and build a model of what was loaded.
+    Returns a dict describing the DMA transfer extracted from the stim:
+        {src_addr, dst_addr, len_words, dir, expected_words}
+    Derived from the descriptor at BASEADDR (no hardcoded constants).
+    """
+    sysmem_image  = {}   # byte_addr -> u32
+    sram_image    = {}
+    ring_baseaddr = 0
+    csr_writes    = {}   # offset -> value (last write wins)
+
     with open(filename, 'r') as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
-
             parts = line.split()
+
             if parts[0] == 'csr_write':
                 offset = int(parts[1], 16)
                 value  = int(parts[2], 16)
                 addr   = csr_base_addr + offset
-                payload = struct.pack('<I', value)
+                csr_writes[offset] = value
+                if offset == CSR_OFF_BASEADDR:
+                    ring_baseaddr = value
 
+                payload = struct.pack('<I', value)
                 print(f"Sending CSR Write: Addr {hex(addr)}, Val {hex(value)}")
                 ser.write(build_packet(CMD_WRITE_CSR, addr, payload))
-                if wait_for_ack(ser):
-                    print("  -> ACK'd")
-                else:
-                    print("  -> FAILED")
-                    sys.exit(1)
+                if not wait_for_ack(ser):
+                    print("  -> FAILED"); sys.exit(1)
+                print("  -> ACK'd")
 
             elif parts[0] in ('sysmem_write', 'sram_write'):
-                addr    = int(parts[1], 16)
-                value   = int(parts[2], 16)
-                payload = struct.pack('<I', value)
-                opcode  = CMD_WRITE_SYSMEM if parts[0] == 'sysmem_write' else CMD_WRITE_SRAM
+                addr  = int(parts[1], 16)
+                value = int(parts[2], 16)
+                if parts[0] == 'sysmem_write':
+                    sysmem_image[addr] = value
+                    opcode = CMD_WRITE_SYSMEM
+                else:
+                    sram_image[addr] = value
+                    opcode = CMD_WRITE_SRAM
 
+                payload = struct.pack('<I', value)
                 print(f"Sending {parts[0]}: Addr {hex(addr)}, Val {hex(value)}")
                 ser.write(build_packet(opcode, addr, payload))
-                if wait_for_ack(ser):
-                    print("  -> ACK'd")
-                else:
-                    print("  -> FAILED")
-                    sys.exit(1)
+                if not wait_for_ack(ser):
+                    print("  -> FAILED"); sys.exit(1)
+                print("  -> ACK'd")
 
             elif parts[0] in ('sysmem_read', 'sram_read'):
-                addr   = int(parts[1], 16)
+                addr = int(parts[1], 16)
                 opcode = CMD_READ_SYSMEM if parts[0] == 'sysmem_read' else CMD_READ_SRAM
-
                 print(f"Sending {parts[0]}: Addr {hex(addr)}")
                 val = read_memory(ser, opcode, addr)
-                if val is not None:
-                    print(f"  -> SUCCESS: Read Value = {hex(val)}")
-                else:
-                    print("  -> FAILED ACK")
-                    sys.exit(1)
+                if val is None:
+                    print("  -> FAILED ACK"); sys.exit(1)
+                print(f"  -> SUCCESS: Read Value = {hex(val)}")
+
+    # --- Derive expected transfer from the descriptor at ring_baseaddr ---
+    # Descriptor layout (descriptor_struct.md):
+    #   +0x00 SRC_ADDR, +0x04 DST_ADDR, +0x08 LEN (low 8b = beat count), +0x0C FLAGS (bit0=DIR)
+    desc_src   = sysmem_image.get(ring_baseaddr + 0x00, 0)
+    desc_dst   = sysmem_image.get(ring_baseaddr + 0x04, 0)
+    desc_len   = sysmem_image.get(ring_baseaddr + 0x08, 0) & 0xFF
+    desc_flags = sysmem_image.get(ring_baseaddr + 0x0C, 0)
+    desc_dir   = desc_flags & 1
+
+    # DIR=1: sysmem -> SRAM, source data was preloaded via sysmem_write.
+    # DIR=0: SRAM   -> sysmem, source data was preloaded via sram_write.
+    src_image      = sysmem_image if desc_dir == 1 else sram_image
+    expected_words = [src_image.get(desc_src + i * 4, 0) for i in range(desc_len)]
+
+    return {
+        'src_addr':       desc_src,
+        'dst_addr':       desc_dst,
+        'len_words':      desc_len,
+        'dir':            desc_dir,
+        'expected_words': expected_words,
+    }
 
 
-def verify_dma_result(ser):
-    """
-    Verify the DMA transfer defined in stim.txt:
-      SYSMEM[0x40] (0xCAFECAFE) -> SRAM[0x100]
+def verify_dma_result(ser, params):
+    """Verify the DMA transfer described by params (from parse_stimulus)."""
+    src_addr       = params['src_addr']
+    dst_addr       = params['dst_addr']
+    len_words      = params['len_words']
+    direction      = params['dir']
+    expected_words = params['expected_words']
 
-    Checks:
-      1. Single-word readback of SRAM destination.
-      2. CRC32 of SRAM destination range vs. Python-computed expected CRC.
-      3. CRC32 of SYSMEM source range to confirm source is unchanged.
-    """
-    expected_crc = compute_crc32(STIM_EXPECTED_DATA)
-    byte_len     = STIM_TRANSFER_WORDS * 4
+    if len_words == 0:
+        print("\n--- DMA Verification ---")
+        print("  [SKIP] No descriptor found in sysmem (LEN=0). Check BASEADDR / descriptor writes.")
+        return False
+
+    expected_crc = compute_crc32(expected_words)
+    byte_len     = len_words * 4
     all_pass     = True
 
-    print("\n--- DMA Verification ---")
-
-    # 1. Readback SRAM destination
-    val = read_memory(ser, CMD_READ_SRAM, STIM_DST_SRAM_ADDR)
-    if val is None:
-        print(f"  [FAIL] SRAM[{hex(STIM_DST_SRAM_ADDR)}]: read failed")
-        all_pass = False
-    elif val == STIM_EXPECTED_DATA[0]:
-        print(f"  [PASS] SRAM[{hex(STIM_DST_SRAM_ADDR)}] = {hex(val)}")
+    if direction == 1:
+        dst_crc_op, src_crc_op = CMD_CRC_SRAM,   CMD_CRC_SYSMEM
+        dst_read_op            = CMD_READ_SRAM
+        dst_label              = f"SRAM[{hex(dst_addr)}]"
+        src_label              = f"SYSMEM[{hex(src_addr)}]"
     else:
-        print(f"  [FAIL] SRAM[{hex(STIM_DST_SRAM_ADDR)}] = {hex(val)}, expected {hex(STIM_EXPECTED_DATA[0])}")
+        dst_crc_op, src_crc_op = CMD_CRC_SYSMEM, CMD_CRC_SRAM
+        dst_read_op            = CMD_READ_SYSMEM
+        dst_label              = f"SYSMEM[{hex(dst_addr)}]"
+        src_label              = f"SRAM[{hex(src_addr)}]"
+
+    print("\n--- DMA Verification ---")
+    print(f"  Direction: {'SYSMEM->SRAM' if direction == 1 else 'SRAM->SYSMEM'}")
+    print(f"  Transfer : {src_label} -> {dst_label}, {len_words} word(s)")
+    print(f"  Expected : {[hex(w) for w in expected_words]}")
+    print(f"  Expected CRC: {hex(expected_crc)}")
+
+    # 1. Single-word readback of dst[0]
+    val = read_memory(ser, dst_read_op, dst_addr)
+    if val is None:
+        print(f"  [FAIL] {dst_label}: read failed")
+        all_pass = False
+    elif val == expected_words[0]:
+        print(f"  [PASS] {dst_label} = {hex(val)}")
+    else:
+        print(f"  [FAIL] {dst_label} = {hex(val)}, expected {hex(expected_words[0])}")
         all_pass = False
 
-    # 2. CRC check SRAM destination
-    fw_crc_dst = request_crc(ser, CMD_CRC_SRAM, STIM_DST_SRAM_ADDR, byte_len)
+    # 2. CRC over destination range
+    fw_crc_dst = request_crc(ser, dst_crc_op, dst_addr, byte_len)
     if fw_crc_dst is None:
-        print(f"  [FAIL] SRAM CRC: request failed")
+        print("  [FAIL] dst CRC: request failed")
         all_pass = False
     elif fw_crc_dst == expected_crc:
-        print(f"  [PASS] SRAM CRC = {hex(fw_crc_dst)}")
+        print(f"  [PASS] dst CRC = {hex(fw_crc_dst)}")
     else:
-        print(f"  [FAIL] SRAM CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}")
+        print(f"  [FAIL] dst CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}")
         all_pass = False
 
-    # 3. CRC check SYSMEM source (must be unchanged after DMA)
-    fw_crc_src = request_crc(ser, CMD_CRC_SYSMEM, STIM_SRC_SYSMEM_ADDR, byte_len)
+    # 3. CRC over source range — must still match (DMA shouldn't clobber source)
+    fw_crc_src = request_crc(ser, src_crc_op, src_addr, byte_len)
     if fw_crc_src is None:
-        print(f"  [FAIL] SYSMEM CRC: request failed")
+        print("  [FAIL] src CRC: request failed")
         all_pass = False
     elif fw_crc_src == expected_crc:
-        print(f"  [PASS] SYSMEM[{hex(STIM_SRC_SYSMEM_ADDR)}] CRC = {hex(fw_crc_src)} (source intact)")
+        print(f"  [PASS] {src_label} CRC = {hex(fw_crc_src)} (source intact)")
     else:
-        print(f"  [FAIL] SYSMEM[{hex(STIM_SRC_SYSMEM_ADDR)}] CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}")
+        print(f"  [FAIL] {src_label} CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}")
         all_pass = False
 
     print()
-    if all_pass:
-        print("=== DMA TEST PASSED ===")
-    else:
-        print("=== DMA TEST FAILED ===")
+    print("=== DMA TEST PASSED ===" if all_pass else "=== DMA TEST FAILED ===")
     return all_pass
 
 
@@ -193,7 +237,7 @@ def main():
     _default_stim = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
 
     parser = argparse.ArgumentParser(description="Host runner for DMA FPGA validation")
-    parser.add_argument("--port",  default=PORT,       help="Serial port (default: %s)" % PORT)
+    parser.add_argument("--port",  default=PORT,           help="Serial port (default: %s)" % PORT)
     parser.add_argument("--baud",  type=int, default=BAUD, help="Baud rate (default: %d)" % BAUD)
     parser.add_argument("--stim",  default=_default_stim,  help="Path to stim.txt (default: firmware/stim.txt)")
     args = parser.parse_args()
@@ -205,13 +249,12 @@ def main():
         print(f"Error opening port: {e}")
         return
 
-    # Allow firmware to start up after reset
     time.sleep(1)
     print(ser.read_all().decode(errors='ignore'))
 
     stim_path = os.path.abspath(args.stim)
     print(f"Parsing and sending {stim_path}...")
-    parse_stimulus(stim_path, ser)
+    params = parse_stimulus(stim_path, ser)
 
     print("\nSending RUN DMA Command...")
     ser.write(build_packet(CMD_RUN_DMA, 0x00000000))
@@ -221,8 +264,7 @@ def main():
         sys.exit(1)
     print("  -> DMA Trigger ACK'd")
 
-    verify_dma_result(ser)
-
+    verify_dma_result(ser, params)
     ser.close()
 
 
