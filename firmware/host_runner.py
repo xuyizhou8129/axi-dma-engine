@@ -190,7 +190,7 @@ def verify_dma_result(ser):
 
 
 def main():
-    _default_stim = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim1.txt')
+    _default_stim = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
 
     parser = argparse.ArgumentParser(description="Host runner for DMA FPGA validation")
     parser.add_argument("--port",  default=PORT,       help="Serial port (default: %s)" % PORT)
