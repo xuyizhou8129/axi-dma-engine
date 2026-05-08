@@ -68,6 +68,7 @@ CMD_READ_SRAM    = 0x06
 CMD_READ_SYSMEM  = 0x07
 CMD_CRC_SRAM     = 0x08
 CMD_CRC_SYSMEM   = 0x09
+CMD_READ_CSR     = 0x0A
 CMD_ACK          = 0xAA
 CMD_NACK         = 0xEE
 HEADER_SIZE      = 13  # 4 (sync) + 1 (opcode) + 4 (addr) + 4 (len)
