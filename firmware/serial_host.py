@@ -72,6 +72,9 @@ CMD_ACK          = 0xAA
 CMD_NACK         = 0xEE
 HEADER_SIZE      = 13  # 4 (sync) + 1 (opcode) + 4 (addr) + 4 (len)
 
+PORT = 'COM5'
+BAUD = 9600
+
 # Optional import — fail gracefully so the module can be imported without
 # pyserial installed (unit tests / dry-run mode still work).
 try:
@@ -497,8 +500,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Serial host for DMA FPGA verification (Arty A7 + MicroBlaze, binary protocol)"
     )
-    parser.add_argument("--port",          help="Serial port (e.g. /dev/tty.usbserial-XXX). Auto-detected if omitted.")
-    parser.add_argument("--baud",          type=int, default=9600)
+    parser.add_argument("--port",          default=PORT, help="Serial port (default: %s)" % PORT)
+    parser.add_argument("--baud",          type=int, default=BAUD)
     parser.add_argument("--csr-base",      type=lambda x: int(x, 0), default=0x80000000, dest="csr_base",
                         help="AXI base address of the DMA CSR block (default 0x80000000)")
     parser.add_argument("--smem-base",     type=lambda x: int(x, 0), default=0x00000000, dest="smem_base",
@@ -548,10 +551,7 @@ def main():
     print("Expected SRAM CRC: 0x%08x" % expected_sram_crc)
 
     # 3. Connect to FPGA.
-    port = args.port or _find_arty_port()
-    if not port:
-        print("ERROR: No serial port found. Connect the Arty A7 or pass --port.")
-        sys.exit(1)
+    port = args.port
     print("Opening %s at %d baud ..." % (port, args.baud))
     print("CSR base=0x%08x  SMEM base=0x%08x  SRAM base=0x%08x" % (
         args.csr_base, args.smem_base, args.sram_base))
