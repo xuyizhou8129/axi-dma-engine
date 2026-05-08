@@ -216,6 +216,10 @@ int main(void) {
                             if ((status & STATUS_EMPTY) && !(status & STATUS_BUSY)) break;
                         }
 
+                        /* Return memory ownership to the MicroBlaze shim so
+                         * subsequent CMD_READ_SRAM / CMD_CRC_* commands work. */
+                        REG_WRITE(REG_INIT_DONE, 0);
+
                         if ((status & STATUS_ERROR) || i >= 10000000) {
                             xil_printf("DMA failed: status=0x%08x\r\n", status);
                             send_ack(CMD_NACK);

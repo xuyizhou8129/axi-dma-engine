@@ -84,7 +84,7 @@ def compute_crc32(words):
 
 def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
     with open(filename, 'r') as f:
-        for line_num, line in enumerate(f):
+        for line in f:
             line = line.strip()
             if not line or line.startswith('#'):
                 continue
