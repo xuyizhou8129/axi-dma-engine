@@ -7,10 +7,10 @@
 #   SRAM    0x0100-0x010F : DMA destination
 
 # --- Step 1: Write source data into sys_mem ---
-sysmem_write 00000100 AABBCCDD
-sysmem_write 00000104 11223344
+sysmem_write 00000100 DEADBEEF
+sysmem_write 00000104 DEADBEEF
 sysmem_write 00000108 DEADBEEF
-sysmem_write 0000010C CAFECAFE
+sysmem_write 0000010C DEADBEEF
 
 # --- Step 2: Write Descriptor 0 into sys_mem at ring base 0x0000 ---
 # SRC_ADDR = sys_mem 0x100
