@@ -198,11 +198,31 @@ class DMASerialHost:
         self._wait_for_ack()
 
     def csr_read(self, byte_offset):
-        """CSR reads are not yet implemented in the MicroBlaze firmware."""
-        raise NotImplementedError(
-            "csr_read: CMD_REQ_RESULTS is not yet implemented in the MicroBlaze firmware. "
-            "Update firmware to respond with register data, then implement here."
-        )
+        """Read a CSR register via CMD_READ_CSR (absolute addr = csr_base + offset)."""
+        addr = (self.csr_base_addr + byte_offset) & 0xFFFFFFFF
+        self._send_packet(CMD_READ_CSR, addr)
+        self._wait_for_ack()
+        data = self.ser.read(4)
+        if len(data) != 4:
+            raise TimeoutError("Timeout reading CSR word")
+        return struct.unpack("<I", data)[0]
+
+    def dump_csr_status(self, label="CSR snapshot"):
+        try:
+            status     = self.csr_read(0x14)  # CSR_REG_STATUS
+            irq_status = self.csr_read(0x18)  # CSR_REG_IRQ_STATUS
+            head       = self.csr_read(0x08)  # CSR_REG_HEAD
+            tail       = self.csr_read(0x0C)  # CSR_REG_TAIL
+        except (TimeoutError, RuntimeError) as e:
+            print("  CSR dump failed: %s" % e)
+            return
+        print("\n--- %s ---" % label)
+        print("  STATUS     = 0x%08x  BUSY=%d EMPTY=%d ERROR=%d" % (
+            status, status & 1, (status >> 1) & 1, (status >> 2) & 1))
+        print("  IRQ_STATUS = 0x%08x  EMPTY_IRQ=%d ERROR_IRQ=%d" % (
+            irq_status, irq_status & 1, (irq_status >> 1) & 1))
+        print("  HEAD       = %d" % head)
+        print("  TAIL       = %d" % tail)
 
     # ----------------------------------------------------------------
     # Memory writes
@@ -573,7 +593,15 @@ def main():
             print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
 
         # 5. Trigger DMA and wait for completion (polled inside firmware).
-        host.run_dma()
+        try:
+            host.run_dma()
+            dma_ok = True
+        except RuntimeError as e:
+            print("*** DMA NACK: %s ***" % e)
+            dma_ok = False
+        host.dump_csr_status("Post-DMA CSR snapshot")
+        if not dma_ok:
+            sys.exit(1)
 
         # [DBG] Spot-check SRAM destination and SMEM source after DMA.
         print("[DBG] SRAM after DMA (expected data @ 0x100):")
