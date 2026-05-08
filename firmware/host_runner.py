@@ -1,3 +1,4 @@
+import argparse
 import serial
 import struct
 import time
@@ -189,8 +190,16 @@ def verify_dma_result(ser):
 
 
 def main():
+    _default_stim = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
+
+    parser = argparse.ArgumentParser(description="Host runner for DMA FPGA validation")
+    parser.add_argument("--port",  default=PORT,       help="Serial port (default: %s)" % PORT)
+    parser.add_argument("--baud",  type=int, default=BAUD, help="Baud rate (default: %d)" % BAUD)
+    parser.add_argument("--stim",  default=_default_stim,  help="Path to stim.txt (default: firmware/stim.txt)")
+    args = parser.parse_args()
+
     try:
-        ser = serial.Serial(PORT, BAUD, timeout=2)
+        ser = serial.Serial(args.port, args.baud, timeout=2)
         print("Connected to FPGA.")
     except Exception as e:
         print(f"Error opening port: {e}")
@@ -200,7 +209,7 @@ def main():
     time.sleep(1)
     print(ser.read_all().decode(errors='ignore'))
 
-    stim_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
+    stim_path = os.path.abspath(args.stim)
     print(f"Parsing and sending {stim_path}...")
     parse_stimulus(stim_path, ser)
 
