@@ -80,8 +80,9 @@ except ImportError:
     _SERIAL_AVAILABLE = False
 
 # Paths
-_here   = os.path.dirname(os.path.abspath(__file__))
-_source = os.path.join(os.path.dirname(_here), "source")
+_here    = os.path.dirname(os.path.abspath(__file__))
+_sim_dir = os.path.join(os.path.dirname(_here), "sim")
+_source  = os.path.join(os.path.dirname(_here), "source")
 if _source not in sys.path:
     sys.path.insert(0, _source)
 
@@ -228,7 +229,7 @@ class DMASerialHost:
     # High-level DMA operations
     # ----------------------------------------------------------------
     def send_stim(self, stim_path):
-        """Parse stim.txt and issue all CSR writes."""
+        """Parse stim.txt and issue all memory and CSR writes."""
         count = 0
         with open(stim_path) as f:
             for line in f:
@@ -236,12 +237,20 @@ class DMASerialHost:
                 if not line or line.startswith("#"):
                     continue
                 parts = line.split()
-                if parts[0] == "csr_write" and len(parts) == 3:
-                    addr = int(parts[1], 16)
-                    data = int(parts[2], 16)
+                if len(parts) != 3:
+                    continue
+                addr = int(parts[1], 16)
+                data = int(parts[2], 16)
+                if parts[0] == "sysmem_write":
+                    self.smem_write(addr, data)
+                elif parts[0] == "sram_write":
+                    self.sram_write(addr, data)
+                elif parts[0] == "csr_write":
                     self.csr_write(addr, data)
-                    count += 1
-        print("Sent %d CSR write(s) from %s" % (count, os.path.basename(stim_path)))
+                else:
+                    continue
+                count += 1
+        print("Sent %d command(s) from %s" % (count, os.path.basename(stim_path)))
 
     def wait_done(self, poll_interval=0.1, timeout=30.0):
         """Requires CSR reads — not yet implemented in firmware. Raises NotImplementedError."""
@@ -330,7 +339,7 @@ def run_golden(scenario_csv, out_dir):
     """Call run_golden.py's run_scenario() and write artifacts to out_dir."""
     import importlib.util, csv as _csv
 
-    golden_path = os.path.join(_here, "run_golden.py")
+    golden_path = os.path.join(_sim_dir, "run_golden.py")
     spec = importlib.util.spec_from_file_location("run_golden", golden_path)
     rg   = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rg)
@@ -370,7 +379,7 @@ def dry_run(scenario_csv, out_dir):
     """Run golden model and self-check transfers without touching the FPGA."""
     import csv as _csv, importlib.util
 
-    golden_path = os.path.join(_here, "run_golden.py")
+    golden_path = os.path.join(_sim_dir, "run_golden.py")
     spec = importlib.util.spec_from_file_location("run_golden", golden_path)
     rg   = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rg)
@@ -460,6 +469,8 @@ def dry_run_all(scenarios_dir, out_dir):
 
 # Main
 def main():
+    _default_scenario = os.path.join(_sim_dir, "scenarios", "example.csv")
+
     parser = argparse.ArgumentParser(
         description="Serial host for DMA FPGA verification (Arty A7 + MicroBlaze, binary protocol)"
     )
@@ -471,21 +482,21 @@ def main():
                         help="AXI base address of system memory (default 0x00000000)")
     parser.add_argument("--sram-base",     type=lambda x: int(x, 0), default=0x00010000, dest="sram_base",
                         help="AXI base address of on-chip SRAM/BRAM (default 0x00010000)")
-    parser.add_argument("--scenario",      default="scenarios/example.csv", help="Scenario CSV to run")
+    parser.add_argument("--scenario",      default=_default_scenario, help="Scenario CSV to run")
     parser.add_argument("--out-dir",       default="out", dest="out_dir")
     parser.add_argument("--list-ports",    action="store_true", dest="list_ports", help="List available serial ports and exit")
     parser.add_argument("--dry-run",       action="store_true", dest="dry_run",    help="Run golden model only, no FPGA")
-    parser.add_argument("--dry-run-all",   action="store_true", dest="dry_run_all",help="Dry-run all scenarios/*.csv")
+    parser.add_argument("--dry-run-all",   action="store_true", dest="dry_run_all",help="Dry-run all sim/scenarios/*.csv")
     args = parser.parse_args()
 
-    os.chdir(_here)  # run from sim/ so relative paths work
+    os.chdir(_here)
 
     if args.list_ports:
         list_ports()
         return
 
     if args.dry_run_all:
-        passed, failed = dry_run_all("scenarios", args.out_dir)
+        passed, failed = dry_run_all(os.path.join(_sim_dir, "scenarios"), args.out_dir)
         sys.exit(0 if failed == 0 else 1)
 
     if args.dry_run:
@@ -493,11 +504,25 @@ def main():
         sys.exit(0 if ok else 1)
 
     # --- FPGA path ---
-    stim_path = os.path.join(args.out_dir, "stim.txt")
-    if not os.path.exists(stim_path):
-        print("Generating golden artifacts for %s ..." % args.scenario)
-        run_golden(args.scenario, args.out_dir)
 
+    # 1. Always regenerate golden artifacts from the scenario so CRCs are fresh.
+    os.makedirs(args.out_dir, exist_ok=True)
+    print("Running golden model for %s ..." % args.scenario)
+    run_golden(args.scenario, args.out_dir)
+
+    stim_path   = os.path.join(args.out_dir, "stim.txt")
+    golden_smem = os.path.join(args.out_dir, "golden_smem.hex")
+    golden_sram = os.path.join(args.out_dir, "golden_sram.hex")
+
+    # 2. Compute expected CRCs from golden files (no hardcoded constants).
+    smem_words = _load_hex32(golden_smem)
+    sram_words = _load_hex32(golden_sram)
+    expected_smem_crc = _crc32_words(smem_words)
+    expected_sram_crc = _crc32_words(sram_words)
+    print("Expected SMEM CRC: 0x%08x" % expected_smem_crc)
+    print("Expected SRAM CRC: 0x%08x" % expected_sram_crc)
+
+    # 3. Connect to FPGA.
     port = args.port or _find_arty_port()
     if not port:
         print("ERROR: No serial port found. Connect the Arty A7 or pass --port.")
@@ -506,30 +531,34 @@ def main():
     print("CSR base=0x%08x  SMEM base=0x%08x  SRAM base=0x%08x" % (
         args.csr_base, args.smem_base, args.sram_base))
 
-    smem_path = os.path.join(args.out_dir, "initial_smem.hex")
-    sram_path = os.path.join(args.out_dir, "initial_sram.hex")
-
     host = DMASerialHost(port, baud=args.baud,
                          csr_base_addr=args.csr_base,
                          smem_base_addr=args.smem_base,
                          sram_base_addr=args.sram_base)
     try:
-        # 1. Pre-write initial memory contents (descriptor ring + data)
-        host.send_initial_smem(smem_path)
-
-        # 2. Pre-write initial SRAM contents
-        host.send_initial_sram(sram_path)
-
-        # 3. Send CSR writes (baseaddr, ringlen, tail, ctrl.enable)
+        # 4. Send all writes from stim.txt (sysmem_write, sram_write, csr_write).
         host.send_stim(stim_path)
 
-        # 4. Trigger DMA engine
+        # 5. Trigger DMA and wait for completion (polled inside firmware).
         host.run_dma()
 
-        # NOTE: DMA completion polling (wait_done) and IRQ/CRC verification
-        # require CMD_REQ_RESULTS to be implemented in the MicroBlaze firmware.
-        print("*** Stimulus sent. DMA triggered. ***")
-        print("    (Completion polling not yet supported — check DMA status via Vitis debug or UART prints.)")
+        # 6. Request CRC32 from firmware and compare against golden.
+        got_smem_crc = host.smem_crc(0, len(smem_words) * 4)
+        got_sram_crc = host.sram_crc(0, len(sram_words) * 4)
+
+        smem_pass = (got_smem_crc == expected_smem_crc)
+        sram_pass = (got_sram_crc == expected_sram_crc)
+
+        print("SMEM CRC: got=0x%08x  exp=0x%08x  %s" % (
+            got_smem_crc, expected_smem_crc, "PASS" if smem_pass else "FAIL"))
+        print("SRAM CRC: got=0x%08x  exp=0x%08x  %s" % (
+            got_sram_crc, expected_sram_crc, "PASS" if sram_pass else "FAIL"))
+
+        if smem_pass and sram_pass:
+            print("=== TEST PASSED ===")
+        else:
+            print("=== TEST FAILED ===")
+            sys.exit(1)
     except (RuntimeError, TimeoutError) as e:
         print("*** FAIL: %s ***" % e)
         sys.exit(1)

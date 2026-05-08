@@ -176,6 +176,7 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             if wi >= smem_words:
                 raise ValueError("smem word index %d out of range (size=%d)" % (wi, smem_words))
             sysmem.mem[wi] = data
+            stim_lines.append("sysmem_write %08x %08x" % (wi * 4, data))
 
         elif op == "sram":
             wi   = int(args[0], 10)
@@ -183,6 +184,7 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             if wi >= sram_words:
                 raise ValueError("sram word index %d out of range (size=%d)" % (wi, sram_words))
             sram.mem[wi] = data
+            stim_lines.append("sram_write %08x %08x" % (wi * 4, data))
 
         elif op == "csr_baseaddr":
             addr = int(args[0], 16) & 0xFFFFFFFF
@@ -200,7 +202,17 @@ def run_scenario(rows, smem_words=SMEM_WORDS, sram_words=BRAM_SIZE):
             w2 = int(args[2], 16) & 0xFFFFFFFF
             w3 = int(args[3], 16) & 0xFFFFFFFF
             desc = Descriptor(w0, w1, w2, w3)
+            # Compute where enqueue will write before advancing tail
+            rlen = csr.ringlen() & 0xFFFFFFFF
+            base = csr.baseaddr() & 0xFFFFFFFF
+            ti   = csr.read(csr.REG_TAIL) % rlen
+            slot = base + ti * 16
             ring.enqueue(desc)
+            # Emit descriptor ring writes (must precede tail update)
+            stim_lines.append("sysmem_write %08x %08x" % (slot +  0, w0))
+            stim_lines.append("sysmem_write %08x %08x" % (slot +  4, w1))
+            stim_lines.append("sysmem_write %08x %08x" % (slot +  8, w2))
+            stim_lines.append("sysmem_write %08x %08x" % (slot + 12, w3))
             # Emit the updated tail so the TB can mirror it via AXI-Lite
             tail = csr.read(csr.REG_TAIL)
             stim_lines.append("csr_write %02x %08x" % (csr.REG_TAIL, tail))
