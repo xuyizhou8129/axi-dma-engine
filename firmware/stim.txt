@@ -6,7 +6,7 @@
 #   SRAM    0x0100        : DMA destination (byte address)
 
 # --- Step 1: Write source data into sys_mem ---
-sysmem_write 00000040 CAFECAFE
+sysmem_write 00000040 DEADBEEF
 
 # --- Step 2: Write Descriptor 0 into sys_mem at ring base (BASEADDR = 0) ---
 # SRC_ADDR = sys_mem 0x40
