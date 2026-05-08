@@ -81,13 +81,12 @@ def compute_crc32(words):
 
 def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
     """Send all directives from stim.txt and build a model of what was loaded.
-    Returns a dict describing the DMA transfer extracted from the stim:
-        {src_addr, dst_addr, len_words, dir, expected_words}
-    Derived from the descriptor at BASEADDR (no hardcoded constants).
+    Returns a list of transfer dicts (one per enqueued descriptor):
+        [{src_addr, dst_addr, len_words, dir, expected_words}, ...]
+    Walks the descriptor ring from index 0 to TAIL-1.
     """
     sysmem_image  = {}   # byte_addr -> u32
     sram_image    = {}
-    ring_baseaddr = 0
     csr_writes    = {}   # offset -> value (last write wins)
 
     with open(filename, 'r') as f:
@@ -102,8 +101,6 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                 value  = int(parts[2], 16)
                 addr   = csr_base_addr + offset
                 csr_writes[offset] = value
-                if offset == CSR_OFF_BASEADDR:
-                    ring_baseaddr = value
 
                 payload = struct.pack('<I', value)
                 print(f"Sending CSR Write: Addr {hex(addr)}, Val {hex(value)}")
@@ -138,31 +135,36 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                     print("  -> FAILED ACK"); sys.exit(1)
                 print(f"  -> SUCCESS: Read Value = {hex(val)}")
 
-    # --- Derive expected transfer from the descriptor at ring_baseaddr ---
+    # --- Walk the ring (BASEADDR ... BASEADDR + TAIL*16) for each descriptor ---
     # Descriptor layout (descriptor_struct.md):
     #   +0x00 SRC_ADDR, +0x04 DST_ADDR, +0x08 LEN (low 8b = beat count), +0x0C FLAGS (bit0=DIR)
-    desc_src   = sysmem_image.get(ring_baseaddr + 0x00, 0)
-    desc_dst   = sysmem_image.get(ring_baseaddr + 0x04, 0)
-    desc_len   = sysmem_image.get(ring_baseaddr + 0x08, 0) & 0xFF
-    desc_flags = sysmem_image.get(ring_baseaddr + 0x0C, 0)
-    desc_dir   = desc_flags & 1
+    ring_baseaddr = csr_writes.get(CSR_OFF_BASEADDR, 0)
+    tail          = csr_writes.get(CSR_OFF_TAIL, 0)
 
-    # DIR=1: sysmem -> SRAM, source data was preloaded via sysmem_write.
-    # DIR=0: SRAM   -> sysmem, source data was preloaded via sram_write.
-    src_image      = sysmem_image if desc_dir == 1 else sram_image
-    expected_words = [src_image.get(desc_src + i * 4, 0) for i in range(desc_len)]
+    transfers = []
+    for i in range(tail):
+        desc_off   = ring_baseaddr + i * 16
+        desc_src   = sysmem_image.get(desc_off + 0x00, 0)
+        desc_dst   = sysmem_image.get(desc_off + 0x04, 0)
+        desc_len   = sysmem_image.get(desc_off + 0x08, 0) & 0xFF
+        desc_flags = sysmem_image.get(desc_off + 0x0C, 0)
+        desc_dir   = desc_flags & 1
 
-    return {
-        'src_addr':       desc_src,
-        'dst_addr':       desc_dst,
-        'len_words':      desc_len,
-        'dir':            desc_dir,
-        'expected_words': expected_words,
-    }
+        src_image      = sysmem_image if desc_dir == 1 else sram_image
+        expected_words = [src_image.get(desc_src + j * 4, 0) for j in range(desc_len)]
+
+        transfers.append({
+            'src_addr':       desc_src,
+            'dst_addr':       desc_dst,
+            'len_words':      desc_len,
+            'dir':            desc_dir,
+            'expected_words': expected_words,
+        })
+    return transfers
 
 
-def verify_dma_result(ser, params):
-    """Verify the DMA transfer described by params (from parse_stimulus)."""
+def verify_one_transfer(ser, idx, params):
+    """Verify a single descriptor's transfer. Returns True on PASS."""
     src_addr       = params['src_addr']
     dst_addr       = params['dst_addr']
     len_words      = params['len_words']
@@ -170,13 +172,11 @@ def verify_dma_result(ser, params):
     expected_words = params['expected_words']
 
     if len_words == 0:
-        print("\n--- DMA Verification ---")
-        print("  [SKIP] No descriptor found in sysmem (LEN=0). Check BASEADDR / descriptor writes.")
-        return False
+        print(f"  [SKIP] Desc {idx}: LEN=0")
+        return True
 
     expected_crc = compute_crc32(expected_words)
     byte_len     = len_words * 4
-    all_pass     = True
 
     if direction == 1:
         dst_crc_op, src_crc_op = CMD_CRC_SRAM,   CMD_CRC_SYSMEM
@@ -189,44 +189,51 @@ def verify_dma_result(ser, params):
         dst_label              = f"SYSMEM[{hex(dst_addr)}]"
         src_label              = f"SRAM[{hex(src_addr)}]"
 
-    print("\n--- DMA Verification ---")
-    print(f"  Direction: {'SYSMEM->SRAM' if direction == 1 else 'SRAM->SYSMEM'}")
-    print(f"  Transfer : {src_label} -> {dst_label}, {len_words} word(s)")
-    print(f"  Expected : {[hex(w) for w in expected_words]}")
-    print(f"  Expected CRC: {hex(expected_crc)}")
+    print(f"\n  [Desc {idx}] {src_label} -> {dst_label}, {len_words} word(s), "
+          f"DIR={direction}, expected_crc={hex(expected_crc)}")
 
-    # 1. Single-word readback of dst[0]
+    ok = True
+
     val = read_memory(ser, dst_read_op, dst_addr)
     if val is None:
-        print(f"  [FAIL] {dst_label}: read failed")
-        all_pass = False
+        print(f"    [FAIL] {dst_label}: read failed");                           ok = False
     elif val == expected_words[0]:
-        print(f"  [PASS] {dst_label} = {hex(val)}")
+        print(f"    [PASS] {dst_label} = {hex(val)}")
     else:
-        print(f"  [FAIL] {dst_label} = {hex(val)}, expected {hex(expected_words[0])}")
-        all_pass = False
+        print(f"    [FAIL] {dst_label} = {hex(val)}, expected {hex(expected_words[0])}"); ok = False
 
-    # 2. CRC over destination range
     fw_crc_dst = request_crc(ser, dst_crc_op, dst_addr, byte_len)
     if fw_crc_dst is None:
-        print("  [FAIL] dst CRC: request failed")
-        all_pass = False
+        print("    [FAIL] dst CRC: request failed"); ok = False
     elif fw_crc_dst == expected_crc:
-        print(f"  [PASS] dst CRC = {hex(fw_crc_dst)}")
+        print(f"    [PASS] dst CRC = {hex(fw_crc_dst)}")
     else:
-        print(f"  [FAIL] dst CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}")
-        all_pass = False
+        print(f"    [FAIL] dst CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}"); ok = False
 
-    # 3. CRC over source range — must still match (DMA shouldn't clobber source)
     fw_crc_src = request_crc(ser, src_crc_op, src_addr, byte_len)
     if fw_crc_src is None:
-        print("  [FAIL] src CRC: request failed")
-        all_pass = False
+        print("    [FAIL] src CRC: request failed"); ok = False
     elif fw_crc_src == expected_crc:
-        print(f"  [PASS] {src_label} CRC = {hex(fw_crc_src)} (source intact)")
+        print(f"    [PASS] src CRC = {hex(fw_crc_src)} (source intact)")
     else:
-        print(f"  [FAIL] {src_label} CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}")
-        all_pass = False
+        print(f"    [FAIL] src CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}"); ok = False
+
+    return ok
+
+
+def verify_dma_result(ser, transfers):
+    """Verify each descriptor's transfer in order. Returns True only if all PASS."""
+    print("\n--- DMA Verification ---")
+    print(f"  Descriptors enqueued: {len(transfers)}")
+
+    if not transfers:
+        print("  [SKIP] No descriptors to verify (TAIL=0).")
+        return False
+
+    all_pass = True
+    for idx, params in enumerate(transfers):
+        if not verify_one_transfer(ser, idx, params):
+            all_pass = False
 
     print()
     print("=== DMA TEST PASSED ===" if all_pass else "=== DMA TEST FAILED ===")
@@ -254,7 +261,7 @@ def main():
 
     stim_path = os.path.abspath(args.stim)
     print(f"Parsing and sending {stim_path}...")
-    params = parse_stimulus(stim_path, ser)
+    transfers = parse_stimulus(stim_path, ser)
 
     print("\nSending RUN DMA Command...")
     ser.write(build_packet(CMD_RUN_DMA, 0x00000000))
@@ -264,7 +271,7 @@ def main():
         sys.exit(1)
     print("  -> DMA Trigger ACK'd")
 
-    verify_dma_result(ser, params)
+    verify_dma_result(ser, transfers)
     ser.close()
 
 
