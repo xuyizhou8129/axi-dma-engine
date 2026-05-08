@@ -17,17 +17,49 @@ CMD_READ_SRAM     = 0x06
 CMD_READ_SYSMEM   = 0x07
 CMD_CRC_SRAM      = 0x08
 CMD_CRC_SYSMEM    = 0x09
+CMD_READ_CSR      = 0x0A
 
 CMD_ACK           = 0xAA
 CMD_NACK          = 0xEE
 
 PORT = 'COM5'
 BAUD = 9600
+CSR_BASE = 0x80000000
 
 # CSR offsets (from csr_spec.md)
-CSR_OFF_BASEADDR = 0x00
-CSR_OFF_RINGLEN  = 0x04
-CSR_OFF_TAIL     = 0x0C
+CSR_OFF_BASEADDR   = 0x00
+CSR_OFF_RINGLEN    = 0x04
+CSR_OFF_HEAD       = 0x08
+CSR_OFF_TAIL       = 0x0C
+CSR_OFF_CTRL       = 0x10
+CSR_OFF_STATUS     = 0x14
+CSR_OFF_IRQ_STATUS = 0x18
+
+
+def csr_read(ser, offset):
+    """Read a CSR register over UART (direct MMIO, not via shim)."""
+    return read_memory(ser, CMD_READ_CSR, CSR_BASE + offset)
+
+
+def dump_csr_status(ser, label="CSR snapshot"):
+    """Print STATUS / IRQ_STATUS / HEAD / TAIL so the user can see error bits."""
+    status     = csr_read(ser, CSR_OFF_STATUS)
+    irq_status = csr_read(ser, CSR_OFF_IRQ_STATUS)
+    head       = csr_read(ser, CSR_OFF_HEAD)
+    tail       = csr_read(ser, CSR_OFF_TAIL)
+    print(f"\n--- {label} ---")
+    if status is None:
+        print("  CSR read failed.")
+        return
+    busy  = (status >> 0) & 1
+    empty = (status >> 1) & 1
+    err   = (status >> 2) & 1
+    irq_e = (irq_status >> 0) & 1 if irq_status is not None else '?'
+    irq_x = (irq_status >> 1) & 1 if irq_status is not None else '?'
+    print(f"  STATUS     = {hex(status)}  BUSY={busy} EMPTY={empty} ERROR={err}")
+    print(f"  IRQ_STATUS = {hex(irq_status)}  EMPTY={irq_e} ERROR={irq_x}")
+    print(f"  HEAD       = {head}")
+    print(f"  TAIL       = {tail}")
 
 
 def wait_for_ack(ser):
@@ -265,14 +297,19 @@ def main():
 
     print("\nSending RUN DMA Command...")
     ser.write(build_packet(CMD_RUN_DMA, 0x00000000))
-    if not wait_for_ack(ser):
+    dma_ok = wait_for_ack(ser)
+    if dma_ok:
+        print("  -> DMA Trigger ACK'd")
+    else:
         print("  -> DMA failed (NACK or timeout)")
-        ser.close()
-        sys.exit(1)
-    print("  -> DMA Trigger ACK'd")
 
-    verify_dma_result(ser, transfers)
+    # Always read CSR after RUN_DMA so the user can see error bits even on NACK.
+    dump_csr_status(ser, "Post-DMA CSR snapshot")
+
+    if dma_ok:
+        verify_dma_result(ser, transfers)
     ser.close()
+    sys.exit(0 if dma_ok else 1)
 
 
 if __name__ == '__main__':
