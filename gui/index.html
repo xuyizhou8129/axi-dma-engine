@@ -11,104 +11,176 @@
     <h1>⚡ DMA Architecture Visualizer</h1>
     <div class="controls">
       <button id="playBtn">▶ Play Demo</button>
+      <button id="stepBtn">⏭ Step</button>
       <button id="pauseBtn">⏸ Pause</button>
       <label>Speed: <input id="speed" type="range" min="0.25" max="3" value="1" step="0.25"></label>
+      <span id="stage" aria-live="polite">Ready</span>
+      <button id="themeBtn">🌙 Dark</button>
     </div>
   </header>
 
   <main>
     <section id="canvas">
-      <!-- High-fidelity SVG based on DMA.drawio.png -->
-      <svg id="arch" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+      <!-- Reference-style architecture diagram rebuilt as vector SVG -->
+      <svg id="arch" viewBox="0 0 980 888" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#555" id="markerPath"/>
+          <!-- Arrow markers for dark and light modes -->
+          <marker id="arrow-dark" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 14 7 L 0 14 Z" fill="#6b7280" stroke="none" />
           </marker>
-          <marker id="arrow-glow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#0ff" />
+          <marker id="arrow-light" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 14 7 L 0 14 Z" fill="#a3a3a3" stroke="none" />
           </marker>
+          
+          <!-- Material Design Gradients -->
+          <linearGradient id="gradCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#4de8ff;stop-opacity:0.18" />
+            <stop offset="100%" style="stop-color:#4de8ff;stop-opacity:0.04" />
+          </linearGradient>
+          <linearGradient id="gradMagenta" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#ff66ff;stop-opacity:0.18" />
+            <stop offset="100%" style="stop-color:#ff66ff;stop-opacity:0.04" />
+          </linearGradient>
+          <linearGradient id="gradBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#5588ff;stop-opacity:0.16" />
+            <stop offset="100%" style="stop-color:#5588ff;stop-opacity:0.04" />
+          </linearGradient>
+          <linearGradient id="gradGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#66ff66;stop-opacity:0.16" />
+            <stop offset="100%" style="stop-color:#66ff66;stop-opacity:0.04" />
+          </linearGradient>
+          
+          <!-- Material elevation shadow -->
+          <filter id="shadow-elevation" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" />
+            <feOffset dx="0" dy="2" result="offsetblur" />
+            <feFlood flood-color="#000000" flood-opacity="0.16" />
+            <feComposite in2="offsetblur" operator="in" result="fcShadow" />
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" />
+            <feOffset dx="0" dy="1" result="offsetblur" />
+            <feFlood flood-color="#000000" flood-opacity="0.08" />
+            <feComposite in2="offsetblur" operator="in" result="fcShadow2" />
+            <feMerge>
+              <feMergeNode in="fcShadow" />
+              <feMergeNode in="fcShadow2" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
 
-        <!-- Outer Boundary -->
-        <rect x="50" y="100" width="900" height="450" fill="none" stroke="#222" stroke-width="3" stroke-dasharray="8,4" rx="8"/>
-        <text x="70" y="130" fill="#444" font-family="sans-serif" font-size="16">DMA Unit Boundary</text>
+        <rect x="0" y="0" width="980" height="888" fill="var(--bg-secondary)" />
 
-        <!-- Paths/Lines between components -->
-        <!-- SoC to CSR -->
-        <path id="p_soc_csr" class="line" d="M350 70 L350 150" marker-end="url(#arrow)"/>
-        <!-- CSR to Ring Manager -->
-        <path id="p_csr_ring" class="line" d="M250 180 L180 180 L180 250" marker-end="url(#arrow)"/>
-        <!-- Ring Manager to Desc Fetcher -->
-        <path id="p_ring_desc" class="line" d="M260 280 L400 280" marker-end="url(#arrow)"/>
-        <!-- Desc Fetcher to Data Mover -->
-        <path id="p_desc_dm" class="line" d="M600 280 L700 280" marker-end="url(#arrow)"/>
-        <!-- Desc Fetcher to AXI Master -->
-        <path id="p_desc_axi" class="line" d="M500 310 L500 370 L650 370 L650 400" marker-end="url(#arrow)"/>
-        <!-- Data Mover to SRAM Ctrl -->
-        <path id="p_dm_sram_ctrl" class="line" d="M750 310 L750 360 L250 360 L250 400" marker-end="url(#arrow)"/>
-        <!-- Data Mover to AXI Master -->
-        <path id="p_dm_axi" class="line" d="M800 310 L800 400" marker-end="url(#arrow)"/>
-        
-        <!-- AXI Master <-> Sys Mem -->
-        <path id="p_axi_sysmem" class="line" d="M750 460 L750 580" marker-end="url(#arrow)"/>
-        <path id="p_sysmem_axi" class="line" d="M720 580 L720 460" marker-end="url(#arrow)"/>
-        
-        <!-- SRAM Ctrl <-> SRAM -->
-        <path id="p_sramctrl_sram" class="line" d="M220 460 L220 580" marker-end="url(#arrow)"/>
-        <path id="p_sram_sramctrl" class="line" d="M280 580 L280 460" marker-end="url(#arrow)"/>
+        <!-- DMA Unit Container -->
+        <g id="dma-container">
+          <rect x="20" y="174" width="920" height="580" fill="none" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.5" rx="8" />
+          <text x="38" y="195" class="label" font-size="14" font-weight="700" fill="var(--text-secondary)">DMA Control Unit</text>
+        </g>
 
-        <!-- External Interfaces -->
         <g id="socBus">
-          <rect class="box" x="250" y="10" width="200" height="60" />
-          <text class="label" x="350" y="45" text-anchor="middle">SoC Bus (AXI-Lite)</text>
-        </g>
-        
-        <g id="sysmem">
-          <rect class="box" x="650" y="580" width="180" height="60" />
-          <text class="label" x="740" y="615" text-anchor="middle">System Memory</text>
-        </g>
-        
-        <g id="sram">
-          <rect class="box" x="160" y="580" width="180" height="60" />
-          <text class="label" x="250" y="615" text-anchor="middle">On-Chip SRAM</text>
+          <rect class="box box-ctrl" x="250" y="56" width="250" height="74" rx="6" ry="6" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
+          <text class="label" x="375" y="100" text-anchor="middle" font-size="14" font-weight="600">SoC Bus (AXI-Lite)</text>
         </g>
 
-        <!-- Internal Modules -->
+        <g id="cpu_interrupt_pin">
+          <text class="label" x="610" y="70" font-size="18">CPU Interrupt</text>
+          <text class="label" x="610" y="92" font-size="18">Pin</text>
+          <path class="line" d="M 590 112 L 590 176" marker-end="url(#arrow-dark)" />
+        </g>
+
+        <path class="line" d="M 375 130 L 375 174" marker-end="url(#arrow-dark)" />
+
         <g id="csr">
-          <rect class="box" x="250" y="150" width="160" height="60" />
-          <text class="label" x="330" y="185" text-anchor="middle">CSR</text>
+          <rect class="box box-ctrl" x="270" y="272" width="155" height="80" rx="6" ry="6" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
+          <text class="label" x="347.5" y="320" text-anchor="middle" font-size="16" font-weight="700">CSR</text>
         </g>
 
         <g id="irq">
-          <rect class="box" x="500" y="150" width="160" height="60" />
-          <text class="label" x="580" y="185" text-anchor="middle">IRQ</text>
+          <rect class="box box-ctrl" x="465" y="272" width="150" height="80" rx="6" ry="6" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
+          <text class="label" x="540" y="320" text-anchor="middle" font-size="16" font-weight="700">IRQ</text>
         </g>
 
         <g id="ring">
-          <rect class="box" x="100" y="250" width="160" height="60" />
-          <text class="label" x="180" y="285" text-anchor="middle">Ring Manager</text>
+          <rect class="box box-ring" x="40" y="486" width="180" height="74" rx="6" ry="6" fill="url(#gradGreen)" filter="url(#shadow-elevation)" />
+          <text class="label" x="130" y="531" text-anchor="middle" font-size="14" font-weight="700">Ring Manager</text>
         </g>
 
         <g id="desc">
-          <rect class="box" x="400" y="250" width="200" height="60" />
-          <text class="label" x="500" y="285" text-anchor="middle">Descriptor Fetcher</text>
+          <rect class="box box-fetch" x="345" y="486" width="185" height="74" rx="6" ry="6" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
+          <text class="label" x="437.5" y="521" text-anchor="middle" font-size="13" font-weight="700">Descriptor</text>
+          <text class="label" x="437.5" y="543" text-anchor="middle" font-size="13" font-weight="700">Fetcher</text>
         </g>
 
         <g id="dataMover">
-          <rect class="box" x="700" y="250" width="160" height="60" />
-          <text class="label" x="780" y="285" text-anchor="middle">Data Mover</text>
+          <rect class="box box-mover" x="650" y="486" width="180" height="74" rx="6" ry="6" fill="url(#gradMagenta)" filter="url(#shadow-elevation)" />
+          <text class="label" x="740" y="531" text-anchor="middle" font-size="14" font-weight="700">Data Mover</text>
+        </g>
+
+        <g id="df_in_fifo">
+          <rect class="box box-fifo" x="234" y="472" width="68" height="24" rx="4" ry="4" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
+          <text class="label" x="268" y="486" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
+        </g>
+
+        <g id="df_out_fifo">
+          <rect class="box box-fifo" x="556" y="472" width="68" height="24" rx="4" ry="4" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
+          <text class="label" x="590" y="486" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
+        </g>
+
+        <g id="mid_fifo">
+          <rect class="box box-fifo" x="466" y="612" width="68" height="24" rx="4" ry="4" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
+          <text class="label" x="500" y="626" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
+        </g>
+
+        <g id="dm_sram_fifo">
+          <rect class="box box-fifo" x="176" y="640" width="68" height="24" rx="4" ry="4" fill="url(#gradMagenta)" filter="url(#shadow-elevation)" />
+          <text class="label" x="210" y="654" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
+        </g>
+
+        <g id="dm_axi_fifo">
+          <rect class="box box-fifo" x="776" y="640" width="68" height="24" rx="4" ry="4" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
+          <text class="label" x="810" y="654" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
         </g>
 
         <g id="sram_ctrl">
-          <rect class="box" x="160" y="400" width="180" height="60" />
-          <text class="label" x="250" y="435" text-anchor="middle">SRAM Controller</text>
+          <rect class="box box-ctrl" x="95" y="714" width="160" height="72" rx="6" ry="6" fill="url(#gradMagenta)" filter="url(#shadow-elevation)" />
+          <text class="label" x="175" y="758" text-anchor="middle" font-size="14" font-weight="700">SRAM Controller</text>
         </g>
 
         <g id="axi">
-          <rect class="box" x="650" y="400" width="180" height="60" />
-          <text class="label" x="740" y="435" text-anchor="middle">AXI4 Master</text>
+          <rect class="box box-axi" x="670" y="714" width="170" height="72" rx="6" ry="6" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
+          <text class="label" x="755" y="758" text-anchor="middle" font-size="14" font-weight="700">AXI4 Master</text>
         </g>
 
+        <g id="sram">
+          <rect class="box box-mem" x="112" y="818" width="126" height="62" rx="6" ry="6" fill="url(#gradGreen)" filter="url(#shadow-elevation)" />
+          <text class="label" x="175" y="856" text-anchor="middle" font-size="14" font-weight="700">SRAM</text>
+        </g>
+
+        <g id="sysmem">
+          <rect class="box box-mem" x="688" y="818" width="134" height="62" rx="6" ry="6" fill="url(#gradGreen)" filter="url(#shadow-elevation)" />
+          <text class="label" x="755" y="856" text-anchor="middle" font-size="13" font-weight="700">System Memory</text>
+        </g>
+
+        <path id="p_soc_csr" class="line transparent-path" d="M 375 130 L 375 272" marker-end="url(#arrow-dark)" />
+        <path id="p_csr_ring" class="line transparent-path" d="M 270 312 L 220 312 L 220 486 L 130 486" marker-end="url(#arrow-dark)" />
+        <path id="p_ring_df_in" class="line transparent-path" d="M 220 524 L 232 524 L 238 485" marker-end="url(#arrow-dark)" />
+        <path id="p_df_in_desc" class="line transparent-path" d="M 298 485 L 322 490 L 345 524" marker-end="url(#arrow-dark)" />
+        <path id="p_ring_desc" class="line transparent-path" d="M 220 524 L 285 524 L 345 524" marker-end="url(#arrow-dark)" />
+        <path id="p_desc_df_out" class="line transparent-path" d="M 530 524 L 548 524 L 560 485" marker-end="url(#arrow-dark)" />
+        <path id="p_df_out_dm" class="line transparent-path" d="M 620 485 L 636 490 L 650 524" marker-end="url(#arrow-dark)" />
+        <path id="p_desc_dm" class="line transparent-path" d="M 530 524 L 650 524" marker-end="url(#arrow-dark)" />
+        <path id="p_desc_axi" class="line transparent-path" d="M 437 560 L 437 610 L 755 610 L 755 714" marker-end="url(#arrow-dark)" />
+        <path id="p_dm_axi_fifo" class="line transparent-path" d="M 810 560 L 810 640" marker-end="url(#arrow-dark)" />
+        <path id="p_dm_sram_fifo" class="line transparent-path" d="M 210 560 L 210 640" marker-end="url(#arrow-dark)" />
+        <path id="p_dm_axi" class="line transparent-path" d="M 740 560 L 740 690 L 755 690" marker-end="url(#arrow-dark)" />
+        <path id="p_dm_sram_ctrl" class="line transparent-path" d="M 650 524 L 400 524 L 400 690 L 255 690" marker-end="url(#arrow-dark)" />
+        <path id="p_axi_fifo_axi" class="line transparent-path" d="M 810 662 L 810 714" marker-end="url(#arrow-dark)" />
+        <path id="p_sram_fifo_ctrl" class="line transparent-path" d="M 210 662 L 210 714" marker-end="url(#arrow-dark)" />
+        <path id="p_axi_mid" class="line transparent-path" d="M 755 714 L 626 714 L 626 651 L 530 651 L 500 651" marker-end="url(#arrow-dark)" />
+        <path id="p_sramctrl_bram" class="line transparent-path" d="M 175 786 L 175 818" marker-end="url(#arrow-dark)" />
+        <path id="p_axi_sysmem" class="line transparent-path" d="M 755 786 L 755 818" marker-end="url(#arrow-dark)" />
+        <path id="p_sysmem_axi" class="line transparent-path" d="M 755 818 L 755 786" marker-end="url(#arrow-dark)" />
+        <path id="p_sramctrl_sram" class="line transparent-path" d="M 175 818 L 175 786" marker-end="url(#arrow-dark)" />
+        <path id="p_sram_sramctrl" class="line transparent-path" d="M 175 818 L 175 786" marker-end="url(#arrow-dark)" />
       </svg>
     </section>
 
