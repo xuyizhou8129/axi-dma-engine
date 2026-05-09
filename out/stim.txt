@@ -1,0 +1,12 @@
+# generated from example.csv
+sysmem_write 00000100 aabbccdd
+sysmem_write 00000104 11223344
+sysmem_write 00000108 deadbeef
+sysmem_write 0000010c cafecafe
+csr_write 00 00000000
+csr_write 04 00000004
+sysmem_write 00000000 00000100
+sysmem_write 00000004 00000100
+sysmem_write 00000008 00000004
+sysmem_write 0000000c 00000001
+csr_write 0c 00000001

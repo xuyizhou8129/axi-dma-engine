@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/laptop/Desktop/DMA/DMA_Mike.vitis/backdoor/build",
+  "command": "C:\\AMDDesignTools\\2025.2\\Vitis\\gnu\\microblaze\\nt\\bin\\mb-gcc.exe -IC:/Users/laptop/Desktop/DMA/DMA_Mike.vitis/backdoor/src -isystem C:/Users/laptop/Desktop/DMA/DMA_Mike.vitis/Mike_platform/export/Mike_platform/sw/standalone_microblaze_0/include -isystem C:/AMDDesignTools/2025.2/gnu/microblaze/nt/x86_64-oesdk-mingw32/usr/lib/microblaze-xilinx-elf/gcc/microblaze-xilinx-elf/13.3.0/include -isystem C:/AMDDesignTools/2025.2/gnu/microblaze/nt/x86_64-oesdk-mingw32/usr/lib/microblaze-xilinx-elf/gcc/microblaze-xilinx-elf/13.3.0/include-fixed -isystem C:/AMDDesignTools/2025.2/Vitis/gnu/microblaze/nt/microblazeeb-xilinx-elf/usr/include   -mlittle-endian -mxl-soft-mul -mcpu=v11.0 -DSDT  -MMD -MP -specs=C:/Users/laptop/Desktop/DMA/DMA_Mike.vitis/Mike_platform/export/Mike_platform/sw/standalone_microblaze_0/Xilinx.spec -IC:/Users/laptop/Desktop/DMA/DMA_Mike.vitis/Mike_platform/export/Mike_platform/sw/standalone_microblaze_0/include -Wall -Wextra      -O0  -g3     -U__clang__ -o CMakeFiles\\backdoor.elf.dir\\main.c.obj -c C:\\Users\\laptop\\Desktop\\DMA\\DMA_Mike.vitis\\backdoor\\src\\main.c",
+  "file": "C:\\Users\\laptop\\Desktop\\DMA\\DMA_Mike.vitis\\backdoor\\src\\main.c"
+}
+]

@@ -1,0 +1,1261 @@
+2026-05-05 17:35:41 [debug] : --------------------------------------------------------------------------------- 
+2026-05-05 17:35:41 [debug] : C:\Users\laptop\Desktop\DMA\DMA.vitis 
+2026-05-05 17:35:41 [debug] : --------------------------------------------------------------------------------- 
+2026-05-05 17:35:41 [debug] : [Logger] Previous user logs are stored in the file - C:\Users\laptop\.Xilinx\Vitis\2025.2\logs\ide.log 
+2026-05-05 17:35:41 [debug] : [Logger] Previous debug logs are stored in the file - C:\Users\laptop\.Xilinx\Vitis\2025.2\.wsdata\ide_verbose.log 
+2026-05-05 17:35:41 [debug] : RIGEL SERVER 17:35:41 INFO  : Marking the target connection as default Local 
+2026-05-05 17:35:41 [debug] : RIGEL SERVER 17:35:41 INFO  : Marking the target connection as default Linux Agent 
+2026-05-05 17:35:41 [debug] : RIGEL SERVER 17:35:41 INFO  : Marking the target connection as default XRTServer 
+2026-05-05 17:35:41 [debug] : RIGEL SERVER 17:35:41 INFO  : Marking the target connection as default LinuxEmulation 
+2026-05-05 17:35:41 [debug] : RIGEL SERVER 17:35:41 INFO  : Marking the target connection as default QEMU 
+2026-05-05 17:35:41 [debug] : Frontend f.onStart took longer than the expected maximum 100 milliseconds: 501.5 ms [Finished 2.630 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend c.onStart: 0.2 ms [Finished 2.631 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend y.onStart: 3.3 ms [Finished 2.635 s after frontend start] 
+2026-05-05 17:35:41 [debug] : RIGEL SERVER 17:35:41 INFO  : created .gitignore file for the project C:\Users\laptop\Desktop\DMA\DMA.vitis 
+2026-05-05 17:35:41 [debug] : Frontend w.onStart: 0.4 ms [Finished 2.635 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend B.onStart: 0.3 ms [Finished 2.636 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend u.onStart: 0.5 ms [Finished 2.653 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend l.onStart: 0.9 ms [Finished 2.654 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend l.onStart: 0.3 ms [Finished 2.655 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend l.onStart: 0.2 ms [Finished 2.655 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend p.onStart: 8.8 ms [Finished 2.665 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend d.onStart: 0.3 ms [Finished 2.665 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend u.onStart: 0.1 ms [Finished 2.665 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend E.onStart: 0.7 ms [Finished 2.667 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend d.onStart: 0.0 ms [Finished 2.667 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend u.onStart: 0.3 ms [Finished 2.667 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend c.onStart: 0.3 ms [Finished 2.668 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend c.onStart: 0.2 ms [Finished 2.668 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend l.onStart: 0.2 ms [Finished 2.669 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/openai/gpt-4.1 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/openai/gpt-4.1-nano 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/openai/gpt-4.1-mini 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/openai/gpt-4-turbo 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/openai/gpt-4o 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/openai/gpt-4o-mini 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/anthropic/claude-3-7-sonnet-20250219 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/anthropic/claude-3-5-haiku-20241022 
+2026-05-05 17:35:41 [debug] : Vercel AI: Creating or updating model vercel/anthropic/claude-3-opus-20240229 
+2026-05-05 17:35:41 [debug] : Frontend l.onStart: 0.1 ms [Finished 2.669 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend l.onStart: 0.3 ms [Finished 2.670 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Start frontend contributions: 963.4 ms [Finished 2.671 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Changed application state from 'init' to 'started_contributions'. 
+2026-05-05 17:35:41 [debug] : Changed application state from 'started_contributions' to 'attached_shell'. 
+2026-05-05 17:35:41 [debug] : >>> Restoring the layout state... 
+2026-05-05 17:35:41 [debug] : Received event from notification service: ON_START_ANALYSIS_PROGRESS. 
+2026-05-05 17:35:41 [debug] : Event posted using notification server in backend. {"0":{"wrappers_":{},"arrayIndexOffset_":-1,"array":["b4557426-96a9-4b52-b355-f0f620feb139",null,54,null,null,null,null,"list-reports"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:35:41 [debug] : [Repository Server] Executing method:getEmbeddedExampleTemplateTree with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:35:41 [debug] : [Application Examples Provider]  updating the embedded templates on workspace event. 
+2026-05-05 17:35:41 [debug] : [Application Examples Provider] refresh requested. 
+2026-05-05 17:35:41 [debug] : Received event from notification service: ON_DID_UPDATE_WORKSPACE. 
+2026-05-05 17:35:41 [debug] : [Logger Client] log levelchanged to  {"0":"Info"}
+2026-05-05 17:35:41 [debug] : [Logger UI]  Update Log Level  called 
+2026-05-05 17:35:41 [debug] : [Application Examples Provider] common calling method requested. 
+2026-05-05 17:35:41 [debug] : [Application Examples Provider] Repositories model update requested. 
+2026-05-05 17:35:41 [debug] : [Application Examples Provider] Repositories model update completed. 
+2026-05-05 17:35:41 [debug] : [Application Examples Provider] Templates model update requested. 
+2026-05-05 17:35:41 [debug] : [Repository Service] Executing method:getEmbeddedExampleTemplateTree from frontend. {"0":"request:"}
+2026-05-05 17:35:41 [debug] : Received event from notification service: ON_DID_REFRESH_WORKSPACE_SUMMARIES. 
+2026-05-05 17:35:41 [debug] : [ProjectCache] fetching projects for project-cache 
+2026-05-05 17:35:41 [debug] : Received event from notification service: ON_STOP_ANALYSIS_PROGRESS. 
+2026-05-05 17:35:41 [debug] : [Logger UI]  Update Log Level success {"0":{"success":true,"error":""}}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 2,
+        "startColumn": 47,
+        "endLineNumber": 2,
+        "endColumn": 52
+      },
+      "rangeLength": 5,
+      "text": "false",
+      "rangeOffset": 49,
+      "forceMoveMarkers": false
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 2,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.cancelSync {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.markAsDirty - exit {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 3,
+        "startColumn": 29,
+        "endLineNumber": 3,
+        "endColumn": 37
+      },
+      "rangeLength": 8,
+      "text": "\"custom\"",
+      "rangeOffset": 85,
+      "forceMoveMarkers": false
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 3,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.cancelSync {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.markAsDirty - exit {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:41 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:35:41 [debug] : [ProjectCache] Project location updated to undefined 
+2026-05-05 17:35:41 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:35:41 [debug] : <<< Nothing to restore. 
+2026-05-05 17:35:41 [debug] : Frontend A.initializeLayout: 15.4 ms [Finished 2.776 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend v.initializeLayout: 5.1 ms [Finished 2.781 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend f.initializeLayout: 4.0 ms [Finished 2.785 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend Object.initializeLayout: 0.0 ms [Finished 2.785 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend $.initializeLayout: 3.8 ms [Finished 2.789 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend w.initializeLayout: 8.1 ms [Finished 2.797 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend _.initializeLayout: 4.9 ms [Finished 2.802 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend c.initializeLayout: 6.3 ms [Finished 2.809 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend E.initializeLayout: 17.1 ms [Finished 2.829 s after frontend start] 
+2026-05-05 17:35:41 [debug] : [Repository Examples UI] in on initialize layout method. 
+2026-05-05 17:35:41 [debug] : Frontend R.initializeLayout: 9.8 ms [Finished 2.839 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend u.initializeLayout: 4.6 ms [Finished 2.844 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend h.initializeLayout: 0.0 ms [Finished 2.844 s after frontend start] 
+2026-05-05 17:35:41 [debug] : Frontend D.initializeLayout: 12.6 ms [Finished 2.857 s after frontend start] 
+2026-05-05 17:35:42 [debug] : No label for action menu node: No command "workspace:addFolder" exists. 
+2026-05-05 17:35:42 [debug] : Failed to parse markers data: {"0":"SyntaxError: Unexpected end of JSON input\n    at JSON.parse (<anonymous>)\n    at _.setMarkersFromWorkspace (file:///C:/AMDDesignTools/2025.2/Vitis/ide/electron-app/win64/resources/app/lib/frontend/bundle.js:2:7825359)"}
+2026-05-05 17:35:42 [debug] : Frontend H.initializeLayout took longer than the expected maximum 100 milliseconds: 173.1 ms [Finished 3.030 s after frontend start] 
+2026-05-05 17:35:42 [debug] : [Library Api Contribution] in on initialize layout method. 
+2026-05-05 17:35:42 [debug] : Frontend g.initializeLayout: 9.5 ms [Finished 3.039 s after frontend start] 
+2026-05-05 17:35:42 [debug] : MonacoEditorModel.cancelSync {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:42 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:42 [debug] : Initialize the workbench layout: 437.7 ms [Finished 3.122 s after frontend start] 
+2026-05-05 17:35:42 [debug] : Changed application state from 'attached_shell' to 'initialized_layout'. 
+2026-05-05 17:35:42 [debug] : Frontend d.onDidInitializeLayout: 0.1 ms [Finished 3.122 s after frontend start] 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9] Loading plugin contributions 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][eclipse-cdt.serial-monitor]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.json-language-features]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][pkief.material-icon-theme]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.git-base]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][eamodio.gitlens]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.tcf-debug]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][twxs.cmake]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-config]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-hls-l1-library]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-hls-pragma]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-hls-verilog-vhdl-support]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-output]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.cpp]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.json]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][llvm-vs-code-extensions.vscode-clangd]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][webfreak.debug]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.git]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.make]: Loaded contributions. 
+2026-05-05 17:35:42 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9] Load contributions of 18 plugins: 450.9 ms [Finished 3.579 s after frontend start] 
+2026-05-05 17:35:42 [debug] : Frontend c.onDidInitializeLayout: 12.5 ms [Finished 3.592 s after frontend start] 
+2026-05-05 17:35:42 [debug] : Frontend n.onDidInitializeLayout: 3.6 ms [Finished 3.599 s after frontend start] 
+2026-05-05 17:35:42 [debug] : Frontend T.onDidInitializeLayout: 25.9 ms [Finished 3.626 s after frontend start] 
+2026-05-05 17:35:42 [debug] : Frontend p.onDidInitializeLayout: 6.9 ms [Finished 3.649 s after frontend start] 
+2026-05-05 17:35:42 [debug] : Frontend h.onDidInitializeLayout: 0.2 ms [Finished 3.649 s after frontend start] 
+2026-05-05 17:35:42 [debug] : 'cpp' language is remapped from 'source.cpp.embedded.macro' to 'source.cpp' scope 
+2026-05-05 17:35:42 [debug] : a registered grammar configuration for 'cpp' language is overridden 
+2026-05-05 17:35:42 [debug] : No label for action menu node: No command "workspace:addFolder" exists. 
+2026-05-05 17:35:42 [debug] : No label for action menu node: No command "workspace:addFolder" exists. 
+2026-05-05 17:35:43 [debug] : Frontend H.onDidInitializeLayout took longer than the expected maximum 100 milliseconds: 560.1 ms [Finished 4.210 s after frontend start] 
+2026-05-05 17:35:43 [debug] : Frontend P.onDidInitializeLayout: 0.0 ms [Finished 4.210 s after frontend start] 
+2026-05-05 17:35:43 [debug] : Frontend D.onDidInitializeLayout: 1.6 ms [Finished 4.211 s after frontend start] 
+2026-05-05 17:35:43 [debug] : Frontend R.onDidInitializeLayout: 0.1 ms [Finished 4.212 s after frontend start] 
+2026-05-05 17:35:43 [debug] : Frontend v.onDidInitializeLayout: 0.2 ms [Finished 4.212 s after frontend start] 
+2026-05-05 17:35:43 [debug] : Frontend h.onDidInitializeLayout: 0.1 ms [Finished 4.215 s after frontend start] 
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 4,
+        "startColumn": 29,
+        "endLineNumber": 14,
+        "endColumn": 6
+      },
+      "rangeLength": 310,
+      "text": "{\r\n        \"**/.git/objects/**\": true,\r\n        \"**/.git/subtree-cache/**\": true,\r\n        \"**/_build/**\": true,\r\n        \"**/build/**\": true,\r\n        \"**/export/**\": true,\r\n        \"**/hls/impl/**\": true,\r\n        \"**/hls/syth/**\": true,\r\n        \"**/hls/syn/**\": true,\r\n        \"**/hls/csim/**\": true\r\n    }",
+      "rangeOffset": 124,
+      "forceMoveMarkers": false
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 2,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.cancelSync {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.markAsDirty - exit {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : getTasks(): about to return task information for 0 tasks 
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.cancelSync {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : MonacoEditorModel.cancelSave {"0":"user-storage:/user/settings.json"}
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/init() 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(serial-monitor@1.0.2 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(json-language-features@1.88.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(material-icon-theme@5.15.0 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(git-base@1.95.3 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(gitlens@11.7.0 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(tcf-debug@0.0.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(cmake@0.0.17 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(vitis-config@0.0.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(vitis-hls-l1-library@0.0.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(vitis-hls-pragma@0.6.0 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(vitis-hls-verilog-vhdl-support@0.0.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(vitis-output@0.0.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(cpp@1.88.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(json@1.88.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(vscode-clangd@0.1.33 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(debug@0.27.0 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(git@1.95.3 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): initializing(make@1.88.1 with C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\plugin-vscode-init) 
+2026-05-05 17:35:43 [debug] : Debugger contribution has been registered: tcf-debug 
+2026-05-05 17:35:43 [debug] : Debugger contribution has been registered: gdb 
+2026-05-05 17:35:43 [debug] : Debugger contribution has been registered: lldb-mi 
+2026-05-05 17:35:43 [debug] : Debugger contribution has been registered: mago-mi 
+2026-05-05 17:35:43 [debug] : Unsupported activation events: oncommand:gitlens.copyCurrentBranch, please open an issue: https://github.com/eclipse-theia/theia/issues/new 
+2026-05-05 17:35:43 [debug] : Unsupported activation events: onEditSession:file, please open an issue: https://github.com/eclipse-theia/theia/issues/new 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vitis-output-0.0.1\extension\lib\extension.js) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vscode-builtin-json-language-features\extension\client\dist\node\jsonClientMain) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vscode.git-base\extension\dist\extension.js) 
+2026-05-05 17:35:43 [debug] : Calling activation function on plugin amd.vitis-output 
+2026-05-05 17:35:43 [debug] : Calling activation function on plugin Git Base (built-in) 
+2026-05-05 17:35:43 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vscode.git\extension\dist\main) 
+2026-05-05 17:35:44 [debug] : Calling activation function on plugin Git (built-in) 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9] Starting plugins. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][eclipse-cdt.serial-monitor]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.json-language-features]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][pkief.material-icon-theme]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.git-base]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][eamodio.gitlens]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.tcf-debug]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][twxs.cmake]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-config]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-hls-l1-library]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-hls-pragma]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-hls-verilog-vhdl-support]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][amd.vitis-output]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.cpp]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.json]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][llvm-vs-code-extensions.vscode-clangd]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][webfreak.debug]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.git]: Started plugin. 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9][vscode.make]: Started plugin. 
+2026-05-05 17:35:44 [debug] : Frontend application start: 3186.0 ms [Finished 198.092 s after backend start] 
+2026-05-05 17:35:44 [debug] : Replace loading indicator with ready workbench UI (animation): 811.6 ms [Finished 5.027 s after frontend start] 
+2026-05-05 17:35:44 [debug] : Changed application state from 'initialized_layout' to 'ready'. 
+2026-05-05 17:35:44 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens) 
+2026-05-05 17:35:44 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vscode-material-icon-theme\extension\dist\extension\desktop\extension.cjs) 
+2026-05-05 17:35:44 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eclipse-cdt.serial-monitor\extension\dist\desktop\extension.js) 
+2026-05-05 17:35:44 [debug] : Calling activation function on plugin Web and Desktop Serial Monitor 
+2026-05-05 17:35:44 [debug] : [INFO] 2026-05-05T22:35:44.397Z - Translations initialized. 
+2026-05-05 17:35:44 [debug] : [INFO] 2026-05-05T22:35:44.407Z - Extension activated! 
+2026-05-05 17:35:44 [debug] : Calling activation function on plugin Material Icon Theme 
+2026-05-05 17:35:44 [debug] : Calling activation function on plugin JSON Language Features (built-in) 
+2026-05-05 17:35:44 [debug] : Calling activation function on plugin GitLens — Git supercharged 
+2026-05-05 17:35:44 [debug] : [baff07b4-0f00-4b13-ac8f-09e4e910e0f9] Start of 18 plugins: 1932.1 ms [Finished 5.628 s after frontend start] 
+2026-05-05 17:35:44 [debug] : No label for action menu node: No command "workspace:addFolder" exists. 
+2026-05-05 17:35:46 [debug] : RIGEL SERVER 17:35:46 INFO  : [INFO]: Initializing repositories 
+2026-05-05 17:35:46 [debug] : RIGEL SERVER 17:35:46 INFO  : [INFO]: Successfully set the EmbeddedSW path, refer .repo.yaml for more details. 
+2026-05-05 17:35:46 [debug] : RIGEL SERVER 17:35:46 INFO  : Successfully created repository data at C:\Users\laptop\AppData\Local\Temp\rigel_lopper_laptop4149783408857670813 
+2026-05-05 17:35:46 [debug] : RIGEL SERVER 17:35:46 INFO  : cmd.exe, /C, empyro.bat get_template_data -d C:\Users\laptop\AppData\Local\Temp\rigel_lopper_laptop6218870614506366030 -r C:\Users\laptop\AppData\Local\Temp\rigel_lopper_laptop4149783408857670813\.repo.yaml 
+2026-05-05 17:35:47 [debug] : RIGEL SERVER 17:35:47 INFO  : Embedded Template List generated successfully 
+2026-05-05 17:35:47 [debug] : [Application Examples Provider] Templates model update completed. 
+2026-05-05 17:35:47 [debug] : [Application Examples Provider] common calling method completed. 
+2026-05-05 17:35:47 [debug] : [Application Examples Provider] refresh completed. 
+2026-05-05 17:35:47 [debug] : RIGEL SERVER 17:35:47 INFO  : cmd.exe, /C, empyro.bat repo -st   C:\AMDDesignTools\2025.2\Vitis\data\embeddedsw 
+2026-05-05 17:35:52 [debug] : RIGEL SERVER 17:35:52 INFO  : [INFO]: Initializing repositories 
+2026-05-05 17:35:52 [debug] : RIGEL SERVER 17:35:52 INFO  : [INFO]: Successfully set the EmbeddedSW path, refer .repo.yaml for more details. 
+2026-05-05 17:35:52 [debug] : RIGEL SERVER 17:35:52 INFO  : Successfully created repository data at C:\Users\laptop\Desktop\DMA\DMA.vitis/_ide\.wsdata 
+2026-05-05 17:35:52 [debug] : RIGEL SERVER 17:35:52 INFO  : cmd.exe, /C, empyro.bat get_template_data -d C:\Users\laptop\AppData\Local\Temp\rigel_lopper_laptop5295079118820935025 -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:35:53 [debug] : RIGEL SERVER 17:35:53 INFO  : Embedded Template List generated successfully 
+2026-05-05 17:35:53 [debug] : [Application Examples Provider] Templates model update completed. 
+2026-05-05 17:35:53 [debug] : [Application Examples Provider] common calling method completed. 
+2026-05-05 17:35:53 [debug] : [Application Examples Provider] refresh completed. 
+2026-05-05 17:36:45 [debug] : [Platform Server] Executing method:[getProcessorOSList] with connection:(object). {"0":"request:","1":{"wrappers_":{"6":[{"wrappers_":null,"arrayIndexOffset_":-1,"array":["VITIS_SDT_REPO",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["VITIS_SDT_BOARD_DTS",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["VITIS_SDT_INCLUDE_DTS",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["-dt_overlay","0"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["custom_dtsi",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}],"8":[]},"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\dma_wrapper_0.xsa",null,[],[],null,[["VITIS_SDT_REPO",null],["VITIS_SDT_BOARD_DTS",null],["VITIS_SDT_INCLUDE_DTS",null],["-dt_overlay","0"],["custom_dtsi",null]],null,[],null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,true],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:36:50 [debug] : RIGEL SERVER 17:36:50 INFO  : Using sdt generation script from C:\AMDDesignTools\2025.2\Vitis\vitis-server\scripts\platformutil.tcl 
+2026-05-05 17:36:50 [debug] : RIGEL SERVER 17:36:50 INFO  : cmd.exe, /C, sdtgen.bat C:\AMDDesignTools\2025.2\Vitis\vitis-server\scripts\platformutil.tcl C:\Users\laptop\Desktop\DMA\dma_wrapper_0.xsa C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper_temp_platform\dma_wrapper_0\hw\sdt 
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 8,
+        "startColumn": 1,
+        "endLineNumber": 8,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:35:46 INFO  : [INFO]: Initializing repositories\r\n17:35:46 INFO  : [INFO]: Successfully set the EmbeddedSW path, refer .repo.yaml for more details.\r\n17:35:46 INFO  : Successfully created repository data at C:\\Users\\laptop\\AppData\\Local\\Temp\\rigel_lopper_laptop4149783408857670813\r\n17:35:46 INFO  : cmd.exe, /C, empyro.bat get_template_data -d C:\\Users\\laptop\\AppData\\Local\\Temp\\rigel_lopper_laptop6218870614506366030 -r C:\\Users\\laptop\\AppData\\Local\\Temp\\rigel_lopper_laptop4149783408857670813\\.repo.yaml\r\n17:35:47 INFO  : Embedded Template List generated successfully\r\n17:35:47 INFO  : cmd.exe, /C, empyro.bat repo -st   C:\\AMDDesignTools\\2025.2\\Vitis\\data\\embeddedsw\r\n17:35:52 INFO  : [INFO]: Initializing repositories\r\n17:35:52 INFO  : [INFO]: Successfully set the EmbeddedSW path, refer .repo.yaml for more details.\r\n17:35:52 INFO  : Successfully created repository data at C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis/_ide\\.wsdata\r\n17:35:52 INFO  : cmd.exe, /C, empyro.bat get_template_data -d C:\\Users\\laptop\\AppData\\Local\\Temp\\rigel_lopper_laptop5295079118820935025 -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n17:35:53 INFO  : Embedded Template List generated successfully\r\n17:36:50 INFO  : Using sdt generation script from C:\\AMDDesignTools\\2025.2\\Vitis\\vitis-server\\scripts\\platformutil.tcl\r\n17:36:50 INFO  : cmd.exe, /C, sdtgen.bat C:\\AMDDesignTools\\2025.2\\Vitis\\vitis-server\\scripts\\platformutil.tcl C:\\Users\\laptop\\Desktop\\DMA\\dma_wrapper_0.xsa C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper_temp_platform\\dma_wrapper_0\\hw\\sdt\r\n",
+      "rangeOffset": 519,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 2,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:50 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:36:58 [debug] : RIGEL SERVER 17:36:58 INFO  : INFO: C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper_temp_platform\dma_wrapper_0\hw\sdt exists. Files will be overwritten 
+2026-05-05 17:36:58 [debug] : RIGEL SERVER 17:36:58 INFO  : -xsa C:\Users\laptop\Desktop\DMA\dma_wrapper_0.xsa
+17:36:58 INFO  : -dir C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper_temp_platform\dma_wrapper_0\hw\sdt
+17:36:58 INFO  : -board_dts 
+17:36:58 INFO  : -include_dts 
+2026-05-05 17:36:58 [debug] : RIGEL SERVER 17:36:58 INFO  : -repo C:/AMDDesignTools/2025.2/Vitis/data/system-device-tree-xlnx
+17:36:58 INFO  : -zocl disable
+17:36:58 INFO  : INFO: [Hsi 55-2053] elapsed time for repository (C:/AMDDesignTools/2025.2/Vitis/data/embeddedsw) loading 1 seconds 
+2026-05-05 17:36:58 [debug] : RIGEL SERVER 17:36:58 INFO  : SDT generated successfully 
+2026-05-05 17:36:58 [debug] : RIGEL SERVER 17:36:58 INFO  : Lopper command for cpu List generation: lopper.bat --enhanced --werror -f -O C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper -i lop-cpu-oslist.dts C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper_temp_platform\dma_wrapper_0\hw\sdt\system-top.dts 
+2026-05-05 17:36:58 [debug] : RIGEL SERVER 17:36:58 INFO  : cmd.exe, /C, lopper.bat --enhanced --werror -f -O C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper -i lop-cpu-oslist.dts C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper_temp_platform\dma_wrapper_0\hw\sdt\system-top.dts 
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 21,
+        "startColumn": 1,
+        "endLineNumber": 21,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:36:58 INFO  : INFO: C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper_temp_platform\\dma_wrapper_0\\hw\\sdt exists. Files will be overwritten\r\n17:36:58 INFO  : -xsa C:\\Users\\laptop\\Desktop\\DMA\\dma_wrapper_0.xsa\r\n17:36:58 INFO  : -dir C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper_temp_platform\\dma_wrapper_0\\hw\\sdt\r\n17:36:58 INFO  : -board_dts \r\n17:36:58 INFO  : -include_dts \r\n17:36:58 INFO  : -repo C:/AMDDesignTools/2025.2/Vitis/data/system-device-tree-xlnx\r\n17:36:58 INFO  : -zocl disable\r\n17:36:58 INFO  : INFO: [Hsi 55-2053] elapsed time for repository (C:/AMDDesignTools/2025.2/Vitis/data/embeddedsw) loading 1 seconds\r\n17:36:58 INFO  : SDT generated successfully\r\n17:36:58 INFO  : Lopper command for cpu List generation: lopper.bat --enhanced --werror -f -O C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper -i lop-cpu-oslist.dts C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper_temp_platform\\dma_wrapper_0\\hw\\sdt\\system-top.dts\r\n17:36:58 INFO  : cmd.exe, /C, lopper.bat --enhanced --werror -f -O C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper -i lop-cpu-oslist.dts C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper_temp_platform\\dma_wrapper_0\\hw\\sdt\\system-top.dts\r\n",
+      "rangeOffset": 2081,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 3,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:00 [debug] : RIGEL SERVER 17:37:00 INFO  : CPU List generated successfully 
+2026-05-05 17:37:41 [debug] : [Platform Server] Executing method:[createPlatformProject] with connection:(object). {"0":"request:","1":{"wrappers_":{"19":[{"wrappers_":null,"arrayIndexOffset_":-1,"array":["VITIS_SDT_REPO",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["VITIS_SDT_BOARD_DTS",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["VITIS_SDT_INCLUDE_DTS",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["-dt_overlay","0"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}},{"wrappers_":null,"arrayIndexOffset_":-1,"array":["custom_dtsi",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}],"22":[]},"arrayIndexOffset_":-1,"array":["DMA_platform",null,"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform","C:\\Users\\laptop\\Desktop\\DMA\\dma_wrapper_0.xsa","microblaze_0","standalone",null,null,null,null,null,null,null,true,null,"",null,null,[["VITIS_SDT_REPO",null],["VITIS_SDT_BOARD_DTS",null],["VITIS_SDT_INCLUDE_DTS",null],["-dt_overlay","0"],["custom_dtsi",null]],null,1,[],"f716a7a0-4f96-4d83-b162-d1d1fc687af9",null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:37:41 [debug] : [Platform Server] Create platform DMA_platform requested with internal id 'f716a7a0-4f96-4d83-b162-d1d1fc687af9'. 
+2026-05-05 17:37:41 [debug] : RIGEL SERVER 17:37:41 INFO  : Platform DMA_platform creation started. 
+2026-05-05 17:37:41 [debug] : [Platform Output] Creating DMA_platform platform with id 'f716a7a0-4f96-4d83-b162-d1d1fc687af9' started. 
+2026-05-05 17:37:41 [debug] : RIGEL SERVER 17:37:41 INFO  : Lopper command for cpu List generation: lopper.bat --enhanced --werror -f -O C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper -i lop-cpu-oslist.dts C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\hw\sdt\system-top.dts 
+2026-05-05 17:37:41 [debug] : RIGEL SERVER 17:37:41 INFO  : cmd.exe, /C, lopper.bat --enhanced --werror -f -O C:\Users\laptop\Desktop\DMA\DMA.vitis\.rigel_lopper -i lop-cpu-oslist.dts C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\hw\sdt\system-top.dts 
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 32,
+        "startColumn": 1,
+        "endLineNumber": 32,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:37:00 INFO  : CPU List generated successfully\r\n17:37:41 INFO  : Platform DMA_platform creation started.\r\n17:37:41 INFO  : Lopper command for cpu List generation: lopper.bat --enhanced --werror -f -O C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper -i lop-cpu-oslist.dts C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\hw\\sdt\\system-top.dts\r\n17:37:41 INFO  : cmd.exe, /C, lopper.bat --enhanced --werror -f -O C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\.rigel_lopper -i lop-cpu-oslist.dts C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\hw\\sdt\\system-top.dts\r\n",
+      "rangeOffset": 3276,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 4,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:41 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:42 [debug] : RIGEL SERVER 17:37:42 INFO  : CPU List generated successfully 
+2026-05-05 17:37:42 [debug] : RIGEL SERVER 17:37:42 INFO  : SDT generated successfully. 
+2026-05-05 17:37:42 [debug] : RIGEL SERVER 17:37:42 INFO  : lopper command to generate BSP :empyro.bat create_bsp -w C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp -p microblaze_0 -o standalone -s C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\hw\sdt\system-top.dts -t empty_application -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:37:42 [debug] : RIGEL SERVER 17:37:42 INFO  : cmd.exe, /C, empyro.bat create_bsp -w C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp -p microblaze_0 -o standalone -s C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\hw\sdt\system-top.dts -t empty_application -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 36,
+        "startColumn": 1,
+        "endLineNumber": 36,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:37:42 INFO  : CPU List generated successfully\r\n17:37:42 INFO  : SDT generated successfully.\r\n17:37:42 INFO  : lopper command to generate BSP :empyro.bat create_bsp -w C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp -p microblaze_0 -o standalone -s C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\hw\\sdt\\system-top.dts -t empty_application -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n17:37:42 INFO  : cmd.exe, /C, empyro.bat create_bsp -w C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp -p microblaze_0 -o standalone -s C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\hw\\sdt\\system-top.dts -t empty_application -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n",
+      "rangeOffset": 3841,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 5,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:37:43 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : [INFO]: Starting domain creation 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : [INFO]: Generating Domain-specific DTS for microblaze_0 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : [INFO]: Generating required metadata from domain specific DT
+17:38:10 INFO  : [INFO]: Successfully created Domain at C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp
+17:38:10 INFO  : Successfully Generated Domain C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : Domain standalone_microblaze_0 added successfully. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_UPDATE_PLATFORM_STATUS. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_DID_UPDATE_COMPONENT. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_UPDATE_PLATFORM_STATUS. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_DID_CREATE_COMPONENT. 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : created .gitignore file for the project C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : Platform creation finished successfully. 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : Platform Quick Build initiated. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_DID_OPEN_COMPONENT. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_DID_BUILD_START. 
+2026-05-05 17:38:10 [debug] : Received event from notification service: ON_UPDATE_FLOWNAVIGATOR_STATUS. 
+2026-05-05 17:38:10 [debug] : RIGEL SERVER 17:38:10 INFO  : Generating Export directory 
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 40,
+        "startColumn": 1,
+        "endLineNumber": 40,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:38:10 INFO  : [INFO]: Starting domain creation\r\n17:38:10 INFO  : [INFO]: Generating Domain-specific DTS for microblaze_0\r\n17:38:10 INFO  : [INFO]: Generating required metadata from domain specific DT\r\n17:38:10 INFO  : [INFO]: Successfully created Domain at C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:38:10 INFO  : Successfully Generated Domain C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:38:10 INFO  : Domain standalone_microblaze_0 added successfully.\r\n17:38:10 INFO  : created .gitignore file for the project C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\r\n17:38:10 INFO  : Platform creation finished successfully.\r\n17:38:10 INFO  : Platform Quick Build initiated.\r\n17:38:10 INFO  : Generating Export directory\r\n",
+      "rangeOffset": 4636,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 6,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:10 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : RIGEL SERVER 17:38:11 INFO  : Generated platform metadata for creating application(s) based on platform DMA_platform. 
+2026-05-05 17:38:11 [debug] : [Platform Server] Creating platform DMA_platform  completed on 'DMA_platform' with internal id 'f716a7a0-4f96-4d83-b162-d1d1fc687af9'. 
+2026-05-05 17:38:11 [debug] : [Platform Server] Creating platform DMA_platform  status event - label: DMA_platform, status_code:0, status_details:. 
+2026-05-05 17:38:11 [debug] : [Platform Server] Creating platform DMA_platform  output steam finished on 'DMA_platform' with internal id 'f716a7a0-4f96-4d83-b162-d1d1fc687af9'. 
+2026-05-05 17:38:11 [info] : [Platform Server] Creating platform DMA_platform  output stream finished - DMA_platform. 
+2026-05-05 17:38:11 [debug] : Received event from notification service: ON_DID_MODIFY_PLATFORM_REPOS. 
+2026-05-05 17:38:11 [debug] : [Platform Output] Creating DMA_platform platform with id 'f716a7a0-4f96-4d83-b162-d1d1fc687af9' completed. 
+2026-05-05 17:38:11 [debug] : [Platform Output] Deleting and canceling the build task with id 'f716a7a0-4f96-4d83-b162-d1d1fc687af9'. 
+2026-05-05 17:38:11 [debug] : Received event from notification service: ON_DID_BUILD_STOP. 
+2026-05-05 17:38:11 [debug] : [ProjectCache] fetching projects for project-cache 
+2026-05-05 17:38:11 [debug] : [Component Provider] updating project C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:38:11 [debug] : Received event from notification service: ON_UPDATE_FLOWNAVIGATOR_STATUS. 
+2026-05-05 17:38:11 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:38:11 [debug] : [ProjectCache] Project location updated to C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:38:11 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:38:11 [debug] : [Platform Provider] updating project C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:38:11 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:38:11 [debug] : [ProjectCache] Project location updated to C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:38:11 [debug] : [Component Provider] project updated C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:38:11 [debug] : [Platform Server] Executing method:[listDomains] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:38:11 [debug] : [Platform Provider] project updated C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform {"0":{"platformName":"DMA_platform","platformDescription":"","platformLocation":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform","xsaPath":"C:/Users/laptop/Desktop/DMA/dma_wrapper_0.xsa","xsapathinplatform":"DMA_platform/hw/dma_wrapper_0.xsa","isCustomFsbl":false,"fsblPath":"","pmufwElf":"","supportedFamily":"fpga","flow":3,"emulationXsaPath":"","emulationXsaPathInPlatform":"","stdGenHooksList":[],"reconfigurablePartitionsList":[]}}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : [Platform Server] Executing method:[getPartFromXSA] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 50,
+        "startColumn": 1,
+        "endLineNumber": 50,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:38:11 INFO  : Generated platform metadata for creating application(s) based on platform DMA_platform.\r\n",
+      "rangeOffset": 5462,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 7,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:11 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:38:37 [debug] : [Debugger Server] In 'List target connections' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:41:11 [debug] : [Debugger Server] In 'programDevice' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[null,"C:\\Users\\laptop\\Desktop\\DMA\\DMA.runs\\impl_1\\design_1_wrapper.bit",null,"Local",null,null,null,null,"Auto Detect","8c0e8fbf-f861-4864-8b61-cc0a68e0a9d0"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:41:11 [debug] : RIGEL SERVER 17:41:11 ERROR : Platform information not found. 
+2026-05-05 17:41:11 [debug] : Program device failed with internal id '8c0e8fbf-f861-4864-8b61-cc0a68e0a9d0'. 
+2026-05-05 17:41:11 [debug] : Program device status event, status_code:0, status_details:. 
+2026-05-05 17:41:11 [debug] : Program device output steam finished with internal id '8c0e8fbf-f861-4864-8b61-cc0a68e0a9d0'. 
+2026-05-05 17:41:11 [debug] : [Program Device Output] Program device with id '8c0e8fbf-f861-4864-8b61-cc0a68e0a9d0' started. 
+2026-05-05 17:41:11 [debug] : [Program Device Output] Program device with id '8c0e8fbf-f861-4864-8b61-cc0a68e0a9d0' stopped due to errors. 
+2026-05-05 17:41:11 [debug] : [Program Device Output] Deleting and canceling the build task with id '8c0e8fbf-f861-4864-8b61-cc0a68e0a9d0'. 
+2026-05-05 17:41:29 [debug] : [Platform Server] Executing method:[generatePlatform] with connection:(object). {"0":"request:","1":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"}
+2026-05-05 17:41:29 [debug] : [Platform Server] Generate platform requested for DMA_platform with internal id '95d5477e-2956-4cbb-8722-5332425f0813'. 
+2026-05-05 17:41:29 [debug] : Received event from notification service: ON_DID_OPEN_COMPONENT. 
+2026-05-05 17:41:29 [debug] : Received event from notification service: ON_DID_BUILD_START. 
+2026-05-05 17:41:29 [debug] : Received event from notification service: ON_UPDATE_FLOWNAVIGATOR_STATUS. 
+2026-05-05 17:41:29 [debug] : [Platform Output] Generate DMA_platform platform with id '95d5477e-2956-4cbb-8722-5332425f0813' started. 
+2026-05-05 17:41:29 [debug] : RIGEL SERVER 17:41:29 INFO  : BSP build will be initiated for Domain standalone_microblaze_0 
+2026-05-05 17:41:29 [debug] : RIGEL SERVER 17:41:29 INFO  : Generating BSP for the domain C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:41:29 [debug] : RIGEL SERVER 17:41:29 INFO  : lopper command to reconfigure BSP :empyro.bat reconfig_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:41:29 [debug] : RIGEL SERVER 17:41:29 INFO  : cmd.exe, /C, empyro.bat reconfig_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 51,
+        "startColumn": 1,
+        "endLineNumber": 51,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:41:11 ERROR : Platform information not found.\r\n17:41:29 INFO  : BSP build will be initiated for Domain standalone_microblaze_0\r\n17:41:29 INFO  : Generating BSP for the domain C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:41:29 INFO  : lopper command to reconfigure BSP :empyro.bat reconfig_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:41:29 INFO  : cmd.exe, /C, empyro.bat reconfig_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n",
+      "rangeOffset": 5568,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 8,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:29 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:30 [debug] : RIGEL SERVER 17:41:30 INFO  : Domain reconfigured successfully 
+2026-05-05 17:41:30 [debug] : RIGEL SERVER 17:41:30 INFO  : Generating BSP for the domain C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:41:30 [debug] : RIGEL SERVER 17:41:30 INFO  : lopper command to build BSP :empyro.bat build_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:41:30 [debug] : RIGEL SERVER 17:41:30 INFO  : cmd.exe, /C, empyro.bat build_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:41:45 [debug] : RIGEL SERVER 17:41:45 INFO  : Domain build successfully 
+2026-05-05 17:41:45 [debug] : RIGEL SERVER 17:41:45 INFO  : Generating Export directory 
+2026-05-05 17:41:46 [debug] : Received event from notification service: ON_DID_UPDATE_COMPONENT. 
+2026-05-05 17:41:46 [debug] : Received event from notification service: ON_UPDATE_PLATFORM_STATUS. 
+2026-05-05 17:41:46 [debug] : RIGEL SERVER 17:41:46 INFO  : Platform Build Finished successfully. 
+2026-05-05 17:41:46 [debug] : [Platform Server] Generate platform completed on 'DMA_platform' with internal id '95d5477e-2956-4cbb-8722-5332425f0813'. 
+2026-05-05 17:41:46 [debug] : [Platform Server] Generate platform status event - label: DMA_platform, status_code:0, status_details:. 
+2026-05-05 17:41:46 [debug] : [Platform Server] Generate platform output steam finished on 'DMA_platform' with internal id '95d5477e-2956-4cbb-8722-5332425f0813'. 
+2026-05-05 17:41:46 [info] : [Platform Server] Generate platform output stream finished - DMA_platform. 
+2026-05-05 17:41:46 [debug] : Received event from notification service: ON_DID_MODIFY_PLATFORM_REPOS. 
+2026-05-05 17:41:46 [debug] : [Platform Output] Generate DMA_platform platform with id '95d5477e-2956-4cbb-8722-5332425f0813' completed. 
+2026-05-05 17:41:46 [debug] : [Platform Output] Deleting and canceling the build task with id '95d5477e-2956-4cbb-8722-5332425f0813'. 
+2026-05-05 17:41:46 [debug] : Received event from notification service: ON_DID_BUILD_STOP. 
+2026-05-05 17:41:46 [debug] : Received event from notification service: ON_UPDATE_FLOWNAVIGATOR_STATUS. 
+2026-05-05 17:41:47 [debug] : [Platform Server] Executing method:[getPartFromXSA] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 56,
+        "startColumn": 1,
+        "endLineNumber": 56,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:41:30 INFO  : Domain reconfigured successfully\r\n17:41:30 INFO  : Generating BSP for the domain C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:41:30 INFO  : lopper command to build BSP :empyro.bat build_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:41:30 INFO  : cmd.exe, /C, empyro.bat build_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:41:45 INFO  : Domain build successfully\r\n17:41:45 INFO  : Generating Export directory\r\n17:41:46 INFO  : Platform Build Finished successfully.\r\n",
+      "rangeOffset": 6161,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 9,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:47 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:41:53 [debug] : [Debugger Server] In 'List target connections' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:42:08 [debug] : [Debugger Server] In 'programDevice' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[null,"C:\\Users\\laptop\\Desktop\\DMA\\DMA.runs\\impl_1\\design_1_wrapper.bit",null,"Local",null,null,null,null,"Auto Detect","0c099a16-d4a7-486f-afcc-1e78934aa116"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:42:08 [debug] : RIGEL SERVER 17:42:08 ERROR : Platform information not found. 
+2026-05-05 17:42:08 [debug] : Program device failed with internal id '0c099a16-d4a7-486f-afcc-1e78934aa116'. 
+2026-05-05 17:42:08 [debug] : Program device status event, status_code:0, status_details:. 
+2026-05-05 17:42:08 [debug] : Program device output steam finished with internal id '0c099a16-d4a7-486f-afcc-1e78934aa116'. 
+2026-05-05 17:42:08 [debug] : [Program Device Output] Program device with id '0c099a16-d4a7-486f-afcc-1e78934aa116' started. 
+2026-05-05 17:42:08 [debug] : [Program Device Output] Program device with id '0c099a16-d4a7-486f-afcc-1e78934aa116' stopped due to errors. 
+2026-05-05 17:42:08 [debug] : [Program Device Output] Deleting and canceling the build task with id '0c099a16-d4a7-486f-afcc-1e78934aa116'. 
+2026-05-05 17:42:45 [debug] : [Debugger Server] In 'List target connections' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:42:56 [debug] : [Debugger Server] In 'programDevice' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[null,"C:\\Users\\laptop\\Desktop\\DMA\\DMA.runs\\impl_1\\design_1_wrapper.bit",null,"Local",null,null,null,null,"Auto Detect","6a0fd36f-e6ce-418d-9502-056fb8c9264b"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:42:56 [debug] : RIGEL SERVER 17:42:56 ERROR : Platform information not found. 
+2026-05-05 17:42:56 [debug] : Program device failed with internal id '6a0fd36f-e6ce-418d-9502-056fb8c9264b'. 
+2026-05-05 17:42:56 [debug] : Program device status event, status_code:0, status_details:. 
+2026-05-05 17:42:56 [debug] : Program device output steam finished with internal id '6a0fd36f-e6ce-418d-9502-056fb8c9264b'. 
+2026-05-05 17:42:56 [debug] : [Program Device Output] Program device with id '6a0fd36f-e6ce-418d-9502-056fb8c9264b' started. 
+2026-05-05 17:42:56 [debug] : [Program Device Output] Program device with id '6a0fd36f-e6ce-418d-9502-056fb8c9264b' stopped due to errors. 
+2026-05-05 17:42:56 [debug] : [Program Device Output] Deleting and canceling the build task with id '6a0fd36f-e6ce-418d-9502-056fb8c9264b'. 
+2026-05-05 17:43:07 [debug] : [Platform Server] Executing method:[generatePlatform] with connection:(object). {"0":"request:","1":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"}
+2026-05-05 17:43:07 [debug] : [Platform Server] Generate platform requested for DMA_platform with internal id '707fc58f-e961-4af0-a660-6a0dde5f9277'. 
+2026-05-05 17:43:07 [debug] : Received event from notification service: ON_DID_OPEN_COMPONENT. 
+2026-05-05 17:43:07 [debug] : Received event from notification service: ON_DID_BUILD_START. 
+2026-05-05 17:43:07 [debug] : Received event from notification service: ON_UPDATE_FLOWNAVIGATOR_STATUS. 
+2026-05-05 17:43:07 [debug] : [Platform Output] Generate DMA_platform platform with id '707fc58f-e961-4af0-a660-6a0dde5f9277' started. 
+2026-05-05 17:43:07 [debug] : RIGEL SERVER 17:43:07 INFO  : BSP build will be initiated for Domain standalone_microblaze_0 
+2026-05-05 17:43:07 [debug] : RIGEL SERVER 17:43:07 INFO  : Generating BSP for the domain C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:43:07 [debug] : RIGEL SERVER 17:43:07 INFO  : lopper command to reconfigure BSP :empyro.bat reconfig_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:43:07 [debug] : RIGEL SERVER 17:43:07 INFO  : cmd.exe, /C, empyro.bat reconfig_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 63,
+        "startColumn": 1,
+        "endLineNumber": 63,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:42:08 ERROR : Platform information not found.\r\n17:42:56 ERROR : Platform information not found.\r\n17:43:07 INFO  : BSP build will be initiated for Domain standalone_microblaze_0\r\n17:43:07 INFO  : Generating BSP for the domain C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:43:07 INFO  : lopper command to reconfigure BSP :empyro.bat reconfig_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:43:07 INFO  : cmd.exe, /C, empyro.bat reconfig_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n",
+      "rangeOffset": 6808,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 10,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:07 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:08 [debug] : RIGEL SERVER 17:43:08 INFO  : Domain reconfigured successfully 
+2026-05-05 17:43:08 [debug] : RIGEL SERVER 17:43:08 INFO  : Generating BSP for the domain C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:43:08 [debug] : RIGEL SERVER 17:43:08 INFO  : lopper command to build BSP :empyro.bat build_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:43:08 [debug] : RIGEL SERVER 17:43:08 INFO  : cmd.exe, /C, empyro.bat build_bsp -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\microblaze_0\standalone_microblaze_0\bsp 
+2026-05-05 17:43:10 [debug] : RIGEL SERVER 17:43:10 INFO  : Domain build successfully 
+2026-05-05 17:43:10 [debug] : RIGEL SERVER 17:43:10 INFO  : Generating Export directory 
+2026-05-05 17:43:12 [debug] : Received event from notification service: ON_DID_UPDATE_COMPONENT. 
+2026-05-05 17:43:12 [debug] : Received event from notification service: ON_UPDATE_PLATFORM_STATUS. 
+2026-05-05 17:43:12 [debug] : RIGEL SERVER 17:43:12 INFO  : Platform Build Finished successfully. 
+2026-05-05 17:43:12 [debug] : [Platform Server] Generate platform completed on 'DMA_platform' with internal id '707fc58f-e961-4af0-a660-6a0dde5f9277'. 
+2026-05-05 17:43:12 [debug] : [Platform Server] Generate platform status event - label: DMA_platform, status_code:0, status_details:. 
+2026-05-05 17:43:12 [debug] : [Platform Server] Generate platform output steam finished on 'DMA_platform' with internal id '707fc58f-e961-4af0-a660-6a0dde5f9277'. 
+2026-05-05 17:43:12 [info] : [Platform Server] Generate platform output stream finished - DMA_platform. 
+2026-05-05 17:43:12 [debug] : Received event from notification service: ON_DID_MODIFY_PLATFORM_REPOS. 
+2026-05-05 17:43:12 [debug] : [Platform Output] Generate DMA_platform platform with id '707fc58f-e961-4af0-a660-6a0dde5f9277' completed. 
+2026-05-05 17:43:12 [debug] : [Platform Output] Deleting and canceling the build task with id '707fc58f-e961-4af0-a660-6a0dde5f9277'. 
+2026-05-05 17:43:12 [debug] : Received event from notification service: ON_DID_BUILD_STOP. 
+2026-05-05 17:43:12 [debug] : Received event from notification service: ON_UPDATE_FLOWNAVIGATOR_STATUS. 
+2026-05-05 17:43:12 [debug] : [Platform Server] Executing method:[getPartFromXSA] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 69,
+        "startColumn": 1,
+        "endLineNumber": 69,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:43:08 INFO  : Domain reconfigured successfully\r\n17:43:08 INFO  : Generating BSP for the domain C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:43:08 INFO  : lopper command to build BSP :empyro.bat build_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:43:08 INFO  : cmd.exe, /C, empyro.bat build_bsp -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\microblaze_0\\standalone_microblaze_0\\bsp\r\n17:43:10 INFO  : Domain build successfully\r\n17:43:10 INFO  : Generating Export directory\r\n17:43:12 INFO  : Platform Build Finished successfully.\r\n",
+      "rangeOffset": 7451,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 11,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:12 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:43:21 [debug] : [Debugger Server] In 'List target connections' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:43:28 [debug] : [Debugger Server] In 'programDevice' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[null,"C:\\Users\\laptop\\Desktop\\DMA\\DMA.runs\\impl_1\\design_1_wrapper.bit",null,"Local",null,null,null,null,"Auto Detect","d9cf4b68-9237-4b9a-890f-831e70af3f56"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:43:28 [debug] : RIGEL SERVER 17:43:28 ERROR : Platform information not found. 
+2026-05-05 17:43:28 [debug] : Program device failed with internal id 'd9cf4b68-9237-4b9a-890f-831e70af3f56'. 
+2026-05-05 17:43:28 [debug] : Program device status event, status_code:0, status_details:. 
+2026-05-05 17:43:28 [debug] : Program device output steam finished with internal id 'd9cf4b68-9237-4b9a-890f-831e70af3f56'. 
+2026-05-05 17:43:28 [debug] : [Program Device Output] Program device with id 'd9cf4b68-9237-4b9a-890f-831e70af3f56' started. 
+2026-05-05 17:43:28 [debug] : [Program Device Output] Program device with id 'd9cf4b68-9237-4b9a-890f-831e70af3f56' stopped due to errors. 
+2026-05-05 17:43:28 [debug] : [Program Device Output] Deleting and canceling the build task with id 'd9cf4b68-9237-4b9a-890f-831e70af3f56'. 
+2026-05-05 17:43:56 [debug] : Widget was activated, but did not accept focus after 2000ms: outputView 
+2026-05-05 17:44:07 [debug] : [Debugger Server] In 'List target connections' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:48:39 [debug] : [Repository Server] Executing method:listRepoPaths with connection:(object). {"0":"request:","1":{"name":""}}
+2026-05-05 17:48:39 [debug] : [Repository Server] Executing method:listRepoPaths with connection:(object). {"0":"request:","1":{"name":""}}
+2026-05-05 17:48:39 [debug] : [Repository Service] Executing method:listRepoPaths from frontend. {"0":"request:","1":{"name":""}}
+2026-05-05 17:48:39 [debug] : [Repository Service] Executing method:listRepoPaths from frontend. {"0":"request:","1":{"name":""}}
+2026-05-05 17:48:39 [debug] : [Repository Service] Executing method:listPlatforms from frontend. {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:48:39 [debug] : [Repository Server] Executing method:listPlatforms with connection:(object). {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:48:39 [debug] : [Repository Service] Executing method:listPlatforms from frontend. {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:48:39 [debug] : [Repository Server] Executing method:listPlatforms with connection:(object). {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:49:08 [debug] : [Repository Server] Executing method:listRepoPaths with connection:(object). {"0":"request:","1":{"name":""}}
+2026-05-05 17:49:08 [debug] : [Repository Server] Executing method:listRepoPaths with connection:(object). {"0":"request:","1":{"name":""}}
+2026-05-05 17:49:08 [debug] : [Repository Service] Executing method:listRepoPaths from frontend. {"0":"request:","1":{"name":""}}
+2026-05-05 17:49:08 [debug] : [Repository Service] Executing method:listRepoPaths from frontend. {"0":"request:","1":{"name":""}}
+2026-05-05 17:49:08 [debug] : [Repository Service] Executing method:listPlatforms from frontend. {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:49:08 [debug] : [Repository Server] Executing method:listPlatforms with connection:(object). {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:49:08 [debug] : [Repository Service] Executing method:listPlatforms from frontend. {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:49:08 [debug] : [Repository Server] Executing method:listPlatforms with connection:(object). {"0":"request:","1":{"name":"","repoPath":"","ignoreCertifiedRequisite":true,"flowList":[3,2,4]}}
+2026-05-05 17:50:14 [debug] : [Repository Service] Executing method:validatePlatform from frontend. {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm"}}
+2026-05-05 17:50:14 [debug] : [Repository Server] Executing method:validatePlatform with connection:(object). {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm"}}
+2026-05-05 17:50:14 [debug] : [Repository Server] Executing method:getFilteredPlatformDomains with connection:(object). {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm","supportedOsList":[],"supportedCputypeList":[]}}
+2026-05-05 17:50:14 [debug] : [Repository Service] Executing method:getFilteredPlatformDomains from frontend. {"0":"request:"}
+2026-05-05 17:50:14 [debug] : [Platform Server] Executing method:[validateBSP] with connection:(object). {"0":"request:","1":{"wrappers_":{},"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm","standalone_microblaze_0",null,null,null],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:50:14 [debug] : RIGEL SERVER 17:50:14 INFO  : cmd.exe, /C, empyro.bat validate_bsp -t empty_application -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\export\DMA_platform\sw\standalone_microblaze_0 -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:50:15 [debug] : RIGEL SERVER 17:50:15 INFO  : Successfully validated template empty_application 
+2026-05-05 17:50:37 [debug] : Executing method:[createComponentProject] with connection:(object). {"0":"request:","1":{"wrappers_":{"13":{"wrappers_":null,"arrayIndexOffset_":-1,"array":[["part=xcvu9p-flga2104-2-i","","[hls]","flow_target=vivado","package.output.format=ip_catalog","package.output.syn=false"]],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}},"arrayIndexOffset_":-1,"array":["backdoor","C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor",3,"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm",null,"standalone_microblaze_0","microblaze_0","standalone",null,"microblaze","standalone_microblaze_0",[],[["part=xcvu9p-flga2104-2-i","","[hls]","flow_target=vivado","package.output.format=ip_catalog","package.output.syn=false"]],null,null,null,null,null,"261bc266-e4a0-4655-8d24-568b95cc3d82"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:50:37 [debug] : RIGEL SERVER 17:50:37 INFO  : lopper command to create baremetal application :empyro.bat create_app --src_dir C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor\src -t empty_application -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\export\DMA_platform\sw\standalone_microblaze_0 -n backdoor -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:50:37 [debug] : RIGEL SERVER 17:50:37 INFO  : cmd.exe, /C, empyro.bat validate_bsp -t empty_application -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\export\DMA_platform\sw\standalone_microblaze_0 -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 76,
+        "startColumn": 1,
+        "endLineNumber": 76,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:43:28 ERROR : Platform information not found.\r\n17:50:14 INFO  : cmd.exe, /C, empyro.bat validate_bsp -t empty_application -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\sw\\standalone_microblaze_0 -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n17:50:15 INFO  : Successfully validated template empty_application\r\n17:50:37 INFO  : lopper command to create baremetal application :empyro.bat create_app --src_dir C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\\src -t empty_application -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\sw\\standalone_microblaze_0 -n backdoor -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n17:50:37 INFO  : cmd.exe, /C, empyro.bat validate_bsp -t empty_application -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\sw\\standalone_microblaze_0 -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n",
+      "rangeOffset": 8098,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 12,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:37 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:38 [debug] : RIGEL SERVER 17:50:38 INFO  : Successfully validated template empty_application 
+2026-05-05 17:50:38 [debug] : RIGEL SERVER 17:50:38 INFO  : cmd.exe, /C, empyro.bat create_app --src_dir C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor\src -t empty_application -d C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform\export\DMA_platform\sw\standalone_microblaze_0 -n backdoor -r C:\Users\laptop\Desktop\DMA\DMA.vitis\_ide\.wsdata\.repo.yaml 
+2026-05-05 17:50:45 [debug] : RIGEL SERVER 17:50:45 INFO  : [INFO]: Generating Linker script for empty_application 
+2026-05-05 17:50:45 [debug] : RIGEL SERVER 17:50:45 INFO  : [INFO]: Successfully Created Application sources at C:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src
+17:50:45 INFO  : Successfully created Application C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor\src 
+2026-05-05 17:50:45 [debug] : RIGEL SERVER 17:50:45 INFO  : The hardware specification used by project 'C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor' is out of sync with the platform. Resource files extracted from the hardware specification will be updated. 
+2026-05-05 17:50:45 [debug] : Received event from notification service: ON_DID_CREATE_COMPONENT. 
+2026-05-05 17:50:45 [debug] : RIGEL SERVER 17:50:45 INFO  : The updated bitstream files are copied from platform to folder 'C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor\_ide\bitstream' in project 'C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor'. 
+2026-05-05 17:50:45 [debug] : RIGEL SERVER 17:50:45 INFO  : created .gitignore file for the project C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:45 [debug] : [ProjectCache] fetching projects for project-cache 
+2026-05-05 17:50:45 [debug] : [Component Provider] updating project C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:45 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:50:45 [debug] : [Platform Provider] updating project C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform 
+2026-05-05 17:50:45 [debug] : [Component Provider] updating project C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:45 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:50:45 [debug] : [ProjectCache] Project location updated to C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:45 [debug] : [Component Provider] project updated C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:45 [debug] : [Platform Server] Executing method:[listDomains] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:50:45 [debug] : [Platform Provider] project updated C:\Users\laptop\Desktop\DMA\DMA.vitis\DMA_platform {"0":{"platformName":"DMA_platform","platformDescription":"","platformLocation":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform","xsaPath":"C:/Users/laptop/Desktop/DMA/dma_wrapper_0.xsa","xsapathinplatform":"DMA_platform/hw/dma_wrapper_0.xsa","isCustomFsbl":false,"fsblPath":"","pmufwElf":"","supportedFamily":"fpga","flow":3,"emulationXsaPath":"","emulationXsaPathInPlatform":"","stdGenHooksList":[],"reconfigurablePartitionsList":[]}}
+2026-05-05 17:50:45 [debug] : [Component Provider] project updated C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:45 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:45 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:45 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : [Repository Server] Executing method:getHwPlatform with connection:(object). {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm"}}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : [Repository Server] Executing method:getSwPlatform with connection:(object). {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm"}}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 81,
+        "startColumn": 1,
+        "endLineNumber": 81,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:50:38 INFO  : Successfully validated template empty_application\r\n17:50:38 INFO  : cmd.exe, /C, empyro.bat create_app --src_dir C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\\src -t empty_application -d C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\sw\\standalone_microblaze_0 -n backdoor -r C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\_ide\\.wsdata\\.repo.yaml\r\n17:50:45 INFO  : [INFO]: Generating Linker script for empty_application\r\n17:50:45 INFO  : [INFO]: Successfully Created Application sources at C:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src\r\n17:50:45 INFO  : Successfully created Application C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\\src\r\n17:50:45 INFO  : The hardware specification used by project 'C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor' is out of sync with the platform. Resource files extracted from the hardware specification will be updated.\r\n17:50:45 INFO  : The updated bitstream files are copied from platform to folder 'C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\\_ide\\bitstream' in project 'C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor'.\r\n17:50:45 INFO  : created .gitignore file for the project C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\r\n",
+      "rangeOffset": 9048,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 13,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 17:50:46 [debug] : No label for action menu node: No command "workspace:addFolder" exists. 
+2026-05-05 17:50:47 [debug] : [Platform Server] Executing method:[getPartFromXSA] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:50:50 [debug] : [ProjectDecorator] tree decoration updated 
+2026-05-05 17:50:50 [debug] : [ProjectCache] Project location updated to C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor 
+2026-05-05 17:50:57 [debug] : [Debugger Server] In 'List target connections' with connection:[object Object] request:{"wrappers_":null,"arrayIndexOffset_":-1,"array":[],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:50:57 [debug] : [Platform Server] Executing method:[extractHwFiles] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:50:57 [debug] : RIGEL SERVER 17:50:57 INFO  : The updated bitstream files are copied from platform to folder 'C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor\_ide\bitstream' in project 'C:\Users\laptop\Desktop\DMA\DMA.vitis\backdoor'. 
+2026-05-05 17:50:58 [debug] : [Repository Server] Executing method:getSwPlatform with connection:(object). {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm"}}
+2026-05-05 17:50:58 [debug] : [Repository Service] Executing method:getSwPlatform from frontend. {"0":"request:","1":{"platformPath":"C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\DMA_platform\\export\\DMA_platform\\DMA_platform.xpfm"}}
+2026-05-05 17:50:58 [debug] : Executing method:[getPdiInfo] with connection:(object). {"0":"request:","1":{"wrappers_":null,"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}}}
+2026-05-05 17:55:19 [debug] : [Debugger Server] In 'programDevice' with connection:[object Object] request:{"wrappers_":{"8":{"arr_":[],"valueCtor_":null,"map_":{"microblaze_0":{"key":"microblaze_0","value":"bootloop"}},"arrClean":false}},"arrayIndexOffset_":-1,"array":["C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor","C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\\_ide\\bitstream\\dma_wrapper_0.bit","C:\\Users\\laptop\\Desktop\\DMA\\DMA.runs\\impl_1\\design_1_wrapper.mmi","Local",null,null,null,[],"Auto Detect","eb80fbe3-83d0-47b6-b239-4675bedfc174"],"pivot_":1.7976931348623157e+308,"convertedPrimitiveFields_":{}} 
+2026-05-05 17:55:19 [debug] : [Program Device Output] Program device with id 'eb80fbe3-83d0-47b6-b239-4675bedfc174' started. 
+2026-05-05 17:55:19 [debug] : Received event from notification service: ON_BAREMETAL_DEBUG_PROGRESS. 
+2026-05-05 17:55:19 [debug] : Received event from notification service: START_XSDB_SERVER. 
+2026-05-05 17:55:19 [debug] : entering runTask 
+2026-05-05 17:55:19 [debug] : got lock 
+2026-05-05 17:55:19 [debug] : getTasks(): about to return task information for 0 tasks 
+2026-05-05 17:55:19 [debug] : running task {"type":"shell","label":"XSDB Console","_scope":2,"problemMatcher":[],"presentation":{"echo":true,"reveal":"silent","focus":true,"panel":"dedicated","showReuseMessage":false,"clear":false,"close":false},"options":{"cwd":"C:\\Users\\laptop\\.Xilinx\\Vitis\\2025.2\\.vitis"},"args":["/C","C:/AMDDesignTools/2025.2/Vitis\\bin\\xsdb.bat","-n","-interactive","C:\\Users\\laptop\\.Xilinx\\Vitis\\2025.2\\.vitis\\temp_xsct_launch_script.tcl"],"command":"cmd"}, already running = false 
+2026-05-05 17:55:19 [debug] : task about to start 
+2026-05-05 17:55:19 [debug] : Starting terminal process {"0":"{\n  \"command\": \"cmd.exe\",\n  \"args\": [\n    \"/S\",\n    \"/C\",\n    \"cmd /C C:/AMDDesignTools/2025.2/Vitis\\\\bin\\\\xsdb.bat -n -interactive C:\\\\Users\\\\laptop\\\\.Xilinx\\\\Vitis\\\\2025.2\\\\.vitis\\\\temp_xsct_launch_script.tcl\"\n  ],\n  \"commandLine\": \"/S /C \\\"cmd /C C:/AMDDesignTools/2025.2/Vitis\\\\bin\\\\xsdb.bat -n -interactive C:\\\\Users\\\\laptop\\\\.Xilinx\\\\Vitis\\\\2025.2\\\\.vitis\\\\temp_xsct_launch_script.tcl\\\"\",\n  \"options\": {\n    \"cwd\": \"C:\\\\Users\\\\laptop\\\\.Xilinx\\\\Vitis\\\\2025.2\\\\.vitis\",\n    \"env\": {\n      \"ALLUSERSPROFILE\": \"C:\\\\ProgramData\",\n      \"APPDATA\": \"C:\\\\Users\\\\laptop\\\\AppData\\\\Roaming\",\n      \"arr.length\": \"0\",\n      \"arr.Ubound\": \"-1\",\n      \"CMAKE_OBJECT_PATH_MAX\": \"4096\",\n      \"CommonProgramFiles\": \"C:\\\\Program Files\\\\Common Files\",\n      \"CommonProgramFiles(x86)\": \"C:\\\\Program Files (x86)\\\\Common Files\",\n      \"CommonProgramW6432\": \"C:\\\\Program Files\\\\Common Files\",\n      \"COMPUTERNAME\": \"NUL-LENDLAP97\",\n      \"ComSpec\": \"C:\\\\WINDOWS\\\\system32\\\\cmd.exe\",\n      \"DriverData\": \"C:\\\\Windows\\\\System32\\\\Drivers\\\\DriverData\",\n      \"EFC_16640_1592913036\": \"1\",\n      \"HDI_APPROOT\": \"C:/AMDDesignTools/2025.2/Vitis\",\n      \"HOMEDRIVE\": \"C:\",\n      \"HOMEPATH\": \"\\\\Users\\\\laptop\",\n      \"HW_SERVER_DJTG_DISABLE\": \"1\",\n      \"HW_SERVER_FTDIMGR_DISABLE\": \"1\",\n      \"IDE_SKIP_SERVER_LICENSE\": \"1\",\n      \"INT_VARIABLE_NAME\": \"XILINX_PATH\",\n      \"JAVA_HOME\": \"C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\jre21.0.5_11\",\n      \"LC_NUMERIC\": \"C\",\n      \"LOCALAPPDATA\": \"C:\\\\Users\\\\laptop\\\\AppData\\\\Local\",\n      \"LOGONSERVER\": \"\\\\\\\\NUL-LENDLAP97\",\n      \"NOSPLASH\": \"false\",\n      \"NUMBER_OF_PROCESSORS\": \"8\",\n      \"OneDrive\": \"C:\\\\Users\\\\Administrator\\\\OneDrive\",\n      \"ORIGINAL_XDG_CURRENT_DESKTOP\": \"undefined\",\n      \"OS\": \"Windows_NT\",\n      \"Path\": \"C:/AMDDesignTools/2025.2/Vitis\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\microblaze\\\\nt\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\arm\\\\nt\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\microblaze\\\\linux_toolchain\\\\nt64_be\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\microblaze\\\\linux_toolchain\\\\nt64_le\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\aarch32\\\\nt\\\\gcc-arm-linux-gnueabi\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\aarch32\\\\nt\\\\gcc-arm-none-eabi\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\aarch64\\\\nt\\\\aarch64-linux\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\aarch64\\\\nt\\\\aarch64-none\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\armr5\\\\nt\\\\gcc-arm-none-eabi\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\riscv\\\\nt\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\riscv\\\\linux_toolchain\\\\nt64\\\\bin;C:/AMDDesignTools/2025.2/Vitis\\\\gnu\\\\riscv\\\\linux_toolchain\\\\nt32\\\\bin;C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\python-3.13.0;C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\git-2.50.0\\\\bin;C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\cmake-3.24.2\\\\bin;C:/AMDDesignTools/2025.2/Vitis/win64/tools/vcxx\\\\libexec;C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\jre21.0.5_11\\\\bin;C:/AMDDesignTools/2025.2/Vitis/lib/win64.o;C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\libxslt/bin;C:/AMDDesignTools/2025.2/Vitis/bin;C:\\\\WINDOWS\\\\system32;C:\\\\WINDOWS;C:\\\\WINDOWS\\\\System32\\\\Wbem;C:\\\\WINDOWS\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\;C:\\\\WINDOWS\\\\System32\\\\OpenSSH\\\\;C:\\\\Program Files\\\\PuTTY\\\\;C:\\\\Program Files\\\\Git\\\\cmd;C:\\\\Users\\\\laptop\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps;C:\\\\Users\\\\laptop\\\\AppData\\\\Local\\\\Python\\\\bin\",\n      \"PATHEXT\": \".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC\",\n      \"PROCESSOR_ARCHITECTURE\": \"AMD64\",\n      \"PROCESSOR_IDENTIFIER\": \"Intel64 Family 6 Model 140 Stepping 1, GenuineIntel\",\n      \"PROCESSOR_LEVEL\": \"6\",\n      \"PROCESSOR_REVISION\": \"8c01\",\n      \"ProgramData\": \"C:\\\\ProgramData\",\n      \"ProgramFiles\": \"C:\\\\Program Files\",\n      \"ProgramFiles(x86)\": \"C:\\\\Program Files (x86)\",\n      \"ProgramW6432\": \"C:\\\\Program Files\",\n      \"PROMPT\": \"$P$G\",\n      \"PSModulePath\": \"C:\\\\Program Files\\\\WindowsPowerShell\\\\Modules;C:\\\\WINDOWS\\\\system32\\\\WindowsPowerShell\\\\v1.0\\\\Modules\",\n      \"PUBLIC\": \"C:\\\\Users\\\\Public\",\n      \"PYTHONPATH\": \"C:/AMDDesignTools/2025.2/Vitis\\\\cli;C:/AMDDesignTools/2025.2/Vitis\\\\cli\\\\python-packages\\\\win64;C:/AMDDesignTools/2025.2/Vitis\\\\cli\\\\python-packages\\\\site-packages;C:/AMDDesignTools/2025.2/Vitis\\\\cli\\\\proto;C:/AMDDesignTools/2025.2/Vitis\\\\scripts\\\\python_pkg;\",\n      \"RDI_APPROOT\": \"C:/AMDDesignTools/2025.2/Vitis\",\n      \"RDI_BASEROOT\": \"C:/AMDDesignTools/2025.2\",\n      \"RDI_BINROOT\": \"C:/AMDDesignTools/2025.2/Vitis/bin\",\n      \"RDI_CHECK_PROG\": \"True\",\n      \"RDI_DATADIR\": \"C:/AMDDesignTools/2025.2/Vitis/data\",\n      \"RDI_INSTALLROOT\": \"C:/AMDDesignTools\",\n      \"RDI_INSTALLVER\": \"Vitis\",\n      \"RDI_INSTALLVERSION\": \"2025.2\",\n      \"RDI_NO_JRE\": \"1\",\n      \"RDI_OPT_EXT\": \".o\",\n      \"RDI_OS_ARCH\": \"64\",\n      \"RDI_PROG\": \"buildinfo.exe\",\n      \"RDI_SESSION_INFO\": \"C:\\\\AMDDesignTools\\\\2025.2\\\\Vitis\\\\bin:NUL-LENDLAP97-Tue05-05-2026_17-32-23.61\",\n      \"RDI_SHARED_DATA\": \"C:/AMDDesignTools/SharedData/Vitis/data\",\n      \"RDI_TEMPINSTALL\": \"C:\\\\AMDDesignTools\\\\2025.2\",\n      \"RDI_USE_JDK11\": \"1\",\n      \"SESSIONNAME\": \"Console\",\n      \"session_string\": \"C:\\\\AMDDesignTools\\\\2025.2\\\\Vitis\\\\bin:NUL-LENDLAP97-Tue05-05-2026_17-32-24.46\",\n      \"supports_classic_ide\": \"false\",\n      \"SystemDrive\": \"C:\",\n      \"SystemRoot\": \"C:\\\\WINDOWS\",\n      \"TEMP\": \"C:\\\\Users\\\\laptop\\\\AppData\\\\Local\\\\Temp\",\n      \"THEIA_APP_PROJECT_PATH\": \"C:\\\\AMDDesignTools\\\\2025.2\\\\Vitis\\\\ide\\\\electron-app\\\\win64\\\\resources\\\\app\",\n      \"THEIA_DEFAULT_PLUGINS\": \"local-dir:C:\\\\AMDDesignTools\\\\2025.2\\\\Vitis\\\\ide\\\\electron-app\\\\win64\\\\resources\\\\app\\\\plugins\",\n      \"THEIA_ELECTRON_TOKEN\": \"{\\\"value\\\":\\\"fd159082-1a56-462b-91dd-adbee002bcee\\\"}\",\n      \"THEIA_ELECTRON_VERSION\": \"30.1.2\",\n      \"THEIA_PLUGINS\": \"local-dir:C:\\\\Users\\\\laptop\\\\.theia\\\\plugins\",\n      \"TMP\": \"C:\\\\Users\\\\laptop\\\\AppData\\\\Local\\\\Temp\",\n      \"tooldir\": \"tps\\\\win64\\\\git-2.50.0\",\n      \"TOOLS_CLANGD\": \"C:/AMDDesignTools/2025.2/Vitis/win64/tools/vcxx\\\\libexec\",\n      \"TPS_CMAKE\": \"C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\cmake-3.24.2\",\n      \"TPS_GIT\": \"C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\git-2.50.0\",\n      \"TPS_LIBXSLT\": \"C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\libxslt\",\n      \"TPS_PYTHON\": \"C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\python-3.13.0\",\n      \"UATDATA\": \"C:\\\\WINDOWS\\\\CCM\\\\UATData\\\\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77\",\n      \"USERDOMAIN\": \"NUL-LENDLAP97\",\n      \"USERDOMAIN_ROAMINGPROFILE\": \"NUL-LENDLAP97\",\n      \"USERNAME\": \"laptop\",\n      \"USERPROFILE\": \"C:\\\\Users\\\\laptop\",\n      \"VALIDATE_ARGS\": \"\\\"False\\\"\",\n      \"VITISNEW\": \"true\",\n      \"VITIS_EMBEDDED_INSTALL\": \"true\",\n      \"VITIS_HLS_INSTALL\": \"true\",\n      \"VSCODE_API_VERSION\": \"1.99.3\",\n      \"windir\": \"C:\\\\WINDOWS\",\n      \"XILINX_HLS\": \"C:/AMDDesignTools/2025.2/Vitis\",\n      \"XILINX_VCXX\": \"C:/AMDDesignTools/2025.2/Vitis/win64/tools/vcxx\",\n      \"XILINX_VERSION_DEFAULT\": \"2025.2\",\n      \"XILINX_VERSION_VITIS\": \"2025.2\",\n      \"XILINX_VITIS\": \"C:/AMDDesignTools/2025.2/Vitis\",\n      \"XILINX_VITIS_GIT\": \"C:/AMDDesignTools/2025.2/Vivado\\\\tps\\\\win64\\\\git-2.50.0\\\\bin\",\n      \"XILINX_VITIS_VERSION\": \"Vitis v2025.2 (64-bit)\",\n      \"XILINX_VIVADO\": \"C:/AMDDesignTools/2025.2/Vivado\",\n      \"XIL_NO_OVERRIDE\": \"0\",\n      \"XIL_SUPPRESS_OVERRIDE_WARNINGS\": \"1\",\n      \"_RDI_DONT_SET_XILINX_AS_PATH\": \"True\",\n      \"_RDI_SETENV_RUN\": \"true\"\n    }\n  }\n}"}
+2026-05-05 17:55:19 [debug] : Created new task, id: 0, process id: 510600603, OS PID: 24516, context: file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis 
+2026-05-05 17:55:19 [debug] : task created: {"0":{"taskId":0,"ctx":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis","config":{"type":"shell","label":"XSDB Console","_scope":2,"problemMatcher":[],"presentation":{"echo":true,"reveal":"silent","focus":true,"panel":"dedicated","showReuseMessage":false,"clear":false,"close":false},"options":{"cwd":"C:\\Users\\laptop\\.Xilinx\\Vitis\\2025.2\\.vitis"},"args":["/C","C:/AMDDesignTools/2025.2/Vitis\\bin\\xsdb.bat","-n","-interactive","C:\\Users\\laptop\\.Xilinx\\Vitis\\2025.2\\.vitis\\temp_xsct_launch_script.tcl"],"command":"cmd"},"terminalId":510600603,"processId":510600603,"command":"cmd /C C:/AMDDesignTools/2025.2/Vitis\\bin\\xsdb.bat -n -interactive C:\\Users\\laptop\\.Xilinx\\Vitis\\2025.2\\.vitis\\temp_xsct_launch_script.tcl"}}
+2026-05-05 17:55:19 [debug] : getTasks(): about to return task information for 1 tasks 
+2026-05-05 17:55:19 [debug] : getTasks(): about to return task information for 1 tasks 
+2026-05-05 17:55:19 [debug] : Task created. Task id: 0 
+2026-05-05 17:55:19 [debug] : release lock 2 
+2026-05-05 17:55:19 [debug] : getTasks(): about to return task information for 1 tasks 
+2026-05-05 17:55:22 [debug] : [Debugger Server] In 'setXsdbServerAddress' with connection:[object Object] request:{"value":"XSDB Server URL: TCP:localhost:59858\r\n"} 
+2026-05-05 17:55:22 [debug] : >>>>rigel server service call with : {"0":"XSDB Server URL: TCP:localhost:59858\r\n"}
+2026-05-05 17:55:23 [debug] : RIGEL SERVER 17:55:23 INFO  : XSDB server has started successfully from frontend. 
+2026-05-05 17:55:23 [debug] : RIGEL SERVER 17:55:23 INFO  : It has taken  4secs. 
+2026-05-05 17:55:23 [debug] : Received event from notification service: ON_BAREMETAL_DEBUG_PROGRESS. 
+2026-05-05 17:55:24 [debug] : RIGEL SERVER 17:55:24 INFO  : Connection to XSDB Server established. 
+2026-05-05 17:55:24 [debug] : RIGEL SERVER 17:55:24 INFO  : It has taken  1secs. 
+2026-05-05 17:55:24 [debug] : Received event from notification service: ON_BAREMETAL_DEBUG_PROGRESS. 
+2026-05-05 17:55:25 [debug] : RIGEL SERVER 17:55:25 INFO  : Done 
+2026-05-05 17:55:40 [debug] : RIGEL SERVER 17:55:40 INFO  : Connected to target on host '127.0.0.1' and port '3121'. 
+2026-05-05 17:55:40 [debug] : RIGEL SERVER 17:55:40 INFO  : Connected to target on host '127.0.0.1' and port '3121'. 
+2026-05-05 17:55:40 [debug] : RIGEL SERVER 17:55:40 INFO  : 'targets -set -filter {jtag_cable_name =~ "Digilent Arty A7-100T 210319BE74CBA" && level==0 && jtag_device_ctx=="jsn-Arty A7-100T-210319BE74CBA-13631093-0"}' command is executed. 
+2026-05-05 17:55:43 [debug] : RIGEL SERVER 17:55:43 INFO  : Device configured successfully with "C:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/_ide/bitstream/download.bit" 
+2026-05-05 17:55:43 [debug] : Program device completed with internal id 'eb80fbe3-83d0-47b6-b239-4675bedfc174'. 
+2026-05-05 17:55:43 [debug] : Program device status event, status_code:0, status_details:. 
+2026-05-05 17:55:43 [debug] : Program device output steam finished with internal id 'eb80fbe3-83d0-47b6-b239-4675bedfc174'. 
+2026-05-05 17:55:43 [debug] : [Program Device Output] Program device with id 'eb80fbe3-83d0-47b6-b239-4675bedfc174' completed. 
+2026-05-05 17:55:43 [debug] : [Program Device Output] Deleting and canceling the build task with id 'eb80fbe3-83d0-47b6-b239-4675bedfc174'. 
+2026-05-05 17:56:09 [debug] : start navigation 1 
+2026-05-05 17:56:09 [debug] : start navigation 2 
+2026-05-05 17:56:09 [debug] : end navigation 1 
+2026-05-05 17:56:09 [debug] : end navigation 0 
+2026-05-05 17:56:09 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":1,"context":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}}} 
+2026-05-05 17:56:09 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vscode-clangd\extension\out\bundle) 
+2026-05-05 17:56:09 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vitis-hls-verilog-vhdl-support-0.0.1\extension\lib\extension.js) 
+2026-05-05 17:56:09 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vitis-hls-pragma-0.6.0\extension\out\extension.js) 
+2026-05-05 17:56:09 [debug] : PLUGIN_HOST(9828): PluginManagerExtImpl/loadPlugin(C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\vitis-hls-l1-library-0.0.1\extension\lib\extension.js) 
+2026-05-05 17:56:09 [debug] : Starting extension "vitis-hls-pragma"! 
+2026-05-05 17:56:09 [debug] : Calling activation function on plugin amd.vitis-hls-verilog-vhdl-support 
+2026-05-05 17:56:09 [debug] : Calling activation function on plugin amd.vitis-hls-l1-library 
+2026-05-05 17:56:09 [debug] : Calling activation function on plugin amd.vitis-hls-pragma 
+2026-05-05 17:56:10 [debug] : Clang Language Server is now active! 
+2026-05-05 17:56:10 [debug] : Calling activation function on plugin clangd 
+2026-05-05 18:16:46 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 1,
+        "startColumn": 1,
+        "endLineNumber": 1,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "#include \"xil_printf.h\"\r\n#include \"xil_io.h\"\r\n\r\n// Test read and write to sram and sysmem from microblaze\r\n\r\n// Replace with the base address from Vivado Address Editor\r\n#define MEM_ACCESS_CTRL_BASE  0x44A00000\r\n\r\n// Register offsets (from mem_access_ctrl.sv)\r\n#define REG_INIT_ADDR  0x00\r\n#define REG_INIT_DATA  0x04\r\n#define REG_SRAM_WR    0x08\r\n#define REG_SRAM_RD    0x0C\r\n#define REG_MEM_WR     0x10\r\n#define REG_MEM_RD     0x14\r\n#define REG_RDATA      0x18\r\n#define REG_INIT_DONE  0x1C\r\n\r\n#define REG_WRITE(offset, val) \\\r\n    Xil_Out32(MEM_ACCESS_CTRL_BASE + (offset), (val))\r\n\r\n#define REG_READ(offset) \\\r\n    Xil_In32(MEM_ACCESS_CTRL_BASE + (offset))\r\n\r\n// Write one word to sys_mem at the given byte address\r\nvoid sysmem_write(u32 byte_addr, u32 data) {\r\n    REG_WRITE(REG_INIT_ADDR, byte_addr);\r\n    REG_WRITE(REG_INIT_DATA, data);\r\n    REG_WRITE(REG_MEM_WR, 1);\r\n}\r\n\r\n// Read one word from sys_mem at the given byte address\r\nu32 sysmem_read(u32 byte_addr) {\r\n    REG_WRITE(REG_INIT_ADDR, byte_addr);\r\n    REG_WRITE(REG_MEM_RD, 1);\r\n    return REG_READ(REG_RDATA);\r\n}\r\n\r\nint main() {\r\n    xil_printf(\"=== sys_mem read/write test ===\\r\\n\");\r\n\r\n    int pass = 1;\r\n    int num_words = 16;\r\n\r\n    // Write phase\r\n    xil_printf(\"Writing NaN words...\\r\\n\", num_words);\r\n    for (int i = 0; i < num_words; i++) {\r\n        u32 byte_addr = i * 4;\r\n        u32 data = 0xA0000000 | i;\r\n        sysmem_write(byte_addr, data);\r\n        xil_printf(\"  write [0x%08X] = 0x%08X\\r\\n\", byte_addr, data);\r\n    }\r\n\r\n    // Read back and verify\r\n    xil_printf(\"Reading back...\\r\\n\");\r\n    for (int i = 0; i < num_words; i++) {\r\n        u32 byte_addr = i * 4;\r\n        u32 expected = 0xA0000000 | i;\r\n        u32 actual = sysmem_read(byte_addr);\r\n\r\n        if (actual == expected) {\r\n            xil_printf(\"  [0x%08X] PASS: 0x%08X\\r\\n\", byte_addr, actual);\r\n        } else {\r\n            xil_printf(\"  [0x%08X] FAIL: expected 0x%08X got 0x%08X\\r\\n\",\r\n                       byte_addr, expected, actual);\r\n            pass = 0;\r\n        }\r\n    }\r\n\r\n    if (pass)\r\n        xil_printf(\"=== ALL PASSED ===\\r\\n\");\r\n    else\r\n        xil_printf(\"=== FAILURES DETECTED ===\\r\\n\");\r\n\r\n    return 0;\r\n}",
+      "rangeOffset": 0,
+      "forceMoveMarkers": false
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 2,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} 
+2026-05-05 18:16:46 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c"}
+2026-05-05 18:16:46 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c"}
+2026-05-05 18:16:46 [debug] : MonacoEditorModel.markAsDirty - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c"}
+2026-05-05 18:16:46 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c"}
+2026-05-05 18:16:46 [debug] : start navigation 1 
+2026-05-05 18:16:46 [debug] : end navigation 0 
+2026-05-05 18:16:46 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":2,"context":{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"rangeLength":0,"text":"#include \"xil_printf.h\"\r\n#include \"xil_io.h\"\r\n\r\n// Test read and write to sram and sysmem from microblaze\r\n\r\n// Replace with the base address from Vivado Address Editor\r\n#define MEM_ACCESS_CTRL_BASE  0x44A00000\r\n\r\n// Register offsets (from mem_access_ctrl.sv)\r\n#define REG_INIT_ADDR  0x00\r\n#define REG_INIT_DATA  0x04\r\n#define REG_SRAM_WR    0x08\r\n#define REG_SRAM_RD    0x0C\r\n#define REG_MEM_WR     0x10\r\n#define REG_MEM_RD     0x14\r\n#define REG_RDATA      0x18\r\n#define REG_INIT_DONE  0x1C\r\n\r\n#define REG_WRITE(offset, val) \\\r\n    Xil_Out32(MEM_ACCESS_CTRL_BASE + (offset), (val))\r\n\r\n#define REG_READ(offset) \\\r\n    Xil_In32(MEM_ACCESS_CTRL_BASE + (offset))\r\n\r\n// Write one word to sys_mem at the given byte address\r\nvoid sysmem_write(u32 byte_addr, u32 data) {\r\n    REG_WRITE(REG_INIT_ADDR, byte_addr);\r\n    REG_WRITE(REG_INIT_DATA, data);\r\n    REG_WRITE(REG_MEM_WR, 1);\r\n}\r\n\r\n// Read one word from sys_mem at the given byte address\r\nu32 sysmem_read(u32 byte_addr) {\r\n    REG_WRITE(REG_INIT_ADDR, byte_addr);\r\n    REG_WRITE(REG_MEM_RD, 1);\r\n    return REG_READ(REG_RDATA);\r\n}\r\n\r\nint main() {\r\n    xil_printf(\"=== sys_mem read/write test ===\\r\\n\");\r\n\r\n    int pass = 1;\r\n    int num_words = 16;\r\n\r\n    // Write phase\r\n    xil_printf(\"Writing 0 words...\\r\\n\", num_words);\r\n    for (int i = 0; i < num_words; i++) {\r\n        u32 byte_addr = i * 4;\r\n        u32 data = 0xA0000000 | i;\r\n        sysmem_write(byte_addr, data);\r\n        xil_printf(\"  write [0x%08X] = 0x%08X\\r\\n\", byte_addr, data);\r\n    }\r\n\r\n    // Read back and verify\r\n    xil_printf(\"Reading back...\\r\\n\");\r\n    for (int i = 0; i < num_words; i++) {\r\n        u32 byte_addr = i * 4;\r\n        u32 expected = 0xA0000000 | i;\r\n        u32 actual = sysmem_read(byte_addr);\r\n\r\n        if (actual == expected) {\r\n            xil_printf(\"  [0x%08X] PASS: 0x%08X\\r\\n\", byte_addr, actual);\r\n        } else {\r\n            xil_printf(\"  [0x%08X] FAIL: expected 0x%08X got 0x%08X\\r\\n\",\r\n                       byte_addr, expected, actual);\r\n            pass = 0;\r\n        }\r\n    }\r\n\r\n    if (pass)\r\n        xil_printf(\"=== ALL PASSED ===\\r\\n\");\r\n    else\r\n        xil_printf(\"=== FAILURES DETECTED ===\\r\\n\");\r\n\r\n    return 0;\r\n}"}} 
+2026-05-05 18:16:46 [debug] : start navigation 1 
+2026-05-05 18:16:46 [debug] : end navigation 0 
+2026-05-05 18:16:46 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":75,"character":1}} 
+2026-05-05 18:16:46 [debug] : TypeError: Cannot read properties of undefined (reading 'replace')
+    at ee.onActiveLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:35:1404)
+    at Te.<computed> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:209:4816)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6138)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:8100)
+    at Ji.onLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6753)
+    at Ji.trigger (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6162)
+    at Ji.onTextEditorSelectionChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:4322)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at t.TextEditorsExtImpl.$acceptEditorPropertiesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\36.js:1:215504)
+    at t.RPCProtocolImpl.handleRequest (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153425)
+    at c.requestHandler (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153001) 
+2026-05-05 18:16:47 [debug] : MonacoEditorModel.cancelSave {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.cancelSync {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.doSync - exit - cancelled while looking for a resource {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.doSync - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.fireDidChangeContent - enter - {
+  "changes": [
+    {
+      "range": {
+        "startLineNumber": 89,
+        "startColumn": 1,
+        "endLineNumber": 89,
+        "endColumn": 1
+      },
+      "rangeLength": 0,
+      "text": "17:50:57 INFO  : The updated bitstream files are copied from platform to folder 'C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor\\_ide\\bitstream' in project 'C:\\Users\\laptop\\Desktop\\DMA\\DMA.vitis\\backdoor'.\r\n17:55:23 INFO  : XSDB server has started successfully from frontend.\r\n17:55:23 INFO  : It has taken  4secs.\r\n17:55:24 INFO  : Connection to XSDB Server established.\r\n17:55:24 INFO  : It has taken  1secs.\r\n17:55:25 INFO  : Done\r\n17:55:40 INFO  : Connected to target on host '127.0.0.1' and port '3121'.\r\n17:55:40 INFO  : Connected to target on host '127.0.0.1' and port '3121'.\r\n17:55:40 INFO  : 'targets -set -filter {jtag_cable_name =~ \"Digilent Arty A7-100T 210319BE74CBA\" && level==0 && jtag_device_ctx==\"jsn-Arty A7-100T-210319BE74CBA-13631093-0\"}' command is executed.\r\n17:55:43 INFO  : Device configured successfully with \"C:/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/_ide/bitstream/download.bit\"\r\n",
+      "rangeOffset": 10254,
+      "forceMoveMarkers": true
+    }
+  ],
+  "eol": "\r\n",
+  "isEolChange": false,
+  "versionId": 14,
+  "isUndoing": false,
+  "isRedoing": false,
+  "isFlush": false
+} {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.markAsDirty - enter {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.markAsDirty - exit - ignoring dirty changes enabled {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.fireDidChangeContent - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:20:09 [debug] : MonacoEditorModel.doSync - exit {"0":"file:///c:/Users/laptop/Desktop/DMA/DMA.vitis/_ide/logs/vitis.log"}
+2026-05-05 18:40:04 [debug] : start navigation 1 
+2026-05-05 18:40:04 [debug] : end navigation 0 
+2026-05-05 18:40:04 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":19,"character":24}} 
+2026-05-05 18:40:04 [debug] : TypeError: Cannot read properties of undefined (reading 'replace')
+    at ee.onActiveLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:35:1404)
+    at Te.<computed> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:209:4816)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6138)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:8100)
+    at Ji.onLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6753)
+    at Ji.trigger (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6162)
+    at Ji.onTextEditorSelectionChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:4322)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at t.TextEditorsExtImpl.$acceptEditorPropertiesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\36.js:1:215504)
+    at t.RPCProtocolImpl.handleRequest (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153425)
+    at c.requestHandler (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153001) 
+2026-05-05 18:40:05 [debug] : start navigation 1 
+2026-05-05 18:40:05 [debug] : end navigation 0 
+2026-05-05 18:40:05 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":19,"character":42}} 
+2026-05-05 18:40:06 [debug] : start navigation 1 
+2026-05-05 18:40:06 [debug] : end navigation 0 
+2026-05-05 18:40:06 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":21,"character":26}} 
+2026-05-05 18:40:06 [debug] : TypeError: Cannot read properties of undefined (reading 'replace')
+    at ee.onActiveLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:35:1404)
+    at Te.<computed> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:209:4816)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6138)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:8100)
+    at Ji.onLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6753)
+    at Ji.trigger (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6162)
+    at Ji.onTextEditorSelectionChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:4322)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at t.TextEditorsExtImpl.$acceptEditorPropertiesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\36.js:1:215504)
+    at t.RPCProtocolImpl.handleRequest (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153425)
+    at c.requestHandler (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153001) 
+2026-05-05 18:40:14 [debug] : start navigation 1 
+2026-05-05 18:40:14 [debug] : end navigation 0 
+2026-05-05 18:40:14 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":43,"character":0}} 
+2026-05-05 18:40:14 [debug] : TypeError: Cannot read properties of undefined (reading 'replace')
+    at ee.onActiveLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:35:1404)
+    at Te.<computed> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:209:4816)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6138)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:8100)
+    at Ji.onLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6753)
+    at Ji.trigger (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6162)
+    at Ji.onTextEditorSelectionChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:4322)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at t.TextEditorsExtImpl.$acceptEditorPropertiesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\36.js:1:215504)
+    at t.RPCProtocolImpl.handleRequest (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153425)
+    at c.requestHandler (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153001) 
+2026-05-05 18:40:15 [debug] : start navigation 1 
+2026-05-05 18:40:15 [debug] : end navigation 0 
+2026-05-05 18:40:15 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":42,"character":23}} 
+2026-05-05 18:40:15 [debug] : TypeError: Cannot read properties of undefined (reading 'replace')
+    at ee.onActiveLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:35:1404)
+    at Te.<computed> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:209:4816)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6138)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:8100)
+    at Ji.onLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6753)
+    at Ji.trigger (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6162)
+    at Ji.onTextEditorSelectionChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:4322)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at t.TextEditorsExtImpl.$acceptEditorPropertiesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\36.js:1:215504)
+    at t.RPCProtocolImpl.handleRequest (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153425)
+    at c.requestHandler (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153001) 
+2026-05-05 18:40:37 [debug] : start navigation 1 
+2026-05-05 18:40:37 [debug] : end navigation 0 
+2026-05-05 18:40:37 [debug] : ending navigation with location {"uri":"file:///c%3A/Users/laptop/Desktop/DMA/DMA.vitis/backdoor/src/main.c","type":0,"context":{"line":48,"character":34}} 
+2026-05-05 18:40:37 [debug] : TypeError: Cannot read properties of undefined (reading 'replace')
+    at ee.onActiveLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:35:1404)
+    at Te.<computed> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:209:4816)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6138)
+    at Ji.fireLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:8100)
+    at Ji.onLinesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6753)
+    at Ji.trigger (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:6162)
+    at Ji.onTextEditorSelectionChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\plugins\eamodio-gitlens\extension\dist\gitlens.js:39:4322)
+    at C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126060
+    at s.invoke (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:126149)
+    at a.fire (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\69.js:2:127948)
+    at t.TextEditorsExtImpl.$acceptEditorPropertiesChanged (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\36.js:1:215504)
+    at t.RPCProtocolImpl.handleRequest (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153425)
+    at c.requestHandler (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\366.js:1:153001) 
+2026-05-05 18:53:31 [debug] : socket closed 
+2026-05-05 18:53:31 [debug] : closing connection for 1 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/localization-server'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/os'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/commands'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/logger'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/messageService'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/rigel-utils'. 
+2026-05-05 18:53:31 [debug] : [Rigel Utils Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/ChannelCloseService'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/remote-filesystem'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/envs'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/startup-workspace'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/rigel-workspace'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/workspace'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/keyboard'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/stopwatch'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/application'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/i18n'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/quickInput'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/project'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/component'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/feature-registry'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/debugger'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/debug'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/shell-terminal'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/quickPick'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/task'. 
+2026-05-05 18:53:31 [debug] : a client has disconnected - removed from list: 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/search'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hostedPlugin'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/plugin-ext'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/plugin-paths'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/vsx-environment'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/request-service'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/cli-preferences'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/server'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/repository'. 
+2026-05-05 18:53:31 [debug] : [Repository Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/program_flash'. 
+2026-05-05 18:53:31 [debug] : [Program Flash Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/build'. 
+2026-05-05 18:53:31 [debug] : [Build Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/notification'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path 'services/rigel-backend-helper'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/aie'. 
+2026-05-05 18:53:31 [debug] : [AIE Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/analysis'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/recent-summaries'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/rigel_explorer'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/linker-script'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/rigel-logger'. 
+2026-05-05 18:53:31 [debug] : [Logger Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/platform'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/vitis-hls'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/device'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/mini-browser-service'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/flow_navigator'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/common/data/info'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/common/file/service'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/report'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/dataflow/info'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/l1library/service'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/directive'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls_flow'. 
+2026-05-05 18:53:31 [debug] : [Hls Flow Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/search-in-workspace'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/open-ai/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/mcpservermanager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/languageModelRegistryDelegatePath'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/languageModelDelegatePath'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/rigel-ai/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/anthropic/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/google/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/huggingface/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/llamafilemanager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/ollama/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/vercel-ai/language-model-manager'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/config-file'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/elf-reader'. 
+2026-05-05 18:53:31 [debug] : [Elf Reader Server] Disposing objects in backend. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/project-utils'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/bootgen'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/cdo-utils'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/report-model'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls/wave/open'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/scanoss/service'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/hls-config'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/keyStore'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/languagePackService'. 
+2026-05-05 18:53:31 [debug] : Closing channel on service path '/services/terminals/510600603'. 
+2026-05-05 18:53:31 [debug] : Uncaught Exception:  {"0":"Error: spawn wmic.exe ENOENT"}
+2026-05-05 18:53:31 [debug] : Error: spawn wmic.exe ENOENT
+    at ChildProcess._handle.onexit (node:internal/child_process:286:19)
+    at onErrorNT (node:internal/child_process:484:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) 
+2026-05-05 18:53:31 [debug] : Uncaught Exception:  {"0":"TypeError: Cannot read properties of undefined (reading 'forEach')"}
+2026-05-05 18:53:31 [debug] : TypeError: Cannot read properties of undefined (reading 'forEach')
+    at Stream.<anonymous> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:4071231)
+    at Stream.emit (node:events:519:28)
+    at Stream.s (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:1543096)
+    at Stream.emit (node:events:531:35)
+    at I (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:4299347)
+    at i.write (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:4299702)
+    at Stream.ondata (node:internal/streams/legacy:21:31)
+    at Stream.emit (node:events:519:28)
+    at p (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:5693470)
+    at u.queue.u.push (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:5693687)
+    at u (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:2128932)
+    at Stream.<anonymous> (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:2129191)
+    at u.end (C:\AMDDesignTools\2025.2\Vitis\ide\electron-app\win64\resources\app\lib\backend\384.js:2:5693884)
+    at Socket.onend (node:internal/streams/readable:946:10)
+    at Object.onceWrapper (node:events:633:28)
+    at Socket.emit (node:events:531:35) 
+2026-05-07 17:07:59 [debug] : RIGEL SERVER Cannot send datagram packet to /10.105.255.255 
+2026-05-07 17:07:59 [debug] : RIGEL SERVER java.net.NoRouteToHostException: No route to host: sendto
+	at java.base/sun.nio.ch.DatagramChannelImpl.send0(Native Method)
+	at java.base/sun.nio.ch.DatagramChannelImpl.sendFromNativeBuffer(DatagramChannelImpl.java:1005)
+	at java.base/sun.nio.ch.DatagramChannelImpl.send(DatagramChannelImpl.java:966)
+	at java.base/sun.nio.ch.DatagramChannelImpl.send(DatagramChannelImpl.java:889)
+	at java.base/sun.nio.ch.DatagramChannelImpl.blockingSend(DatagramChannelImpl.java:952)
+	at java.base/sun.nio.ch.DatagramSocketAdaptor.send(DatagramSocketAdaptor.java:193)
+	at java.base/java.net.DatagramSocket.send(DatagramSocket.java:662)
+	at org.eclipse.tcf.internal.services.local.LocatorService.sendDatagramPacket(LocatorService.java:975)
+	at org.eclipse.tcf.internal.services.local.LocatorService.sendEmptyPacket(LocatorService.java:1121)
+	at org.eclipse.tcf.internal.services.local.LocatorService.sendAll(LocatorService.java:1139)
+	at org.eclipse.tcf.internal.services.local.LocatorService.refresh_timer(LocatorService.java:719)
+	at org.eclipse.tcf.internal.services.local.LocatorService$1$1.run(LocatorService.java:225)
+	at org.eclipse.tcf.protocol.Protocol$3.run(Protocol.java:230)
+	at org.eclipse.tcf.init.EventQueue.run(EventQueue.java:69)
+	at java.base/java.lang.Thread.run(Thread.java:1583) 
+2026-05-07 19:52:28 [debug] : RIGEL SERVER Cannot send datagram packet to /10.105.101.136 
+2026-05-07 19:52:28 [debug] : RIGEL SERVER java.net.SocketException: Network is unreachable: sendto 
+2026-05-07 19:52:28 [debug] : RIGEL SERVER at java.base/sun.nio.ch.DatagramChannelImpl.send0(Native Method)
+	at java.base/sun.nio.ch.DatagramChannelImpl.sendFromNativeBuffer(DatagramChannelImpl.java:1005) 
+2026-05-07 19:52:28 [debug] : RIGEL SERVER at java.base/sun.nio.ch.DatagramChannelImpl.send(DatagramChannelImpl.java:966)
+	at java.base/sun.nio.ch.DatagramChannelImpl.send(DatagramChannelImpl.java:889)
+	at java.base/sun.nio.ch.DatagramChannelImpl.blockingSend(DatagramChannelImpl.java:952)
+	at java.base/sun.nio.ch.DatagramSocketAdaptor.send(DatagramSocketAdaptor.java:193)
+	at java.base/java.net.DatagramSocket.send(DatagramSocket.java:662)
+	at org.eclipse.tcf.internal.services.local.LocatorService.sendDatagramPacket(LocatorService.java:975)
+	at org.eclipse.tcf.internal.services.local.LocatorService.sendPeersRequest(LocatorService.java:1066)
+	at org.eclipse.tcf.internal.services.local.LocatorService$7.run(LocatorService.java:751)
+	at org.eclipse.tcf.init.EventQueue.run(EventQueue.java:69)
+	at java.base/java.lang.Thread.run(Thread.java:1583) 

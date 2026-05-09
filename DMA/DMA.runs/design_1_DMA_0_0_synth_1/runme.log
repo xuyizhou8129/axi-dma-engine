@@ -1,0 +1,683 @@
+
+*** Running vivado
+    with args -log design_1_DMA_0_0.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source design_1_DMA_0_0.tcl
+
+
+
+****** Vivado v2025.2 (64-bit)
+  **** SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+  **** IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+  **** SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+  **** Start of session at: Mon May  4 18:25:24 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source design_1_DMA_0_0.tcl -notrace
+create_project: Time (s): cpu = 00:00:15 ; elapsed = 00:00:12 . Memory (MB): peak = 529.758 ; gain = 218.426
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository 'c:/Users/laptop/Desktop/NEW DMA IP'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/AMDDesignTools/2025.2/Vivado/data/ip'.
+Command: synth_design -top design_1_DMA_0_0 -part xc7a100tcsg324-1 -incremental_mode off -mode out_of_context
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 23944
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:08 ; elapsed = 00:00:09 . Memory (MB): peak = 1294.250 ; gain = 543.605
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-11067] parameter 'ADDR_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:7]
+WARNING: [Synth 8-11067] parameter 'DATA_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:8]
+WARNING: [Synth 8-11067] parameter 'LEN_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:9]
+WARNING: [Synth 8-11067] parameter 'DESC_WORDS' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:10]
+WARNING: [Synth 8-11067] parameter 'HANDLE_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:11]
+WARNING: [Synth 8-11067] parameter 'INSTR_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:12]
+WARNING: [Synth 8-11067] parameter 'DESCRIPTOR_SIZE_BYTES' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:17]
+WARNING: [Synth 8-11067] parameter 'MAX_INFLIGHT' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:18]
+WARNING: [Synth 8-11067] parameter 'RING_INDEX_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:19]
+WARNING: [Synth 8-11067] parameter 'MAX_SRAM_ADDR' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:24]
+WARNING: [Synth 8-11067] parameter 'DF_IN_FIFO_Q' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:29]
+WARNING: [Synth 8-11067] parameter 'DF_OUT_FIFO_Q' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:30]
+WARNING: [Synth 8-11067] parameter 'DM_FIFO_Q' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:31]
+WARNING: [Synth 8-11067] parameter 'MID_FIFO_Q' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:32]
+WARNING: [Synth 8-11067] parameter 'BRAM_SIZE' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:33]
+WARNING: [Synth 8-11067] parameter 'AXIL_ADDR_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:38]
+WARNING: [Synth 8-11067] parameter 'AXIL_DATA_WIDTH' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:39]
+WARNING: [Synth 8-11067] parameter 'REG_BASEADDR' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:42]
+WARNING: [Synth 8-11067] parameter 'REG_RINGLEN' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:43]
+WARNING: [Synth 8-11067] parameter 'REG_HEAD' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:44]
+WARNING: [Synth 8-11067] parameter 'REG_TAIL' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:45]
+WARNING: [Synth 8-11067] parameter 'REG_CTRL' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:46]
+WARNING: [Synth 8-11067] parameter 'REG_STATUS' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:47]
+WARNING: [Synth 8-11067] parameter 'REG_IRQ_STATUS' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:48]
+WARNING: [Synth 8-11067] parameter 'REG_IRQ_CLEAR' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:49]
+WARNING: [Synth 8-11067] parameter 'AXI_RESP_OKAY' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:51]
+WARNING: [Synth 8-11067] parameter 'AXI_RESP_SLVERR' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:52]
+WARNING: [Synth 8-11067] parameter 'INSTR_LEN_LSB' declared inside package 'dma_pkg' shall be treated as localparam [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_pkg.sv:58]
+INFO: [Synth 8-6157] synthesizing module 'design_1_DMA_0_0' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ip/design_1_DMA_0_0/synth/design_1_DMA_0_0.sv:53]
+INFO: [Synth 8-6157] synthesizing module 'vivado_config' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/vivado_config.sv:11]
+INFO: [Synth 8-6157] synthesizing module 'csr_soc_bus_if' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr_interfaces.sv:1]
+INFO: [Synth 8-6155] done synthesizing module 'csr_soc_bus_if' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr_interfaces.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'axi_4_if' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/axi_4_if.sv:5]
+INFO: [Synth 8-6155] done synthesizing module 'axi_4_if' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/axi_4_if.sv:5]
+INFO: [Synth 8-6157] synthesizing module 'dma_top' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_top.sv:8]
+WARNING: [Synth 8-330] inout connections inferred for interface port 'csr_soc_bus_if' with no modport [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/vivado_config.sv:134]
+INFO: [Synth 8-6157] synthesizing module 'csr_ring_manager_if' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr_interfaces.sv:65]
+INFO: [Synth 8-6155] done synthesizing module 'csr_ring_manager_if' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr_interfaces.sv:65]
+INFO: [Synth 8-6157] synthesizing module 'csr' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr.sv:1]
+WARNING: [Synth 8-330] inout connections inferred for interface port 'csr_soc_bus_if' with no modport [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_top.sv:43]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr.sv:192]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr.sv:309]
+INFO: [Synth 8-6155] done synthesizing module 'csr' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/csr.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'ring_manager' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/ring_manager.sv:8]
+INFO: [Synth 8-6155] done synthesizing module 'ring_manager' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/ring_manager.sv:8]
+INFO: [Synth 8-6157] synthesizing module 'IRQ' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/IRQ.sv:1]
+INFO: [Synth 8-6155] done synthesizing module 'IRQ' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/IRQ.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'movement_top' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/movement_top.sv:8]
+INFO: [Synth 8-6157] synthesizing module 'rm_df_if' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/rm_df_if.sv:7]
+INFO: [Synth 8-6155] done synthesizing module 'rm_df_if' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/rm_df_if.sv:7]
+INFO: [Synth 8-6157] synthesizing module 'descriptor_fetcher' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/descriptor_fetcher.sv:17]
+INFO: [Synth 8-155] case statement is not full and has no default [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/descriptor_fetcher.sv:129]
+INFO: [Synth 8-6155] done synthesizing module 'descriptor_fetcher' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/descriptor_fetcher.sv:17]
+INFO: [Synth 8-6157] synthesizing module 'axi_4_master' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/axi_4_master.sv:16]
+INFO: [Synth 8-6155] done synthesizing module 'axi_4_master' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/axi_4_master.sv:16]
+INFO: [Synth 8-6157] synthesizing module 'sram_controller' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sram_controller.sv:11]
+WARNING: [Synth 8-693] zero replication count - replication ignored [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sram_controller.sv:138]
+INFO: [Synth 8-6155] done synthesizing module 'sram_controller' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sram_controller.sv:11]
+INFO: [Synth 8-6157] synthesizing module 'bram' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/bram.sv:1]
+INFO: [Synth 8-6155] done synthesizing module 'bram' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/bram.sv:1]
+INFO: [Synth 8-6157] synthesizing module 'fifo' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-6155] done synthesizing module 'fifo' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6157] synthesizing module 'fifo__parameterized0' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Synth 8-226] default block is never used [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:20]
+INFO: [Common 17-14] Message 'Synth 8-226' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+INFO: [Synth 8-6155] done synthesizing module 'fifo__parameterized0' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6157] synthesizing module 'fifo__parameterized1' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6155] done synthesizing module 'fifo__parameterized1' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6157] synthesizing module 'data_mover' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/data_mover.sv:3]
+INFO: [Synth 8-6155] done synthesizing module 'data_mover' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/data_mover.sv:3]
+INFO: [Synth 8-6157] synthesizing module 'fifo__parameterized2' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6155] done synthesizing module 'fifo__parameterized2' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6157] synthesizing module 'fifo__parameterized3' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6155] done synthesizing module 'fifo__parameterized3' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/fifo.sv:2]
+INFO: [Synth 8-6155] done synthesizing module 'movement_top' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/movement_top.sv:8]
+INFO: [Synth 8-6155] done synthesizing module 'dma_top' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/dma_top.sv:8]
+INFO: [Synth 8-6157] synthesizing module 'sys_mem' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sys_mem.sv:12]
+INFO: [Synth 8-6155] done synthesizing module 'sys_mem' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sys_mem.sv:12]
+INFO: [Synth 8-6157] synthesizing module 'mem_access_ctrl' [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/mem_access_ctrl.sv:15]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/mem_access_ctrl.sv:160]
+INFO: [Synth 8-294] found qualifier unique on case statement: implementing as parallel_case [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/mem_access_ctrl.sv:218]
+INFO: [Synth 8-6155] done synthesizing module 'mem_access_ctrl' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/mem_access_ctrl.sv:15]
+INFO: [Synth 8-6155] done synthesizing module 'vivado_config' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/vivado_config.sv:11]
+INFO: [Synth 8-6155] done synthesizing module 'design_1_DMA_0_0' (0#1) [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ip/design_1_DMA_0_0/synth/design_1_DMA_0_0.sv:53]
+WARNING: [Synth 8-6014] Unused sequential element sw_rst_enable_reg was removed.  [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/ring_manager.sv:103]
+WARNING: [Synth 8-6014] Unused sequential element cur_write_reg was removed.  [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/axi_4_master.sv:93]
+WARNING: [Synth 8-6014] Unused sequential element cur_write_reg was removed.  [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sram_controller.sv:69]
+WARNING: [Synth 8-6014] Unused sequential element w_last_beat_reg was removed.  [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sys_mem.sv:120]
+WARNING: [Synth 8-7137] Register ram_reg in module sys_mem has both Set and reset with same priority. This may cause simulation mismatches. Consider rewriting code 
+WARNING: [Synth 8-4767] Trying to implement RAM 'ram_reg' in registers. Block RAM or DRAM implementation is not possible; see log for reasons. [c:/Users/laptop/Desktop/DMA/DMA.gen/sources_1/bd/design_1/ipshared/b86a/src/sys_mem.sv:139]
+Reason is one or more of the following :
+	1: Invalid write to RAM. 
+	2: RAM is sensitive to asynchronous reset signal. this RTL style is not supported. 
+	3: Invalid write to RAM. 
+INFO: [Synth 8-7129] Port awprot[2] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port awprot[1] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port awprot[0] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[31] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[30] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[29] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[28] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[27] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[26] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[25] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[24] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[23] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[22] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[21] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[20] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[19] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[18] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[17] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[16] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[15] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[14] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[13] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[12] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[11] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[10] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[9] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port araddr[8] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port arprot[2] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port arprot[1] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port arprot[0] in module mem_access_ctrl is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[7] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[6] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[5] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[4] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[3] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[2] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[1] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.awlen[0] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[31] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[30] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[29] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[28] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[27] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[26] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[25] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[24] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[23] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[22] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[21] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[20] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[19] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[18] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[17] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[16] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[15] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[14] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[13] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[12] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[11] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[10] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[1] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port init_addr[0] in module sys_mem is either unconnected or has no load
+INFO: [Synth 8-7129] Port dm_in_dout[1] in module sram_controller is either unconnected or has no load
+INFO: [Synth 8-7129] Port dm_in_dout[0] in module sram_controller is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.clk in module axi_4_master is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.rst_n in module axi_4_master is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.bresp[1] in module axi_4_master is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.bresp[0] in module axi_4_master is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.rresp[1] in module axi_4_master is either unconnected or has no load
+INFO: [Synth 8-7129] Port axi\.rresp[0] in module axi_4_master is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.awprot[2] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.awprot[1] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.awprot[0] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[31] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[30] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[29] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[28] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[27] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[26] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[25] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[24] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[23] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[22] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[21] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[20] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[19] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[18] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[17] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[16] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[15] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[14] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[13] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[12] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[11] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[10] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[9] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.araddr[8] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.arprot[2] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.arprot[1] in module csr is either unconnected or has no load
+INFO: [Synth 8-7129] Port soc_bus\.arprot[0] in module csr is either unconnected or has no load
+INFO: [Common 17-14] Message 'Synth 8-7129' appears 100 times and further instances of the messages will be disabled. Use the Tcl command set_msg_config to change the current settings.
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:12 ; elapsed = 00:00:13 . Memory (MB): peak = 1479.105 ; gain = 728.461
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1479.105 ; gain = 728.461
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:13 ; elapsed = 00:00:13 . Memory (MB): peak = 1479.105 ; gain = 728.461
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.349 . Memory (MB): peak = 1479.105 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.012 . Memory (MB): peak = 1561.133 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.664 . Memory (MB): peak = 1561.133 ; gain = 0.000
+INFO: [Designutils 20-5008] Incremental synthesis strategy off
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 1561.133 ; gain = 810.488
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a100tcsg324-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 1561.133 ; gain = 810.488
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:30 ; elapsed = 00:00:30 . Memory (MB): peak = 1561.133 ; gain = 810.488
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'descriptor_fetcher'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'axi_4_master'
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'sram_controller'
+INFO: [Synth 8-802] inferred FSM for state register 'r_state_reg' in module 'sys_mem'
+INFO: [Synth 8-802] inferred FSM for state register 'w_state_reg' in module 'sys_mem'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                s_normal |                                0 |                               01
+                 s_error |                                1 |                               00
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'descriptor_fetcher'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  s_idle |                             0000 |                             0000
+                s_df_get |                             0001 |                             0001
+                 s_df_ar |                             0010 |                             0010
+                  s_df_r |                             0011 |                             0011
+               s_df_push |                             0100 |                             0100
+                s_dm_get |                             0101 |                             0101
+              s_dm_wr_aw |                             0110 |                             1000
+               s_dm_wr_w |                             0111 |                             1001
+               s_dm_wr_b |                             1000 |                             1010
+              s_dm_rd_ar |                             1001 |                             0110
+               s_dm_rd_r |                             1010 |                             0111
+             s_wait_sram |                             1011 |                             1011
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'axi_4_master'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  s_idle |                              000 |                              000
+                s_dm_get |                              001 |                              001
+               s_writing |                              010 |                              010
+               s_reading |                              011 |                              011
+       s_wait_axi4master |                              100 |                              100
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'sram_controller'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  W_IDLE |                              001 |                               00
+                  W_DATA |                              010 |                               01
+                  W_RESP |                              100 |                               10
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'w_state_reg' using encoding 'one-hot' in module 'sys_mem'
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+                  R_IDLE |                                0 |                               00
+                 R_ISSUE |                                1 |                               01
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'r_state_reg' using encoding 'sequential' in module 'sys_mem'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:49 ; elapsed = 00:00:52 . Memory (MB): peak = 1561.133 ; gain = 810.488
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   3 Input   33 Bit       Adders := 1     
+	   2 Input   32 Bit       Adders := 3     
+	   2 Input   31 Bit       Adders := 3     
+	   2 Input    8 Bit       Adders := 6     
+	   2 Input    7 Bit       Adders := 9     
+	   2 Input    5 Bit       Adders := 9     
+	   2 Input    3 Bit       Adders := 1     
++---Registers : 
+	              128 Bit    Registers := 5     
+	               65 Bit    Registers := 4     
+	               40 Bit    Registers := 2     
+	               32 Bit    Registers := 276   
+	                8 Bit    Registers := 8     
+	                7 Bit    Registers := 6     
+	                5 Bit    Registers := 6     
+	                4 Bit    Registers := 2     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 4     
+	                1 Bit    Registers := 29    
++---RAMs : 
+	              32K Bit	(1024 X 32 bit)          RAMs := 1     
+	               8K Bit	(64 X 128 bit)          RAMs := 1     
+	               2K Bit	(64 X 40 bit)          RAMs := 1     
+	               2K Bit	(16 X 128 bit)          RAMs := 1     
+	               2K Bit	(64 X 32 bit)          RAMs := 1     
+	               1K Bit	(16 X 65 bit)          RAMs := 2     
++---Muxes : 
+	   3 Input 8192 Bit        Muxes := 1     
+	   2 Input  128 Bit        Muxes := 2     
+	  12 Input  128 Bit        Muxes := 2     
+	   2 Input   65 Bit        Muxes := 2     
+	   3 Input   32 Bit        Muxes := 1     
+	   2 Input   32 Bit        Muxes := 29    
+	  12 Input   32 Bit        Muxes := 2     
+	   5 Input   32 Bit        Muxes := 3     
+	   4 Input   32 Bit        Muxes := 2     
+	   2 Input   10 Bit        Muxes := 4     
+	   5 Input   10 Bit        Muxes := 1     
+	   3 Input    8 Bit        Muxes := 1     
+	   2 Input    8 Bit        Muxes := 6     
+	  12 Input    8 Bit        Muxes := 2     
+	   5 Input    8 Bit        Muxes := 1     
+	  12 Input    4 Bit        Muxes := 1     
+	   2 Input    4 Bit        Muxes := 3     
+	   2 Input    3 Bit        Muxes := 3     
+	   5 Input    3 Bit        Muxes := 1     
+	   2 Input    2 Bit        Muxes := 3     
+	   4 Input    2 Bit        Muxes := 1     
+	   3 Input    1 Bit        Muxes := 4     
+	   2 Input    1 Bit        Muxes := 38    
+	   7 Input    1 Bit        Muxes := 1     
+	  12 Input    1 Bit        Muxes := 15    
+	   5 Input    1 Bit        Muxes := 6     
+	   4 Input    1 Bit        Muxes := 5     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 240 (col length:80)
+BRAMs: 270 (col length: RAMB18 80 RAMB36 40)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-3332] Sequential element (u_movement/u_df/FSM_sequential_state_reg) is unused and will be removed from module dma_top.
+INFO: [Synth 8-3886] merging instance 'axi\.bresp_reg[0]' (FDCE) to 'axi\.bresp_reg[1]'
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\axi\.bresp_reg[1] )
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:44 ; elapsed = 00:02:07 . Memory (MB): peak = 1662.684 ; gain = 912.039
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping Report (see note below)
++------------------+-------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name       | RTL Object                                | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------------+-------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|insti_9/u_dma_top | u_movement/u_bram/mem_reg                 | 1 K x 32(READ_FIRST)   | W |   | 1 K x 32(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
+|insti_9/u_dma_top | u_movement/u_df_out_fifo/fifo_buf_reg     | 64 x 128(READ_FIRST)   | W |   | 64 x 128(WRITE_FIRST)  |   | R | Port A and B     | 0      | 2      | 
+|insti_9/u_dma_top | u_movement/u_desc_to_dm_fifo/fifo_buf_reg | 16 x 128(READ_FIRST)   | W |   | 16 x 128(WRITE_FIRST)  |   | R | Port A and B     | 0      | 2      | 
+|insti_9/u_dma_top | u_movement/u_dm_fifo_sram/fifo_buf_reg    | 16 x 65(READ_FIRST)    | W |   | 16 x 65(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|insti_9/u_dma_top | u_movement/u_mid_fifo/fifo_buf_reg        | 64 x 32(READ_FIRST)    | W |   | 64 x 32(WRITE_FIRST)   |   | R | Port A and B     | 1      | 0      | 
+|insti_9/u_dma_top | u_movement/u_df_in_fifo/fifo_buf_reg      | 64 x 40(READ_FIRST)    | W |   | 64 x 40(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|insti_9/u_dma_top | u_movement/u_dm_fifo_axi/fifo_buf_reg     | 16 x 65(READ_FIRST)    | W |   | 16 x 65(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
++------------------+-------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:46 ; elapsed = 00:02:09 . Memory (MB): peak = 1662.684 ; gain = 912.039
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping Report
++------------------+-------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name       | RTL Object                                | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------------+-------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|insti_9/u_dma_top | u_movement/u_bram/mem_reg                 | 1 K x 32(READ_FIRST)   | W |   | 1 K x 32(WRITE_FIRST)  |   | R | Port A and B     | 0      | 1      | 
+|insti_9/u_dma_top | u_movement/u_df_out_fifo/fifo_buf_reg     | 64 x 128(READ_FIRST)   | W |   | 64 x 128(WRITE_FIRST)  |   | R | Port A and B     | 0      | 2      | 
+|insti_9/u_dma_top | u_movement/u_desc_to_dm_fifo/fifo_buf_reg | 16 x 128(READ_FIRST)   | W |   | 16 x 128(WRITE_FIRST)  |   | R | Port A and B     | 0      | 2      | 
+|insti_9/u_dma_top | u_movement/u_dm_fifo_sram/fifo_buf_reg    | 16 x 65(READ_FIRST)    | W |   | 16 x 65(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|insti_9/u_dma_top | u_movement/u_mid_fifo/fifo_buf_reg        | 64 x 32(READ_FIRST)    | W |   | 64 x 32(WRITE_FIRST)   |   | R | Port A and B     | 1      | 0      | 
+|insti_9/u_dma_top | u_movement/u_df_in_fifo/fifo_buf_reg      | 64 x 40(READ_FIRST)    | W |   | 64 x 40(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
+|insti_9/u_dma_top | u_movement/u_dm_fifo_axi/fifo_buf_reg     | 16 x 65(READ_FIRST)    | W |   | 16 x 65(WRITE_FIRST)   |   | R | Port A and B     | 0      | 1      | 
++------------------+-------------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_bram/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_df_out_fifo/fifo_buf_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_df_out_fifo/fifo_buf_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_desc_to_dm_fifo/fifo_buf_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_desc_to_dm_fifo/fifo_buf_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_dm_fifo_sram/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_mid_fifo/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_df_in_fifo/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance insti_9/u_dma_top/u_movement/u_dm_fifo_axi/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:55 ; elapsed = 00:02:28 . Memory (MB): peak = 1662.684 ; gain = 912.039
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_bram/mem_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_df_out_fifo/fifo_buf_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_df_out_fifo/fifo_buf_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_desc_to_dm_fifo/fifo_buf_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_desc_to_dm_fifo/fifo_buf_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_dm_fifo_sram/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_mid_fifo/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_df_in_fifo/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance inst/u_dma_top/u_movement/u_dm_fifo_axi/fifo_buf_reg (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:02:06 ; elapsed = 00:02:40 . Memory (MB): peak = 1775.531 ; gain = 1024.887
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:02:07 ; elapsed = 00:02:41 . Memory (MB): peak = 1775.531 ; gain = 1024.887
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:02:10 ; elapsed = 00:02:44 . Memory (MB): peak = 1785.148 ; gain = 1034.504
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:02:21 ; elapsed = 00:02:56 . Memory (MB): peak = 1785.148 ; gain = 1034.504
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:02:25 ; elapsed = 00:03:00 . Memory (MB): peak = 1805.078 ; gain = 1054.434
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:02:25 ; elapsed = 00:03:00 . Memory (MB): peak = 1805.078 ; gain = 1054.434
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |CARRY4   |    63|
+|2     |LUT1     |    46|
+|3     |LUT2     |   304|
+|4     |LUT3     |  1151|
+|5     |LUT4     |   949|
+|6     |LUT5     | 12216|
+|7     |LUT6     | 21847|
+|8     |MUXF7    |  4352|
+|9     |MUXF8    |  2176|
+|10    |RAMB18E1 |     1|
+|11    |RAMB36E1 |     8|
+|12    |FDCE     |  1122|
+|13    |FDPE     |     7|
+|14    |FDRE     |  8309|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:02:25 ; elapsed = 00:03:00 . Memory (MB): peak = 1805.078 ; gain = 1054.434
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 1 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:02:04 ; elapsed = 00:02:53 . Memory (MB): peak = 1805.078 ; gain = 972.406
+Synthesis Optimization Complete : Time (s): cpu = 00:02:25 ; elapsed = 00:03:01 . Memory (MB): peak = 1805.078 ; gain = 1054.434
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.758 . Memory (MB): peak = 1834.184 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 6600 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.027 . Memory (MB): peak = 1978.719 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Synth Design complete | Checksum: 1ed4078d
+INFO: [Common 17-83] Releasing license: Synthesis
+301 Infos, 38 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:02:49 ; elapsed = 00:03:28 . Memory (MB): peak = 1978.719 ; gain = 1429.004
+Write ShapeDB Complete: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.078 . Memory (MB): peak = 1978.719 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/laptop/Desktop/DMA/DMA.runs/design_1_DMA_0_0_synth_1/design_1_DMA_0_0.dcp' has been generated.
+write_vhdl: Time (s): cpu = 00:00:22 ; elapsed = 00:00:22 . Memory (MB): peak = 1978.719 ; gain = 0.000
+INFO: [Coretcl 2-1648] Added synthesis output to IP cache for IP design_1_DMA_0_0, cache-ID = a3cfb5a98cf32410
+INFO: [Coretcl 2-1174] Renamed 19 cell refs.
+Write ShapeDB Complete: Time (s): cpu = 00:00:01 ; elapsed = 00:00:00.097 . Memory (MB): peak = 1978.719 ; gain = 0.000
+INFO: [Common 17-1381] The checkpoint 'C:/Users/laptop/Desktop/DMA/DMA.runs/design_1_DMA_0_0_synth_1/design_1_DMA_0_0.dcp' has been generated.
+INFO: [Vivado 12-24828] Executing command : report_utilization -file design_1_DMA_0_0_utilization_synth.rpt -pb design_1_DMA_0_0_utilization_synth.pb
+write_vhdl: Time (s): cpu = 00:00:16 ; elapsed = 00:00:16 . Memory (MB): peak = 1978.719 ; gain = 0.000
+INFO: [Common 17-206] Exiting Vivado at Mon May  4 18:30:06 2026...

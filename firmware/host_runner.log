@@ -1,0 +1,18 @@
+
+  AXI DMA Engine  ·  Host Runner
+Traceback (most recent call last):
+  File "C:\Users\laptop\desktop\axi-dma-engine\firmware\host_runner.py", line 465, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\laptop\desktop\axi-dma-engine\firmware\host_runner.py", line 421, in main
+    _sep()
+    ~~~~^^
+Traceback (most recent call last):
+  File "C:\Users\laptop\desktop\axi-dma-engine\firmware\host_runner.py", line 465, in <module>
+    main()
+  File "C:\Users\laptop\desktop\axi-dma-engine\firmware\host_runner.py", line 421, in main
+    _sep()
+  File "C:\Users\laptop\desktop\axi-dma-engine\firmware\host_runner.py", line 23, in _sep
+      File "C:\Users\laptop\AppData\Local\Python\pythoncore-3.14-64\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 0-55: character maps to <undefined>

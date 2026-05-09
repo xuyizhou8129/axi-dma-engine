@@ -1,0 +1,4 @@
+domain_path: C:\Users\laptop\Desktop\DMA\DMA_Mike.vitis\Mike_platform\export\Mike_platform\sw\standalone_microblaze_0
+app_src_dir: C:\AMDDesignTools\2025.2\Vitis\data\embeddedsw\lib\sw_apps\empty_application
+template: empty_application
+lang: c

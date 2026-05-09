@@ -1,0 +1,6 @@
+create libxil.a
+addlib C:/Users/laptop/Desktop/DMA/DMA.vitis/DMA_platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/build_configs/gen_bsp/libsrc/uartlite/src/libuartlite.a
+addlib C:/Users/laptop/Desktop/DMA/DMA.vitis/DMA_platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/build_configs/gen_bsp/libsrc/intc/src/libintc.a
+addlib C:/Users/laptop/Desktop/DMA/DMA.vitis/DMA_platform/microblaze_0/standalone_microblaze_0/bsp/libsrc/build_configs/gen_bsp/libsrc/bram/src/libbram.a
+save
+end

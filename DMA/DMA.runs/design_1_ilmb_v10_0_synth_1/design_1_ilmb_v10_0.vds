@@ -1,0 +1,30 @@
+#-----------------------------------------------------------
+# Vivado v2025.2 (64-bit)
+# SW Build 6299465 on Fri Nov 14 19:35:11 GMT 2025
+# IP Build 6300035 on Fri Nov 14 10:48:45 MST 2025
+# SharedData Build 6298862 on Thu Nov 13 04:50:51 MST 2025
+# Start of session at: Tue May  5 09:27:45 2026
+# Process ID         : 8232
+# Current directory  : C:/Users/laptop/Desktop/DMA/DMA.runs/design_1_ilmb_v10_0_synth_1
+# Command line       : vivado.exe -log design_1_ilmb_v10_0.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source design_1_ilmb_v10_0.tcl
+# Log file           : C:/Users/laptop/Desktop/DMA/DMA.runs/design_1_ilmb_v10_0_synth_1/design_1_ilmb_v10_0.vds
+# Journal file       : C:/Users/laptop/Desktop/DMA/DMA.runs/design_1_ilmb_v10_0_synth_1\vivado.jou
+# Running On         : NUL-LENDLAP97
+# Platform           : Windows Server 2016 or Windows 10
+# Operating System   : 26100
+# Processor Detail   : 11th Gen Intel(R) Core(TM) i5-1145G7 @ 2.60GHz
+# CPU Frequency      : 1498 MHz
+# CPU Physical cores : 4
+# CPU Logical cores  : 8
+# Host memory        : 16888 MB
+# Swap memory        : 10063 MB
+# Total Virtual      : 26952 MB
+# Available Virtual  : 5157 MB
+#-----------------------------------------------------------
+source design_1_ilmb_v10_0.tcl -notrace
+create_project: Time (s): cpu = 00:00:20 ; elapsed = 00:00:16 . Memory (MB): peak = 528.953 ; gain = 218.344
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1700] Loaded user IP repository 'c:/Users/laptop/Desktop/NEW DMA IP'.
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/AMDDesignTools/2025.2/Vivado/data/ip'.
+INFO: [IP_Flow 19-4838] Using cached IP synthesis design for IP design_1_ilmb_v10_0, cache-ID = 6dbf761642e9520c.
+INFO: [Common 17-206] Exiting Vivado at Tue May  5 09:28:12 2026...
