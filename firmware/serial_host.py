@@ -611,6 +611,9 @@ def main():
         print("[DBG] SMEM after DMA (source should be unchanged @ 0x100):")
         for off in [0x100, 0x104, 0x108, 0x10C]:
             print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
+        print("[DBG] SMEM descriptor ring after DMA (check for DMA writeback @ 0x000):")
+        for off in [0x000, 0x004, 0x008, 0x00C]:
+            print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
 
         # 6. Request CRC32 from firmware and compare against golden.
         got_smem_crc = host.smem_crc(0, len(smem_words) * 4)
