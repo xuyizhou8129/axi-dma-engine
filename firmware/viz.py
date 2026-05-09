@@ -1,247 +1,250 @@
 """
-Turtle visualization for the AXI DMA host runner.
+Live Rich visualization for the AXI DMA host runner.
 
-Reads JSON events (one per line) from stdin and draws a 2x2 grid:
-    Expected SRAM | Expected SMEM
-    Actual   SRAM | Actual   SMEM
+Spawns host_runner.py as a subprocess (with --viz) and captures its stdout.
+Lines prefixed with `<<EVENT>>` are JSON events that update the live tables;
+all other lines flow into a log panel.
 
-Each cell shows `addr : value`. Actual cells start empty, fill in as
-host_runner reads them back, then turn green sequentially when the CRC matches.
+Layout:
+    ┌──────────── header ────────────┐
+    │ Expected SRAM │ Expected SMEM  │
+    ├───────────────┼────────────────┤
+    │ Actual   SRAM │ Actual   SMEM  │
+    ├──────────────── log ───────────┤
+    │ host_runner output             │
+    └────────────────────────────────┘
 
-Events:
-    {"type": "header",   "label": "..."}
-    {"type": "expected", "region": "sram"|"smem", "cells": [[addr, val], ...]}
-    {"type": "actual",   "region": "sram"|"smem", "addr": int, "value": int}
-    {"type": "match",    "region": "sram"|"smem", "addr": int}
-    {"type": "fail",     "region": "sram"|"smem", "addr": int}
+Usage:
+    python firmware/viz.py [--port COM5] [--stim path/to/stim.txt] [other host_runner args]
+
+Requires: rich  (pip install rich)
 """
+import argparse
 import json
-import queue
+import os
+import re
+import subprocess
 import sys
 import threading
-import turtle
+import time
+
+from rich.align import Align
+from rich.console import Console
+from rich.layout import Layout
+from rich.live import Live
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
 
-# ── Layout ───────────────────────────────────────────────────────────────────
-WIN_W, WIN_H = 940, 640
-QUAD_W, QUAD_H = 430, 250
-HEADER_H = 30
-CELL_H, CELL_GAP, PAD = 28, 2, 8
-TITLE_H = 40
-
-TITLE_FONT = ("Courier", 14, "bold")
-LABEL_FONT = ("Courier", 12, "bold")
-CELL_FONT  = ("Courier", 11, "normal")
-
-# Colors
-COL_HEAD_EXP = "#4682B4"   # steel blue
-COL_HEAD_ACT = "#DAA520"   # goldenrod
-COL_CELL_EXP = "#E6F0FA"
-COL_CELL_ACT = "#FFF8DC"
-COL_CELL_OK  = "#90EE90"
-COL_CELL_BAD = "#F08080"
-COL_BODY     = "#F8F8F8"
-COL_BORDER   = "#888888"
-COL_TEXT     = "#202020"
-COL_TEXT_HD  = "#FFFFFF"
-
-# Top-left of each quadrant in turtle coords (origin = window center, +y up)
-def _qtl(col, row):
-    x0 = -WIN_W // 2 + 20
-    y0 =  WIN_H // 2 - TITLE_H - 20
-    return (x0 + col * (QUAD_W + 20), y0 - row * (QUAD_H + 20))
-
-QUADS = {
-    ("expected", "sram"): _qtl(0, 0),
-    ("expected", "smem"): _qtl(1, 0),
-    ("actual",   "sram"): _qtl(0, 1),
-    ("actual",   "smem"): _qtl(1, 1),
-}
-LABELS = {
-    ("expected", "sram"): "Expected  SRAM",
-    ("expected", "smem"): "Expected  SMEM",
-    ("actual",   "sram"): "Actual    SRAM",
-    ("actual",   "smem"): "Actual    SMEM",
-}
-
+EVENT_PREFIX = "<<EVENT>> "
+LOG_MAX = 14
+SWEEP_DELAY = 0.20  # seconds between match/fail renders
 
 # ── State ────────────────────────────────────────────────────────────────────
-cells = {}          # (kind, region, addr) -> {idx, addr, value, status}
-events_q = queue.Queue()
-match_q = []        # rate-limited render queue for match/fail events
-match_busy = False
-screen = None
-draw = None
-title_t = None
+state = {
+    ("expected", "sram"): [],
+    ("expected", "smem"): [],
+    ("actual",   "sram"): [],
+    ("actual",   "smem"): [],
+}
+header_text = "AXI DMA  ·  Live Validation"
+log_lines = []
+state_lock = threading.Lock()
+
+_ANSI_RE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+def strip_ansi(s):
+    return _ANSI_RE.sub('', s)
 
 
-# ── Drawing primitives ───────────────────────────────────────────────────────
-def _rect(t, x, y, w, h, fill, outline=None):
-    t.color(outline or fill, fill)
-    t.penup(); t.goto(x, y); t.pendown()
-    t.begin_fill()
-    t.goto(x + w, y); t.goto(x + w, y - h); t.goto(x, y - h); t.goto(x, y)
-    t.end_fill(); t.penup()
+# ── Rendering ────────────────────────────────────────────────────────────────
+def make_table(kind, region):
+    title  = f"{kind.title()}  {region.upper()}"
+    border = "blue" if kind == "expected" else "yellow"
+    t = Table(title=title, border_style=border, header_style="bold",
+              expand=True, pad_edge=False, show_edge=True)
+    t.add_column("Address", style="cyan", no_wrap=True, width=10)
+    t.add_column("Value",   no_wrap=True)
+    if kind == "actual":
+        t.add_column(" ", width=2, no_wrap=True, justify="center")
 
-def _text(t, x, y, s, color, font, align="left"):
-    t.penup(); t.goto(x, y); t.color(color)
-    t.write(s, align=align, font=font)
+    with state_lock:
+        cells = list(state[(kind, region)])
 
+    if not cells:
+        if kind == "actual":
+            t.add_row("[dim]—[/dim]", "[dim]waiting…[/dim]", "")
+        else:
+            t.add_row("[dim]—[/dim]", "[dim]waiting…[/dim]")
+        return t
 
-def setup_screen():
-    global screen, draw, title_t
-    screen = turtle.Screen()
-    screen.setup(WIN_W, WIN_H)
-    screen.title("AXI DMA — Live Validation")
-    screen.bgcolor("white")
-    screen.tracer(0)
-    draw = turtle.Turtle(); draw.hideturtle(); draw.speed(0); draw.penup()
-    title_t = turtle.Turtle(); title_t.hideturtle(); title_t.penup()
-
-
-def draw_quadrant(kind, region):
-    qx, qy = QUADS[(kind, region)]
-    head_color = COL_HEAD_EXP if kind == "expected" else COL_HEAD_ACT
-    _rect(draw, qx, qy, QUAD_W, HEADER_H, head_color)
-    _text(draw, qx + QUAD_W // 2, qy - HEADER_H + 7,
-          LABELS[(kind, region)], COL_TEXT_HD, LABEL_FONT, align="center")
-    _rect(draw, qx, qy - HEADER_H, QUAD_W, QUAD_H - HEADER_H, COL_BODY, outline=COL_BORDER)
-
-
-def draw_title(text):
-    title_t.clear()
-    title_t.color(COL_TEXT)
-    title_t.goto(0, WIN_H // 2 - 28)
-    title_t.write(text, align="center", font=TITLE_FONT)
-
-
-def cell_pos(kind, region, idx):
-    qx, qy = QUADS[(kind, region)]
-    body_top = qy - HEADER_H - PAD
-    return (qx + PAD, body_top - idx * (CELL_H + CELL_GAP),
-            QUAD_W - 2 * PAD, CELL_H)
+    for cell in cells:
+        addr_s = f"0x{cell['addr']:04X}"
+        if kind == "expected":
+            t.add_row(addr_s, f"0x{cell['value']:08X}")
+        else:
+            status = cell["status"]
+            if status == "pending":
+                t.add_row(addr_s, "[dim]────────────[/dim]", "")
+            elif status == "filled":
+                t.add_row(addr_s, f"[yellow]0x{cell['value']:08X}[/yellow]", "")
+            elif status == "match":
+                v = cell["value"] if cell["value"] is not None else 0
+                t.add_row(addr_s, f"[bold green]0x{v:08X}[/bold green]",
+                          "[bold green]✓[/bold green]")
+            elif status == "fail":
+                v = cell["value"] if cell["value"] is not None else 0
+                t.add_row(addr_s, f"[bold red]0x{v:08X}[/bold red]",
+                          "[bold red]✗[/bold red]")
+    return t
 
 
-def draw_cell(kind, region, idx, addr, value, fill):
-    x, y, w, h = cell_pos(kind, region, idx)
-    _rect(draw, x, y, w, h, fill, outline=COL_BORDER)
-    text = (f"0x{addr:04X}  :  0x{value:08X}" if value is not None
-            else f"0x{addr:04X}  :  --------")
-    _text(draw, x + PAD, y - h + 7, text, COL_TEXT, CELL_FONT)
+def make_log_panel():
+    with state_lock:
+        recent = log_lines[-LOG_MAX:]
+        text = "\n".join(recent) if recent else "[dim]waiting for host_runner…[/dim]"
+    return Panel(Text.from_markup(text), title="host_runner log",
+                 border_style="dim", padding=(0, 1))
 
 
-def clear_body(kind, region):
-    qx, qy = QUADS[(kind, region)]
-    _rect(draw, qx, qy - HEADER_H, QUAD_W, QUAD_H - HEADER_H, COL_BODY, outline=COL_BORDER)
+def make_header_panel():
+    return Panel(Align.center(Text(header_text, style="bold cyan")),
+                 style="cyan", padding=0)
+
+
+def make_layout():
+    layout = Layout()
+    layout.split_column(
+        Layout(make_header_panel(), size=3, name="head"),
+        Layout(name="body", ratio=4),
+        Layout(make_log_panel(), size=LOG_MAX + 2, name="log"),
+    )
+    layout["body"].split_row(Layout(name="left"), Layout(name="right"))
+    layout["body"]["left"].split_column(
+        Layout(make_table("expected", "sram")),
+        Layout(make_table("actual",   "sram")),
+    )
+    layout["body"]["right"].split_column(
+        Layout(make_table("expected", "smem")),
+        Layout(make_table("actual",   "smem")),
+    )
+    return layout
 
 
 # ── Event handlers ───────────────────────────────────────────────────────────
 def on_header(ev):
-    draw_title(ev.get("label", "AXI DMA — Live Validation"))
-
+    global header_text
+    header_text = ev.get("label", header_text)
 
 def on_expected(ev):
     region = ev["region"]
-    cell_list = ev["cells"]
-    # Reset both expected and actual sides of this region
-    for kind in ("expected", "actual"):
-        clear_body(kind, region)
-        for k in [k for k in cells if k[0] == kind and k[1] == region]:
-            del cells[k]
-    for idx, (addr, val) in enumerate(cell_list):
-        cells[("expected", region, addr)] = {
-            "idx": idx, "addr": addr, "value": val, "status": "shown"}
-        cells[("actual", region, addr)] = {
-            "idx": idx, "addr": addr, "value": None, "status": "pending"}
-        draw_cell("expected", region, idx, addr, val, COL_CELL_EXP)
-
+    cells_list = ev["cells"]
+    with state_lock:
+        state[("expected", region)] = [
+            {"addr": a, "value": v, "status": "shown"} for a, v in cells_list]
+        state[("actual", region)] = [
+            {"addr": a, "value": None, "status": "pending"} for a, _ in cells_list]
 
 def on_actual(ev):
     region, addr, value = ev["region"], ev["addr"], ev["value"]
-    key = ("actual", region, addr)
-    if key not in cells:
-        idx = sum(1 for k in cells if k[0] == "actual" and k[1] == region)
-        cells[key] = {"idx": idx, "addr": addr, "value": value, "status": "filled"}
-    else:
-        cells[key]["value"] = value
-        cells[key]["status"] = "filled"
-    c = cells[key]
-    draw_cell("actual", region, c["idx"], c["addr"], c["value"], COL_CELL_ACT)
+    with state_lock:
+        for c in state[("actual", region)]:
+            if c["addr"] == addr:
+                c["value"] = value
+                c["status"] = "filled"
+                return
+        state[("actual", region)].append(
+            {"addr": addr, "value": value, "status": "filled"})
 
-
-def _render_terminal(ev, color):
+def on_terminal(ev, status):
     region, addr = ev["region"], ev["addr"]
-    key = ("actual", region, addr)
-    if key in cells:
-        c = cells[key]
-        c["status"] = "match" if color == COL_CELL_OK else "fail"
-        draw_cell("actual", region, c["idx"], c["addr"], c["value"] or 0, color)
-
-
-def _drain_match():
-    """Render queued match/fail events one at a time so the sweep is visible."""
-    global match_busy
-    if not match_q:
-        match_busy = False
-        return
-    ev = match_q.pop(0)
-    color = COL_CELL_OK if ev["type"] == "match" else COL_CELL_BAD
-    _render_terminal(ev, color)
-    screen.update()
-    screen.ontimer(_drain_match, 200)
-
-
-def on_match_or_fail(ev):
-    global match_busy
-    match_q.append(ev)
-    if not match_busy:
-        match_busy = True
-        screen.ontimer(_drain_match, 0)
-
+    with state_lock:
+        for c in state[("actual", region)]:
+            if c["addr"] == addr:
+                c["status"] = status
+                return
 
 HANDLERS = {
     "header":   on_header,
     "expected": on_expected,
     "actual":   on_actual,
-    "match":    on_match_or_fail,
-    "fail":     on_match_or_fail,
+    "match":    lambda ev: on_terminal(ev, "match"),
+    "fail":     lambda ev: on_terminal(ev, "fail"),
 }
 
 
-# ── Main loop ────────────────────────────────────────────────────────────────
-def stdin_reader():
-    for line in sys.stdin:
-        line = line.strip()
+def add_log(line):
+    line = strip_ansi(line)
+    with state_lock:
+        log_lines.append(line)
+        if len(log_lines) > LOG_MAX * 6:
+            del log_lines[:len(log_lines) - LOG_MAX * 6]
+
+
+def output_reader(stream):
+    for raw in iter(stream.readline, ''):
+        line = raw.rstrip("\r\n")
         if not line:
             continue
-        try:
-            events_q.put(json.loads(line))
-        except json.JSONDecodeError:
-            pass
-
-
-def pump():
-    while not events_q.empty():
-        ev = events_q.get()
-        h = HANDLERS.get(ev.get("type"))
-        if h:
+        if line.startswith(EVENT_PREFIX):
+            payload = line[len(EVENT_PREFIX):]
             try:
-                h(ev)
-            except Exception as e:
-                sys.stderr.write("viz error: %s\n" % e)
-    screen.update()
-    screen.ontimer(pump, 50)
+                ev = json.loads(payload)
+            except json.JSONDecodeError:
+                add_log(line)
+                continue
+            handler = HANDLERS.get(ev.get("type"))
+            if handler:
+                handler(ev)
+            if ev.get("type") in ("match", "fail"):
+                time.sleep(SWEEP_DELAY)
+        else:
+            add_log(line)
 
 
+# ── Entry point ──────────────────────────────────────────────────────────────
 def main():
-    setup_screen()
-    draw_title("AXI DMA — Live Validation")
-    for k in QUADS:
-        draw_quadrant(*k)
-    screen.update()
-    threading.Thread(target=stdin_reader, daemon=True).start()
-    screen.ontimer(pump, 50)
-    turtle.mainloop()
+    here = os.path.dirname(os.path.abspath(__file__))
+    default_host_runner = os.path.join(here, "host_runner.py")
+
+    parser = argparse.ArgumentParser(
+        description="Rich live visualization for DMA host runner")
+    parser.add_argument("--host-runner", default=default_host_runner,
+                        help="Path to host_runner.py")
+    parser.add_argument("--no-color",    action="store_true",
+                        help="Disable colored output in host_runner log")
+    args, passthrough = parser.parse_known_args()
+
+    cmd = [sys.executable, args.host_runner, "--viz"]
+    if args.no_color:
+        cmd.append("--no-color")
+    cmd += passthrough
+
+    try:
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, bufsize=1,
+        )
+    except FileNotFoundError as e:
+        print(f"viz: cannot spawn host_runner: {e}", file=sys.stderr)
+        sys.exit(2)
+
+    threading.Thread(target=output_reader, args=(proc.stdout,), daemon=True).start()
+
+    console = Console()
+    with Live(make_layout(), console=console, refresh_per_second=8,
+              screen=True, transient=False) as live:
+        try:
+            while proc.poll() is None:
+                live.update(make_layout())
+                time.sleep(0.12)
+            # one last refresh + linger so user sees the final state
+            live.update(make_layout())
+            time.sleep(2.0)
+        except KeyboardInterrupt:
+            proc.terminate()
+
+    sys.exit(proc.returncode or 0)
 
 
 if __name__ == "__main__":
