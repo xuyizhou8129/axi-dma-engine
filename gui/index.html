@@ -8,31 +8,21 @@
 </head>
 <body>
   <header>
-    <h1>⚡ DMA Architecture Visualizer</h1>
+    <h1>AXI DMA Architecture Visualizer</h1>
     <div class="controls">
       <button id="playBtn">▶ Play Demo</button>
       <button id="stepBtn">⏭ Step</button>
       <button id="pauseBtn">⏸ Pause</button>
       <label>Speed: <input id="speed" type="range" min="0.25" max="3" value="1" step="0.25"></label>
       <span id="stage" aria-live="polite">Ready</span>
-      <button id="themeBtn">🌙 Dark</button>
+      <button id="themeBtn">Dark</button>
     </div>
   </header>
 
   <main>
     <section id="canvas">
-      <!-- Reference-style architecture diagram rebuilt as vector SVG -->
       <svg id="arch" viewBox="0 0 980 888" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <!-- Arrow markers for dark and light modes -->
-          <marker id="arrow-dark" markerWidth="12" markerHeight="12" refX="8" refY="6" orient="auto" markerUnits="strokeWidth">
-            <path d="M 0 0 L 12 6 L 0 12 Z" fill="#6b7280" stroke="none" />
-          </marker>
-          <marker id="arrow-light" markerWidth="12" markerHeight="12" refX="8" refY="6" orient="auto" markerUnits="strokeWidth">
-            <path d="M 0 0 L 12 6 L 0 12 Z" fill="#a3a3a3" stroke="none" />
-          </marker>
-          
-          <!-- Material Design Gradients -->
           <linearGradient id="gradCyan" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style="stop-color:#4de8ff;stop-opacity:0.18" />
             <stop offset="100%" style="stop-color:#4de8ff;stop-opacity:0.04" />
@@ -49,8 +39,6 @@
             <stop offset="0%" style="stop-color:#66ff66;stop-opacity:0.16" />
             <stop offset="100%" style="stop-color:#66ff66;stop-opacity:0.04" />
           </linearGradient>
-          
-          <!-- Material elevation shadow -->
           <filter id="shadow-elevation" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" />
             <feOffset dx="0" dy="2" result="offsetblur" />
@@ -76,14 +64,44 @@
           <text x="38" y="195" class="label" font-size="14" font-weight="700" fill="var(--text-secondary)">DMA Control Unit</text>
         </g>
 
+        <!-- ── Connection lines (drawn first, appear behind boxes) ── -->
+
+        <!-- Main data flow -->
+        <path id="p_soc_csr"       class="conn-line" d="M 375 130 L 375 272" />
+        <path id="p_csr_ring"      class="conn-line" d="M 270 312 L 220 312 L 220 486 L 130 486" />
+        <path id="p_csr_irq"       class="conn-line" d="M 425 312 L 465 312" />
+        <path id="p_ring_desc"     class="conn-line" d="M 220 523 L 345 523" />
+        <path id="p_desc_dm"       class="conn-line" d="M 530 523 L 650 523" />
+        <path id="p_df_axi"        class="conn-line" d="M 530 523 L 635 523 L 635 714 L 670 714" />
+        <path id="p_axi_dm"        class="conn-line" d="M 755 714 L 755 560" />
+        <path id="p_axi_sysmem"    class="conn-line" d="M 755 786 L 755 818" />
+        <path id="p_dm_sram"       class="conn-line" d="M 650 560 L 650 640 L 175 640 L 175 714" />
+        <path id="p_sramctrl_sram" class="conn-line" d="M 175 786 L 175 818" />
+
+        <!-- Dashed DMA bus: AXI4 Master ↔ SRAM Controller -->
+        <path id="p_dma_bus" class="conn-dashed" d="M 255 750 L 670 750" />
+
+        <!-- IRQ / interrupt context (dimmed) -->
+        <path id="p_ring_irq" class="conn-line conn-dim" d="M 130 486 L 130 248 L 540 248 L 540 272" />
+        <path id="p_dm_irq"   class="conn-line conn-dim" d="M 740 486 L 740 254 L 615 254 L 615 312" />
+        <path id="p_irq_cpu"  class="conn-line conn-dim" d="M 590 272 L 590 100" />
+
+        <!-- Invisible paths: reverse / transfer animation direction -->
+        <path id="p_dm_axi"       d="M 755 560 L 755 714" fill="none" stroke="none" />
+        <path id="p_sysmem_axi"   d="M 755 818 L 755 786" fill="none" stroke="none" />
+        <path id="p_dma_transfer" d="M 755 818 L 755 750 L 175 750 L 175 818" fill="none" stroke="none" />
+        <path id="p_axi_df"       d="M 670 714 L 635 714 L 635 523 L 530 523" fill="none" stroke="none" />
+
+        <!-- ── Component boxes (drawn on top of lines) ── -->
+
         <g id="socBus">
           <rect class="box box-ctrl" x="250" y="56" width="250" height="74" rx="6" ry="6" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
           <text class="label" x="375" y="100" text-anchor="middle" font-size="14" font-weight="600">SoC Bus (AXI-Lite)</text>
         </g>
 
         <g id="cpu_interrupt_pin">
-          <text class="label" x="610" y="70" font-size="18">CPU Interrupt</text>
-          <text class="label" x="610" y="92" font-size="18">Pin</text>
+          <text class="label" x="610" y="70" font-size="14">CPU Interrupt</text>
+          <text class="label" x="610" y="88" font-size="14">Pin</text>
         </g>
 
         <g id="csr">
@@ -112,31 +130,6 @@
           <text class="label" x="740" y="531" text-anchor="middle" font-size="14" font-weight="700">Data Mover</text>
         </g>
 
-        <g id="df_in_fifo">
-          <rect class="box box-fifo" x="234" y="472" width="68" height="24" rx="4" ry="4" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
-          <text class="label" x="268" y="486" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
-        </g>
-
-        <g id="df_out_fifo">
-          <rect class="box box-fifo" x="556" y="472" width="68" height="24" rx="4" ry="4" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
-          <text class="label" x="590" y="486" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
-        </g>
-
-        <g id="mid_fifo">
-          <rect class="box box-fifo" x="466" y="612" width="68" height="24" rx="4" ry="4" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
-          <text class="label" x="500" y="626" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
-        </g>
-
-        <g id="dm_sram_fifo">
-          <rect class="box box-fifo" x="176" y="640" width="68" height="24" rx="4" ry="4" fill="url(#gradMagenta)" filter="url(#shadow-elevation)" />
-          <text class="label" x="210" y="654" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
-        </g>
-
-        <g id="dm_axi_fifo">
-          <rect class="box box-fifo" x="776" y="640" width="68" height="24" rx="4" ry="4" fill="url(#gradBlue)" filter="url(#shadow-elevation)" />
-          <text class="label" x="810" y="654" text-anchor="middle" font-size="10" font-weight="600">FIFO</text>
-        </g>
-
         <g id="sram_ctrl">
           <rect class="box box-ctrl" x="95" y="714" width="160" height="72" rx="6" ry="6" fill="url(#gradMagenta)" filter="url(#shadow-elevation)" />
           <text class="label" x="175" y="758" text-anchor="middle" font-size="14" font-weight="700">SRAM Controller</text>
@@ -157,40 +150,6 @@
           <text class="label" x="755" y="856" text-anchor="middle" font-size="13" font-weight="700">System Memory</text>
         </g>
 
-        <path id="p_soc_csr" class="line transparent-path" d="M 375 130 L 375 272" marker-start="url(#arrow-dark)" marker-end="url(#arrow-dark)" />
-        <path id="p_csr_ring" class="line transparent-path" d="M 270 312 L 220 312 L 220 486 L 130 486" marker-end="url(#arrow-dark)" />
-        <path id="p_ring_df_in" class="line transparent-path" d="M 220 523 L 220 484 L 234 484" marker-end="url(#arrow-dark)" />
-        <path id="p_df_in_desc" class="line transparent-path" d="M 302 484 L 345 484" marker-end="url(#arrow-dark)" />
-        <path id="p_desc_df_out" class="line transparent-path" d="M 530 523 L 590 523 L 590 496" marker-end="url(#arrow-dark)" />
-        <path id="p_df_out_dm" class="line transparent-path" d="M 624 484 L 650 484" marker-end="url(#arrow-dark)" />
-        <path id="p_dm_axi_fifo" class="line transparent-path" d="M 810 560 L 810 640" marker-end="url(#arrow-dark)" />
-        <path id="p_dm_sram_fifo" class="line transparent-path" d="M 650 560 L 650 652 L 244 652" marker-end="url(#arrow-dark)" />
-        <path id="p_axi_fifo_axi" class="line transparent-path" d="M 810 662 L 810 714" marker-end="url(#arrow-dark)" />
-        <path id="p_axi_mid" class="line transparent-path" d="M 755 714 L 626 714 L 626 636 L 500 636" marker-end="url(#arrow-dark)" />
-        <path id="p_sramctrl_bram" class="line transparent-path" d="M 175 786 L 175 818" marker-end="url(#arrow-dark)" />
-        <path id="p_axi_sysmem" class="line transparent-path" d="M 755 786 L 755 818" marker-end="url(#arrow-dark)" />
-        <path id="p_sysmem_axi" class="line transparent-path" d="M 755 818 L 755 786" marker-end="url(#arrow-dark)" />
-        <path id="p_sramctrl_sram" class="line transparent-path" d="M 175 818 L 175 786" marker-end="url(#arrow-dark)" />
-        <path id="p_sram_fifo_ctrl" class="line transparent-path" d="M 210 664 L 210 714" marker-end="url(#arrow-dark)" />
-
-        <!-- CSR <-> IRQ -->
-        <path id="p_csr_irq" class="line transparent-path" d="M 425 312 L 465 312" marker-start="url(#arrow-dark)" marker-end="url(#arrow-dark)" />
-
-        <!-- Ring Manager direct to Descriptor Fetcher (notification path) -->
-        <path id="p_ring_desc" class="line transparent-path" d="M 220 523 L 345 523" marker-end="url(#arrow-dark)" />
-
-        <!-- mid FIFO feedback up to Descriptor Fetcher -->
-        <path id="p_mid_df" class="line transparent-path" d="M 500 612 L 500 560" marker-end="url(#arrow-dark)" />
-
-        <!-- IRQ connections -->
-        <path id="p_ring_irq" class="line transparent-path" d="M 130 486 L 130 248 L 540 248 L 540 272" marker-end="url(#arrow-dark)" />
-        <path id="p_dm_irq" class="line transparent-path" d="M 740 486 L 740 254 L 615 254 L 615 312" marker-end="url(#arrow-dark)" />
-        <path id="p_irq_cpu" class="line transparent-path" d="M 590 272 L 590 100" marker-end="url(#arrow-dark)" />
-
-        
-
- 
-</svg>
       </svg>
     </section>
 
