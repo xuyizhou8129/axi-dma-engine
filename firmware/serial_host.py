@@ -49,8 +49,10 @@ CSR register byte offsets (matches csr.py / dma_pkg.sv):
 from __future__ import print_function
 
 import argparse
+import contextlib
 import csv
 import glob
+import io
 import os
 import struct
 import sys
@@ -75,6 +77,25 @@ HEADER_SIZE      = 13  # 4 (sync) + 1 (opcode) + 4 (addr) + 4 (len)
 
 PORT = 'COM5'
 BAUD = 9600
+
+# ── Output formatting ────────────────────────────────────────────────────────
+_USE_COLOR = sys.stdout.isatty()
+
+def _c(code, s):   return ("\033[%sm%s\033[0m" % (code, s)) if _USE_COLOR else s
+def _bold(s):      return _c("1",    s)
+def _green(s):     return _c("1;32", s)
+def _red(s):       return _c("1;31", s)
+def _yellow(s):    return _c("33",   s)
+def _cyan(s):      return _c("36",   s)
+def _dim(s):       return _c("2",    s)
+
+_W = 56
+
+def _sep(ch="━"):
+    print(ch * _W)
+
+def _sline(n, total, label, status=""):
+    print("  %s  %-40s%s" % (_yellow("[%d/%d]" % (n, total)), label, status))
 
 # Optional import — fail gracefully so the module can be imported without
 # pyserial installed (unit tests / dry-run mode still work).
@@ -208,22 +229,22 @@ class DMASerialHost:
             raise TimeoutError("Timeout reading CSR word")
         return struct.unpack("<I", data)[0]
 
-    def dump_csr_status(self, label="CSR snapshot"):
+    def dump_csr_status(self, label=""):
         try:
-            status     = self.csr_read(0x14)  # CSR_REG_STATUS
-            irq_status = self.csr_read(0x18)  # CSR_REG_IRQ_STATUS
-            head       = self.csr_read(0x08)  # CSR_REG_HEAD
-            tail       = self.csr_read(0x0C)  # CSR_REG_TAIL
+            status     = self.csr_read(0x14)
+            irq_status = self.csr_read(0x18)
+            head       = self.csr_read(0x08)
+            tail       = self.csr_read(0x0C)
         except (TimeoutError, RuntimeError) as e:
-            print("  CSR dump failed: %s" % e)
+            print("         %s CSR read failed: %s" % (_red("✗"), e))
             return
-        print("\n--- %s ---" % label)
-        print("  STATUS     = 0x%08x  BUSY=%d EMPTY=%d ERROR=%d" % (
-            status, status & 1, (status >> 1) & 1, (status >> 2) & 1))
-        print("  IRQ_STATUS = 0x%08x  EMPTY_IRQ=%d ERROR_IRQ=%d" % (
-            irq_status, irq_status & 1, (irq_status >> 1) & 1))
-        print("  HEAD       = %d" % head)
-        print("  TAIL       = %d" % tail)
+        busy  = (status >> 0) & 1
+        empty = (status >> 1) & 1
+        error = (status >> 2) & 1
+        flags = ("BUSY " if busy else "") + ("EMPTY " if empty else "") + ("ERROR" if error else "")
+        tag = ("  " + _dim(label) + " ") if label else "  "
+        print("%s%s  STATUS=0x%08x  HEAD=%-3d  TAIL=%d" % (
+            tag, _dim(flags.strip() or "IDLE"), status, head, tail))
 
     # ----------------------------------------------------------------
     # Memory writes
@@ -270,7 +291,6 @@ class DMASerialHost:
         """Send CMD_RUN_DMA to trigger the DMA engine."""
         self._send_packet(CMD_RUN_DMA, 0x00000000)
         self._wait_for_ack(timeout=timeout)
-        print("DMA trigger ACK'd")
 
     # ----------------------------------------------------------------
     # High-level DMA operations
@@ -299,7 +319,7 @@ class DMASerialHost:
                 else:
                     continue
                 count += 1
-        print("Sent %d command(s) from %s" % (count, os.path.basename(stim_path)))
+        return count
 
     def wait_done(self, poll_interval=0.1, timeout=30.0):
         """Requires CSR reads — not yet implemented in firmware. Raises NotImplementedError."""
@@ -528,11 +548,16 @@ def main():
     parser.add_argument("--list-ports",    action="store_true", dest="list_ports", help="List available serial ports and exit")
     parser.add_argument("--dry-run",       action="store_true", dest="dry_run",    help="Run golden model only, no FPGA")
     parser.add_argument("--dry-run-all",   action="store_true", dest="dry_run_all",help="Dry-run all sim/scenarios/*.csv")
+    parser.add_argument("--no-color",      action="store_true", dest="no_color",   help="Disable ANSI colour output")
     args = parser.parse_args()
 
     args.scenario = os.path.abspath(args.scenario)
     args.out_dir  = os.path.abspath(args.out_dir)
     os.chdir(_here)
+
+    global _USE_COLOR
+    if args.no_color:
+        _USE_COLOR = False
 
     if args.list_ports:
         list_ports()
@@ -547,10 +572,16 @@ def main():
         sys.exit(0 if ok else 1)
 
     # --- FPGA path ---
+    print()
+    print("  " + _bold(_cyan("AXI DMA Engine  ·  FPGA Validation")))
+    _sep()
+    print("  Scenario  %s" % os.path.relpath(args.scenario, os.path.dirname(_here)))
+    print("  Port      %s  @  %d baud" % (args.port, args.baud))
+    print()
 
     # 1. Always regenerate golden artifacts from the scenario so CRCs are fresh.
     os.makedirs(args.out_dir, exist_ok=True)
-    print("Running golden model for %s ..." % args.scenario)
+    print(_yellow("[1/5]") + "  Running golden model ...")
     run_golden(args.scenario, args.out_dir)
 
     stim_path    = os.path.join(args.out_dir, "stim.txt")
@@ -564,14 +595,14 @@ def main():
     sram_words = _load_hex32(golden_sram)
     expected_smem_crc = _crc32_words(smem_words)
     expected_sram_crc = _crc32_words(sram_words)
-    print("Expected SMEM CRC: 0x%08x" % expected_smem_crc)
-    print("Expected SRAM CRC: 0x%08x" % expected_sram_crc)
+    print(_dim("       SMEM CRC exp 0x%08x   SRAM CRC exp 0x%08x" % (
+        expected_smem_crc, expected_sram_crc)))
 
     # 3. Connect to FPGA.
     port = args.port
-    print("Opening %s at %d baud ..." % (port, args.baud))
-    print("CSR base=0x%08x  SMEM base=0x%08x  SRAM base=0x%08x" % (
-        args.csr_base, args.smem_base, args.sram_base))
+    print(_yellow("[2/5]") + "  Connecting to FPGA ...")
+    print(_dim("       CSR 0x%08x   SMEM 0x%08x   SRAM 0x%08x" % (
+        args.csr_base, args.smem_base, args.sram_base)))
 
     host = DMASerialHost(port, baud=args.baud,
                          csr_base_addr=args.csr_base,
@@ -582,42 +613,45 @@ def main():
         #     tests doesn't corrupt the full-memory CRC comparison.
         init_smem = _load_hex32(os.path.join(args.out_dir, "initial_smem.hex"))
         init_sram = _load_hex32(os.path.join(args.out_dir, "initial_sram.hex"))
-        print("Clearing SMEM (%d words)..." % len(init_smem))
+        print(_yellow("[3/5]") + "  Initializing memories ...")
+        print(_dim("       SMEM clear (%d words) ..." % len(init_smem)))
         for i, w in enumerate(init_smem):
             host.smem_write(i * 4, w)
-        print("Clearing SRAM (%d words)..." % len(init_sram))
+        print(_dim("       SRAM clear (%d words) ..." % len(init_sram)))
         for i, w in enumerate(init_sram):
             host.sram_write(i * 4, w)
 
         # 4b. Send CSR writes from stim.txt (memory already initialized above).
-        host.send_stim(stim_path)
+        n_writes = host.send_stim(stim_path)
+        print(_yellow("[4/5]") + "  Sending stimulus ...  " + _dim("%d writes" % n_writes))
 
         # [DBG] Spot-check key sysmem locations after stim writes.
-        print("[DBG] SMEM after stim (descriptor ring @ 0x000, data @ 0x100):")
+        print(_dim("       [DBG] SMEM after stim (descriptor ring @ 0x000, data @ 0x100):"))
         for off in [0x000, 0x004, 0x008, 0x00C, 0x100, 0x104, 0x108, 0x10C]:
-            print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
+            print(_dim("             SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off))))
 
         # 5. Trigger DMA and wait for completion (polled inside firmware).
         try:
             host.run_dma()
+            print(_yellow("[5/5]") + "  DMA trigger ...       " + _green("✓  ACK'd"))
             dma_ok = True
         except RuntimeError as e:
-            print("*** DMA NACK: %s ***" % e)
+            print(_yellow("[5/5]") + "  DMA trigger ...       " + _red("✗  NACK: %s" % e))
             dma_ok = False
-        host.dump_csr_status("Post-DMA CSR snapshot")
+        host.dump_csr_status("Post-DMA")
         if not dma_ok:
             sys.exit(1)
 
         # [DBG] Spot-check SRAM destination and SMEM source after DMA.
-        print("[DBG] SRAM after DMA (expected data @ 0x100):")
+        print(_dim("       [DBG] SRAM after DMA (expected data @ 0x100):"))
         for off in [0x100, 0x104, 0x108, 0x10C]:
-            print("  SRAM[0x%03x] = 0x%08x" % (off, host.read_sram(off)))
-        print("[DBG] SMEM after DMA (source should be unchanged @ 0x100):")
+            print(_dim("             SRAM[0x%03x] = 0x%08x" % (off, host.read_sram(off))))
+        print(_dim("       [DBG] SMEM after DMA (source should be unchanged @ 0x100):"))
         for off in [0x100, 0x104, 0x108, 0x10C]:
-            print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
-        print("[DBG] SMEM descriptor ring after DMA (check for DMA writeback @ 0x000):")
+            print(_dim("             SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off))))
+        print(_dim("       [DBG] SMEM descriptor ring after DMA (check for DMA writeback @ 0x000):"))
         for off in [0x000, 0x004, 0x008, 0x00C]:
-            print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
+            print(_dim("             SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off))))
 
         # 6. CRC only the regions the golden model says changed (SRAM dst)
         #    and the source region in SMEM. Full-memory CRC fails because BRAM
@@ -627,7 +661,7 @@ def main():
 
         all_pass = True
         if not changed:
-            print("WARNING: golden model shows no SRAM changes — nothing to verify")
+            print(_red("       WARNING: golden model shows no SRAM changes — nothing to verify"))
             all_pass = False
         else:
             lo = min(changed);  hi = max(changed) + 1
@@ -636,8 +670,9 @@ def main():
             got_crc = host.sram_crc(lo_byte, byte_len)
             ok = (got_crc == exp_crc)
             all_pass = all_pass and ok
-            print("SRAM[0x%03x..+%d] CRC: got=0x%08x  exp=0x%08x  %s" % (
-                lo_byte, byte_len, got_crc, exp_crc, "PASS" if ok else "FAIL"))
+            tag = (_green("✓  PASS") if ok else _red("✗  FAIL"))
+            print("       SRAM[0x%03x..+%d] CRC: got=0x%08x  exp=0x%08x  %s" % (
+                lo_byte, byte_len, got_crc, exp_crc, tag))
 
         init_smem_words = _load_hex32(smem_init_path)
         nonzero = [i for i, w in enumerate(init_smem_words) if w != 0]
@@ -648,14 +683,22 @@ def main():
             got_crc = host.smem_crc(lo_byte, byte_len)
             ok = (got_crc == exp_crc)
             all_pass = all_pass and ok
-            print("SMEM[0x%03x..+%d] CRC: got=0x%08x  exp=0x%08x  %s" % (
-                lo_byte, byte_len, got_crc, exp_crc, "PASS" if ok else "FAIL"))
+            tag = (_green("✓  PASS") if ok else _red("✗  FAIL"))
+            print("       SMEM[0x%03x..+%d] CRC: got=0x%08x  exp=0x%08x  %s" % (
+                lo_byte, byte_len, got_crc, exp_crc, tag))
 
-        print("=== TEST PASSED ===" if all_pass else "=== TEST FAILED ===")
+        print()
+        _sep()
+        if all_pass:
+            print("  " + _bold(_green("✓  TEST PASSED")))
+        else:
+            print("  " + _bold(_red("✗  TEST FAILED")))
+        _sep()
+        print()
         if not all_pass:
             sys.exit(1)
     except (RuntimeError, TimeoutError) as e:
-        print("*** FAIL: %s ***" % e)
+        print(_red("*** FAIL: %s ***" % e))
         sys.exit(1)
     finally:
         host.close()
