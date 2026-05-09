@@ -198,7 +198,21 @@ int main(void) {
                         break;
 
                     case CMD_RUN_DMA: {
-                        xil_printf("Triggering DMA...\r\n");
+                        u32 head_pre = Xil_In32(CSR_ACCESS_BASE + CSR_REG_HEAD);
+                        u32 tail_pre = Xil_In32(CSR_ACCESS_BASE + CSR_REG_TAIL);
+                        xil_printf("Triggering DMA... HEAD=%d TAIL=%d\r\n", head_pre, tail_pre);
+
+                        if (head_pre == tail_pre) {
+                            u32 st = Xil_In32(CSR_ACCESS_BASE + CSR_REG_STATUS);
+                            if (tail_pre > 0 && !(st & STATUS_ERROR)) {
+                                xil_printf("DMA already done (HEAD==TAIL==%d, no error).\r\n", tail_pre);
+                                send_ack(CMD_ACK);
+                            } else {
+                                xil_printf("DMA ring empty before start (HEAD==TAIL==%d).\r\n", tail_pre);
+                                send_ack(CMD_NACK);
+                            }
+                            break;
+                        }
 
                         /* Hand memory ownership over to the DMA. */
                         REG_WRITE(REG_INIT_DONE, 1);
@@ -207,8 +221,15 @@ int main(void) {
                         u32 ctrl = Xil_In32(CSR_ACCESS_BASE + CSR_REG_CTRL);
                         Xil_Out32(CSR_ACCESS_BASE + CSR_REG_CTRL, ctrl | CTRL_ENABLE);
 
-                        /* Done = ring empty AND not busy. Bail on error or timeout. */
+                        /* Wait for DMA to go BUSY before polling for done.
+                         * Without this, a stale EMPTY flag causes a false-done. */
                         u32 status = 0;
+                        for (u32 j = 0; j < 10000; j++) {
+                            status = Xil_In32(CSR_ACCESS_BASE + CSR_REG_STATUS);
+                            if ((status & STATUS_BUSY) || (status & STATUS_ERROR)) break;
+                        }
+
+                        /* Done = ring empty AND not busy. Bail on error or timeout. */
                         u32 i;
                         for (i = 0; i < 10000000; i++) {
                             status = Xil_In32(CSR_ACCESS_BASE + CSR_REG_STATUS);
@@ -216,8 +237,7 @@ int main(void) {
                             if ((status & STATUS_EMPTY) && !(status & STATUS_BUSY)) break;
                         }
 
-                        /* Return memory ownership to the MicroBlaze shim so
-                         * subsequent CMD_READ_SRAM / CMD_CRC_* commands work. */
+                        /* Return memory ownership to the MicroBlaze shim. */
                         REG_WRITE(REG_INIT_DONE, 0);
 
                         if ((status & STATUS_ERROR) || i >= 10000000) {
@@ -273,6 +293,14 @@ int main(void) {
                         } else {
                             send_ack(CMD_NACK);
                         }
+                        break;
+                    }
+
+                    case CMD_READ_CSR: {
+                        u32 val = Xil_In32(dest_addr);
+                        xil_printf("Read CSR[0x%08x] = 0x%08x\r\n", dest_addr, val);
+                        send_ack(CMD_ACK);
+                        uart_write_u32(val);
                         break;
                     }
 
