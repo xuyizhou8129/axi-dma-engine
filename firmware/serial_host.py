@@ -293,6 +293,8 @@ class DMASerialHost:
                 elif parts[0] == "sram_write":
                     self.sram_write(addr, data)
                 elif parts[0] == "csr_write":
+                    if addr == 0x10:  # CTRL register — skip, CMD_RUN_DMA handles ENABLE
+                        continue
                     self.csr_write(addr, data)
                 else:
                     continue
