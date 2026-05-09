@@ -1,6 +1,8 @@
 import argparse
+import json
 import serial
 import struct
+import subprocess
 import time
 import sys
 import os
@@ -19,6 +21,41 @@ def _dim(s):       return _c("2",    s)
 
 _W = 56
 def _sep(ch="━"): print(ch * _W)
+
+
+# ── Live visualization (subprocess + JSON-line IPC) ──────────────────────────
+class Viz:
+    """Spawn viz.py as a subprocess and pipe JSON events to it."""
+    def __init__(self, enabled, viz_path):
+        self.enabled = enabled
+        self.proc = None
+        if not enabled:
+            return
+        try:
+            self.proc = subprocess.Popen(
+                [sys.executable, viz_path],
+                stdin=subprocess.PIPE, text=True, bufsize=1,
+            )
+        except Exception as e:
+            print(_red(f"  viz: failed to spawn ({e}), continuing without visualization"))
+            self.enabled = False
+
+    def send(self, event):
+        if not self.enabled or not self.proc or self.proc.stdin is None:
+            return
+        try:
+            self.proc.stdin.write(json.dumps(event) + "\n")
+            self.proc.stdin.flush()
+        except (BrokenPipeError, OSError):
+            self.enabled = False
+
+    def close(self):
+        if self.proc and self.proc.stdin is not None:
+            try:
+                self.proc.stdin.close()
+            except Exception:
+                pass
+
 
 # Firmware Protocol Definitions matches protocol.h
 PACKET_SYNC_WORD  = 0xDEADBEEF
@@ -209,7 +246,7 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
     return transfers
 
 
-def verify_one_transfer(ser, idx, params):
+def verify_one_transfer(ser, idx, params, viz=None):
     """Verify a single descriptor's transfer. Returns True on PASS."""
     src_addr       = params['src_addr']
     dst_addr       = params['dst_addr']
@@ -229,14 +266,38 @@ def verify_one_transfer(ser, idx, params):
         dst_read_op            = CMD_READ_SRAM
         dst_label              = f"SRAM[{hex(dst_addr)}]"
         src_label              = f"SYSMEM[{hex(src_addr)}]"
+        dst_region, src_region = "sram", "smem"
+        src_read_op            = CMD_READ_SYSMEM
     else:
         dst_crc_op, src_crc_op = CMD_CRC_SYSMEM, CMD_CRC_SRAM
         dst_read_op            = CMD_READ_SYSMEM
         dst_label              = f"SYSMEM[{hex(dst_addr)}]"
         src_label              = f"SRAM[{hex(src_addr)}]"
+        dst_region, src_region = "smem", "sram"
+        src_read_op            = CMD_READ_SRAM
 
     print(f"\n  {_bold(_cyan(f'[Desc {idx}]'))} {src_label} -> {dst_label}, {len_words} word(s), "
           f"DIR={direction}, expected_crc={hex(expected_crc)}")
+
+    # ── Visualization: announce expected cells, then per-cell reads ──────────
+    if viz and viz.enabled:
+        viz.send({"type": "header",
+                  "label": f"Desc {idx}  ·  {src_label} -> {dst_label}  ·  {len_words} word(s)"})
+        exp_dst = [[dst_addr + j * 4, expected_words[j]] for j in range(len_words)]
+        exp_src = [[src_addr + j * 4, expected_words[j]] for j in range(len_words)]
+        viz.send({"type": "expected", "region": dst_region, "cells": exp_dst})
+        viz.send({"type": "expected", "region": src_region, "cells": exp_src})
+        # Read each dst cell, then each src cell, emitting actual events.
+        for j in range(len_words):
+            a = dst_addr + j * 4
+            v = read_memory(ser, dst_read_op, a)
+            viz.send({"type": "actual", "region": dst_region, "addr": a,
+                      "value": v if v is not None else 0})
+        for j in range(len_words):
+            a = src_addr + j * 4
+            v = read_memory(ser, src_read_op, a)
+            viz.send({"type": "actual", "region": src_region, "addr": a,
+                      "value": v if v is not None else 0})
 
     ok = True
     PASS = _green("[PASS]")
@@ -251,6 +312,7 @@ def verify_one_transfer(ser, idx, params):
         print(f"    {FAIL} {dst_label} = {hex(val)}, expected {hex(expected_words[0])}"); ok = False
 
     fw_crc_dst = request_crc(ser, dst_crc_op, dst_addr, byte_len)
+    dst_crc_ok = (fw_crc_dst is not None) and (fw_crc_dst == expected_crc)
     if fw_crc_dst is None:
         print(f"    {FAIL} dst CRC: request failed"); ok = False
     elif fw_crc_dst == expected_crc:
@@ -259,6 +321,7 @@ def verify_one_transfer(ser, idx, params):
         print(f"    {FAIL} dst CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}"); ok = False
 
     fw_crc_src = request_crc(ser, src_crc_op, src_addr, byte_len)
+    src_crc_ok = (fw_crc_src is not None) and (fw_crc_src == expected_crc)
     if fw_crc_src is None:
         print(f"    {FAIL} src CRC: request failed"); ok = False
     elif fw_crc_src == expected_crc:
@@ -266,10 +329,19 @@ def verify_one_transfer(ser, idx, params):
     else:
         print(f"    {FAIL} src CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}"); ok = False
 
+    # ── Visualization: sweep green (or red) for each cell ────────────────────
+    if viz and viz.enabled:
+        dst_evt = "match" if dst_crc_ok else "fail"
+        src_evt = "match" if src_crc_ok else "fail"
+        for j in range(len_words):
+            viz.send({"type": dst_evt, "region": dst_region, "addr": dst_addr + j * 4})
+        for j in range(len_words):
+            viz.send({"type": src_evt, "region": src_region, "addr": src_addr + j * 4})
+
     return ok
 
 
-def verify_dma_result(ser, transfers):
+def verify_dma_result(ser, transfers, viz=None):
     """Verify each descriptor's transfer in order. Returns True only if all PASS."""
     print()
     print("  " + _bold(_cyan("DMA Verification")))
@@ -282,7 +354,7 @@ def verify_dma_result(ser, transfers):
 
     all_pass = True
     for idx, params in enumerate(transfers):
-        if not verify_one_transfer(ser, idx, params):
+        if not verify_one_transfer(ser, idx, params, viz=viz):
             all_pass = False
 
     print()
@@ -299,16 +371,24 @@ def verify_dma_result(ser, transfers):
 def main():
     _default_stim = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
 
+    _default_viz = os.path.join(os.path.dirname(os.path.abspath(__file__)), "viz.py")
+
     parser = argparse.ArgumentParser(description="Host runner for DMA FPGA validation")
     parser.add_argument("--port",     default=PORT,           help="Serial port (default: %s)" % PORT)
     parser.add_argument("--baud",     type=int, default=BAUD, help="Baud rate (default: %d)" % BAUD)
     parser.add_argument("--stim",     default=_default_stim,  help="Path to stim.txt (default: firmware/stim.txt)")
     parser.add_argument("--no-color", action="store_true",    help="Disable ANSI colour output")
+    parser.add_argument("--viz",      action="store_true",    help="Open turtle visualization window during verify")
+    parser.add_argument("--viz-path", default=_default_viz,   help="Path to viz.py (default: firmware/viz.py)")
     args = parser.parse_args()
 
     global _USE_COLOR
     if args.no_color:
         _USE_COLOR = False
+
+    viz = Viz(enabled=args.viz, viz_path=args.viz_path)
+    if viz.enabled:
+        viz.send({"type": "header", "label": f"AXI DMA — {os.path.basename(args.stim)}"})
 
     print()
     print("  " + _bold(_cyan("AXI DMA Engine  ·  Host Runner")))
@@ -349,8 +429,9 @@ def main():
     dump_csr_status(ser, "Post-DMA CSR snapshot")
 
     if dma_ok:
-        verify_dma_result(ser, transfers)
+        verify_dma_result(ser, transfers, viz=viz)
     ser.close()
+    viz.close()
     sys.exit(0 if dma_ok else 1)
 
 
