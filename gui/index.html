@@ -25,11 +25,11 @@
       <svg id="arch" viewBox="0 0 980 888" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
         <defs>
           <!-- Arrow markers for dark and light modes -->
-          <marker id="arrow-dark" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
-            <path d="M 0 0 L 14 7 L 0 14 Z" fill="#6b7280" stroke="none" />
+          <marker id="arrow-dark" markerWidth="12" markerHeight="12" refX="8" refY="6" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 12 6 L 0 12 Z" fill="#6b7280" stroke="none" />
           </marker>
-          <marker id="arrow-light" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
-            <path d="M 0 0 L 14 7 L 0 14 Z" fill="#a3a3a3" stroke="none" />
+          <marker id="arrow-light" markerWidth="12" markerHeight="12" refX="8" refY="6" orient="auto" markerUnits="strokeWidth">
+            <path d="M 0 0 L 12 6 L 0 12 Z" fill="#a3a3a3" stroke="none" />
           </marker>
           
           <!-- Material Design Gradients -->
@@ -84,10 +84,7 @@
         <g id="cpu_interrupt_pin">
           <text class="label" x="610" y="70" font-size="18">CPU Interrupt</text>
           <text class="label" x="610" y="92" font-size="18">Pin</text>
-          <path class="line" d="M 590 112 L 590 176" marker-end="url(#arrow-dark)" />
         </g>
-
-        <path class="line" d="M 375 130 L 375 174" marker-end="url(#arrow-dark)" />
 
         <g id="csr">
           <rect class="box box-ctrl" x="270" y="272" width="155" height="80" rx="6" ry="6" fill="url(#gradCyan)" filter="url(#shadow-elevation)" />
@@ -160,27 +157,40 @@
           <text class="label" x="755" y="856" text-anchor="middle" font-size="13" font-weight="700">System Memory</text>
         </g>
 
-        <path id="p_soc_csr" class="line transparent-path" d="M 375 130 L 375 272" marker-end="url(#arrow-dark)" />
+        <path id="p_soc_csr" class="line transparent-path" d="M 375 130 L 375 272" marker-start="url(#arrow-dark)" marker-end="url(#arrow-dark)" />
         <path id="p_csr_ring" class="line transparent-path" d="M 270 312 L 220 312 L 220 486 L 130 486" marker-end="url(#arrow-dark)" />
-        <path id="p_ring_df_in" class="line transparent-path" d="M 220 524 L 232 524 L 238 485" marker-end="url(#arrow-dark)" />
-        <path id="p_df_in_desc" class="line transparent-path" d="M 298 485 L 322 490 L 345 524" marker-end="url(#arrow-dark)" />
-        <path id="p_ring_desc" class="line transparent-path" d="M 220 524 L 285 524 L 345 524" marker-end="url(#arrow-dark)" />
-        <path id="p_desc_df_out" class="line transparent-path" d="M 530 524 L 548 524 L 560 485" marker-end="url(#arrow-dark)" />
-        <path id="p_df_out_dm" class="line transparent-path" d="M 620 485 L 636 490 L 650 524" marker-end="url(#arrow-dark)" />
-        <path id="p_desc_dm" class="line transparent-path" d="M 530 524 L 650 524" marker-end="url(#arrow-dark)" />
-        <path id="p_desc_axi" class="line transparent-path" d="M 437 560 L 437 610 L 755 610 L 755 714" marker-end="url(#arrow-dark)" />
+        <path id="p_ring_df_in" class="line transparent-path" d="M 220 523 L 220 484 L 234 484" marker-end="url(#arrow-dark)" />
+        <path id="p_df_in_desc" class="line transparent-path" d="M 302 484 L 345 484" marker-end="url(#arrow-dark)" />
+        <path id="p_desc_df_out" class="line transparent-path" d="M 530 523 L 590 523 L 590 496" marker-end="url(#arrow-dark)" />
+        <path id="p_df_out_dm" class="line transparent-path" d="M 624 484 L 650 484" marker-end="url(#arrow-dark)" />
         <path id="p_dm_axi_fifo" class="line transparent-path" d="M 810 560 L 810 640" marker-end="url(#arrow-dark)" />
-        <path id="p_dm_sram_fifo" class="line transparent-path" d="M 210 560 L 210 640" marker-end="url(#arrow-dark)" />
-        <path id="p_dm_axi" class="line transparent-path" d="M 740 560 L 740 690 L 755 690" marker-end="url(#arrow-dark)" />
-        <path id="p_dm_sram_ctrl" class="line transparent-path" d="M 650 524 L 400 524 L 400 690 L 255 690" marker-end="url(#arrow-dark)" />
+        <path id="p_dm_sram_fifo" class="line transparent-path" d="M 650 560 L 650 652 L 244 652" marker-end="url(#arrow-dark)" />
         <path id="p_axi_fifo_axi" class="line transparent-path" d="M 810 662 L 810 714" marker-end="url(#arrow-dark)" />
-        <path id="p_sram_fifo_ctrl" class="line transparent-path" d="M 210 662 L 210 714" marker-end="url(#arrow-dark)" />
-        <path id="p_axi_mid" class="line transparent-path" d="M 755 714 L 626 714 L 626 651 L 530 651 L 500 651" marker-end="url(#arrow-dark)" />
+        <path id="p_axi_mid" class="line transparent-path" d="M 755 714 L 626 714 L 626 636 L 500 636" marker-end="url(#arrow-dark)" />
         <path id="p_sramctrl_bram" class="line transparent-path" d="M 175 786 L 175 818" marker-end="url(#arrow-dark)" />
         <path id="p_axi_sysmem" class="line transparent-path" d="M 755 786 L 755 818" marker-end="url(#arrow-dark)" />
         <path id="p_sysmem_axi" class="line transparent-path" d="M 755 818 L 755 786" marker-end="url(#arrow-dark)" />
         <path id="p_sramctrl_sram" class="line transparent-path" d="M 175 818 L 175 786" marker-end="url(#arrow-dark)" />
-        <path id="p_sram_sramctrl" class="line transparent-path" d="M 175 818 L 175 786" marker-end="url(#arrow-dark)" />
+        <path id="p_sram_fifo_ctrl" class="line transparent-path" d="M 210 664 L 210 714" marker-end="url(#arrow-dark)" />
+
+        <!-- CSR <-> IRQ -->
+        <path id="p_csr_irq" class="line transparent-path" d="M 425 312 L 465 312" marker-start="url(#arrow-dark)" marker-end="url(#arrow-dark)" />
+
+        <!-- Ring Manager direct to Descriptor Fetcher (notification path) -->
+        <path id="p_ring_desc" class="line transparent-path" d="M 220 523 L 345 523" marker-end="url(#arrow-dark)" />
+
+        <!-- mid FIFO feedback up to Descriptor Fetcher -->
+        <path id="p_mid_df" class="line transparent-path" d="M 500 612 L 500 560" marker-end="url(#arrow-dark)" />
+
+        <!-- IRQ connections -->
+        <path id="p_ring_irq" class="line transparent-path" d="M 130 486 L 130 248 L 540 248 L 540 272" marker-end="url(#arrow-dark)" />
+        <path id="p_dm_irq" class="line transparent-path" d="M 740 486 L 740 254 L 615 254 L 615 312" marker-end="url(#arrow-dark)" />
+        <path id="p_irq_cpu" class="line transparent-path" d="M 590 272 L 590 100" marker-end="url(#arrow-dark)" />
+
+        
+
+ 
+</svg>
       </svg>
     </section>
 

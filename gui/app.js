@@ -128,9 +128,11 @@ function handleEvent(ev) {
     flash('desc', 500);
   }
   else if (ev.type === 'DF_DISPATCH_DM') {
-    pulseLine('p_desc_df_out', 400);
-    movePacketAlong('p_desc_df_out', '', 400);
-    setTimeout(() => flash('df_out_fifo', 500), 200);
+    pulseLine('p_desc_df_out', 350);
+    movePacketAlong('p_desc_df_out', '', 350);
+    setTimeout(() => flash('df_out_fifo', 500), 150);
+    setTimeout(() => pulseLine('p_df_out_dm', 350), 150);
+    setTimeout(() => movePacketAlong('p_df_out_dm', '', 350), 150);
     setTimeout(() => flash('dataMover', 550), 300);
   }
   else if (ev.type === 'DM_DECODE') {
@@ -159,14 +161,13 @@ function handleEvent(ev) {
     setTimeout(() => flash('desc', 600), 600);
   }
   else if (ev.type === 'DESC_FETCH_AXI') {
-    pulseLine('p_desc_axi', 600);
-    movePacketAlong('p_desc_axi', '', 600);
-    setTimeout(() => flash('axi', 400), 600);
+    flash('desc', 400);
     setTimeout(() => {
       pulseLine('p_axi_sysmem', 400);
       movePacketAlong('p_axi_sysmem', '', 400);
+      setTimeout(() => flash('axi', 300), 200);
       setTimeout(() => flash('sysmem', 400), 400);
-    }, 600);
+    }, 200);
   }
   else if (ev.type === 'DESC_RETURN_AXI') {
     pulseLine('p_sysmem_axi', 400);
@@ -174,9 +175,12 @@ function handleEvent(ev) {
     setTimeout(() => flash('axi', 400), 400);
   }
   else if (ev.type === 'DESC_NOTIFY_DM') {
-    pulseLine('p_desc_dm', 400);
-    movePacketAlong('p_desc_dm', '', 400);
-    setTimeout(() => flash('dataMover', 600), 400);
+    flash('desc', 300);
+    setTimeout(() => {
+      pulseLine('p_df_out_dm', 350);
+      movePacketAlong('p_df_out_dm', '', 350);
+      setTimeout(() => flash('dataMover', 600), 350);
+    }, 100);
   }
   else if (ev.type === 'AXI_READ_SYSMEM') {
     pulseLine('p_axi_sysmem', 400);
@@ -198,24 +202,34 @@ function handleEvent(ev) {
     flash('irq', 450);
   }
   else if (ev.type === 'DM_READ_SYSMEM') {
-    pulseLine('p_dm_axi', 400);
-    movePacketAlong('p_dm_axi', '', 400);
-    setTimeout(() => flash('axi', 400), 400);
-    setTimeout(() => pulseLine('p_axi_sysmem', 400), 600);
-    setTimeout(() => movePacketAlong('p_axi_sysmem', '', 400), 600);
-    setTimeout(() => flash('sysmem', 500), 1000);
+    flash('dataMover', 300);
+    setTimeout(() => {
+      pulseLine('p_dm_axi_fifo', 350);
+      movePacketAlong('p_dm_axi_fifo', '', 350);
+      setTimeout(() => pulseLine('p_axi_fifo_axi', 350), 200);
+      setTimeout(() => movePacketAlong('p_axi_fifo_axi', '', 350), 200);
+      setTimeout(() => flash('axi', 300), 350);
+    }, 200);
+    setTimeout(() => {
+      pulseLine('p_axi_sysmem', 400);
+      movePacketAlong('p_axi_sysmem', '', 400);
+      setTimeout(() => flash('sysmem', 500), 400);
+    }, 700);
   }
   else if (ev.type === 'DM_WRITE_SRAM') {
-    pulseLine('p_sysmem_axi', 400);
-    movePacketAlong('p_sysmem_axi', '', 400);
-    setTimeout(() => pulseLine('p_dm_sram_ctrl', 400), 400);
-    setTimeout(() => movePacketAlong('p_dm_sram_ctrl', '', 400), 400);
-    setTimeout(() => flash('sram_ctrl', 400), 800);
+    flash('dataMover', 300);
     setTimeout(() => {
-      pulseLine('p_sramctrl_sram', 400);
-      movePacketAlong('p_sramctrl_sram', '', 400, true);
+      pulseLine('p_dm_sram_fifo', 350);
+      movePacketAlong('p_dm_sram_fifo', '', 350, true);
+      setTimeout(() => pulseLine('p_sram_fifo_ctrl', 350), 200);
+      setTimeout(() => movePacketAlong('p_sram_fifo_ctrl', '', 350), 200);
+      setTimeout(() => flash('sram_ctrl', 300), 400);
+    }, 200);
+    setTimeout(() => {
+      pulseLine('p_sramctrl_bram', 400);
+      movePacketAlong('p_sramctrl_bram', '', 400, true);
       flash('sram', 600);
-    }, 1200);
+    }, 800);
   }
 }
 

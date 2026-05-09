@@ -299,8 +299,8 @@ html[data-theme="light"] button:hover {
 
 .transparent-path { 
   stroke: var(--border-color); 
-  stroke-width: 1.6; 
-  stroke-opacity: 0.6; 
+  stroke-width: 2; 
+  stroke-opacity: 0.7; 
   fill: none; 
   stroke-linecap: round; 
   stroke-linejoin: round;
@@ -310,14 +310,14 @@ html[data-theme="light"] button:hover {
 
 html[data-theme="light"] .line {
   stroke: #7a8a99;
-  stroke-width: 1.8;
-  stroke-opacity: 0.85;
+  stroke-width: 1.9;
+  stroke-opacity: 0.88;
 }
 
 html[data-theme="light"] .transparent-path {
-  stroke: #7a8a99;
-  stroke-width: 1.6;
-  stroke-opacity: 0.75;
+  stroke: #5a7a8a;
+  stroke-width: 2;
+  stroke-opacity: 0.82;
 }
 
 #dma-container {
