@@ -198,11 +198,20 @@ int main(void) {
                         break;
 
                     case CMD_RUN_DMA: {
-                        /* Reset DMA state so HEAD returns to 0 regardless of previous runs. */
+                        /* CTRL_RESET clears BASEADDR, RINGLEN, and TAIL (csr.sv soft-reset block).
+                         * Save them before issuing reset and restore immediately after. */
+                        u32 saved_baseaddr = Xil_In32(CSR_ACCESS_BASE + CSR_REG_BASEADDR);
+                        u32 saved_ringlen  = Xil_In32(CSR_ACCESS_BASE + CSR_REG_RINGLEN);
+                        u32 saved_tail     = Xil_In32(CSR_ACCESS_BASE + CSR_REG_TAIL);
+
                         Xil_Out32(CSR_ACCESS_BASE + CSR_REG_CTRL, CTRL_RESET);
                         for (volatile u32 d = 0; d < 100; d++);
                         Xil_Out32(CSR_ACCESS_BASE + CSR_REG_CTRL, 0);
                         Xil_Out32(CSR_ACCESS_BASE + CSR_REG_IRQ_CLEAR, 0x3);
+
+                        Xil_Out32(CSR_ACCESS_BASE + CSR_REG_BASEADDR, saved_baseaddr);
+                        Xil_Out32(CSR_ACCESS_BASE + CSR_REG_RINGLEN,  saved_ringlen);
+                        Xil_Out32(CSR_ACCESS_BASE + CSR_REG_TAIL,     saved_tail);
 
                         u32 head_pre = Xil_In32(CSR_ACCESS_BASE + CSR_REG_HEAD);
                         u32 tail_pre = Xil_In32(CSR_ACCESS_BASE + CSR_REG_TAIL);
