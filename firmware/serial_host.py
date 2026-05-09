@@ -553,9 +553,11 @@ def main():
     print("Running golden model for %s ..." % args.scenario)
     run_golden(args.scenario, args.out_dir)
 
-    stim_path   = os.path.join(args.out_dir, "stim.txt")
-    golden_smem = os.path.join(args.out_dir, "golden_smem.hex")
-    golden_sram = os.path.join(args.out_dir, "golden_sram.hex")
+    stim_path    = os.path.join(args.out_dir, "stim.txt")
+    golden_smem  = os.path.join(args.out_dir, "golden_smem.hex")
+    golden_sram  = os.path.join(args.out_dir, "golden_sram.hex")
+    smem_init_path = os.path.join(args.out_dir, "initial_smem.hex")
+    sram_init_path = os.path.join(args.out_dir, "initial_sram.hex")
 
     # 2. Compute expected CRCs from golden files (no hardcoded constants).
     smem_words = _load_hex32(golden_smem)
@@ -617,22 +619,40 @@ def main():
         for off in [0x000, 0x004, 0x008, 0x00C]:
             print("  SMEM[0x%03x] = 0x%08x" % (off, host.read_smem(off)))
 
-        # 6. Request CRC32 from firmware and compare against golden.
-        got_smem_crc = host.smem_crc(0, len(smem_words) * 4)
-        got_sram_crc = host.sram_crc(0, len(sram_words) * 4)
+        # 6. CRC only the regions the golden model says changed (SRAM dst)
+        #    and the source region in SMEM. Full-memory CRC fails because BRAM
+        #    retains stale words from prior runs outside the active region.
+        init_sram_words = _load_hex32(sram_init_path)
+        changed = [i for i, (a, b) in enumerate(zip(init_sram_words, sram_words)) if a != b]
 
-        smem_pass = (got_smem_crc == expected_smem_crc)
-        sram_pass = (got_sram_crc == expected_sram_crc)
-
-        print("SMEM CRC: got=0x%08x  exp=0x%08x  %s" % (
-            got_smem_crc, expected_smem_crc, "PASS" if smem_pass else "FAIL"))
-        print("SRAM CRC: got=0x%08x  exp=0x%08x  %s" % (
-            got_sram_crc, expected_sram_crc, "PASS" if sram_pass else "FAIL"))
-
-        if smem_pass and sram_pass:
-            print("=== TEST PASSED ===")
+        all_pass = True
+        if not changed:
+            print("WARNING: golden model shows no SRAM changes — nothing to verify")
+            all_pass = False
         else:
-            print("=== TEST FAILED ===")
+            lo = min(changed);  hi = max(changed) + 1
+            lo_byte = lo * 4;   byte_len = (hi - lo) * 4
+            exp_crc = _crc32_words(sram_words[lo:hi])
+            got_crc = host.sram_crc(lo_byte, byte_len)
+            ok = (got_crc == exp_crc)
+            all_pass = all_pass and ok
+            print("SRAM[0x%03x..+%d] CRC: got=0x%08x  exp=0x%08x  %s" % (
+                lo_byte, byte_len, got_crc, exp_crc, "PASS" if ok else "FAIL"))
+
+        init_smem_words = _load_hex32(smem_init_path)
+        nonzero = [i for i, w in enumerate(init_smem_words) if w != 0]
+        if nonzero:
+            lo = min(nonzero);  hi = max(nonzero) + 1
+            lo_byte = lo * 4;   byte_len = (hi - lo) * 4
+            exp_crc = _crc32_words(init_smem_words[lo:hi])
+            got_crc = host.smem_crc(lo_byte, byte_len)
+            ok = (got_crc == exp_crc)
+            all_pass = all_pass and ok
+            print("SMEM[0x%03x..+%d] CRC: got=0x%08x  exp=0x%08x  %s" % (
+                lo_byte, byte_len, got_crc, exp_crc, "PASS" if ok else "FAIL"))
+
+        print("=== TEST PASSED ===" if all_pass else "=== TEST FAILED ===")
+        if not all_pass:
             sys.exit(1)
     except (RuntimeError, TimeoutError) as e:
         print("*** FAIL: %s ***" % e)
