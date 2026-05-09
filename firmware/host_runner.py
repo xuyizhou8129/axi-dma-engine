@@ -378,13 +378,39 @@ def main():
     parser.add_argument("--baud",     type=int, default=BAUD, help="Baud rate (default: %d)" % BAUD)
     parser.add_argument("--stim",     default=_default_stim,  help="Path to stim.txt (default: firmware/stim.txt)")
     parser.add_argument("--no-color", action="store_true",    help="Disable ANSI colour output")
-    parser.add_argument("--viz",      action="store_true",    help="Open turtle visualization window during verify")
+    parser.add_argument("--viz",      action="store_true",    help="Live Rich visualization during verify (requires `pip install rich`)")
     parser.add_argument("--viz-path", default=_default_viz,   help="Path to viz.py (default: firmware/viz.py)")
     args = parser.parse_args()
 
     global _USE_COLOR
     if args.no_color:
         _USE_COLOR = False
+
+    # ── --viz setup ──────────────────────────────────────────────────────────
+    # Rich's Live takes over the terminal (alt-screen). Redirect host_runner's
+    # own stdout/stderr to a log file so we don't fight viz for the screen.
+    # If `rich` isn't installed, fall back gracefully without redirecting.
+    if args.viz:
+        import importlib.util
+        if importlib.util.find_spec("rich") is None:
+            print(_red("--viz needs the `rich` package. Install with:  pip install rich"))
+            print(_dim("    Continuing without visualization..."))
+            args.viz = False
+        else:
+            log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    "host_runner.log")
+            print(_cyan("⏵ Live visualization starting..."))
+            print(_dim(f"    Logs will be written to: {log_path}"))
+            print(_dim("    Press Ctrl+C in the visualization window to exit"))
+            sys.stdout.flush()
+            time.sleep(0.6)
+            try:
+                _log_fp = open(log_path, "w", buffering=1)
+                sys.stdout = _log_fp
+                sys.stderr = _log_fp
+            except OSError:
+                args.viz = False
+            _USE_COLOR = False
 
     viz = Viz(enabled=args.viz, viz_path=args.viz_path)
     if viz.enabled:

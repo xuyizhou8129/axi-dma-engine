@@ -1,29 +1,22 @@
 """
-Live Rich visualization for the AXI DMA host runner.
+Rich live visualization for the AXI DMA host runner.
 
-Spawns host_runner.py as a subprocess (with --viz) and captures its stdout.
-Lines prefixed with `<<EVENT>>` are JSON events that update the live tables;
-all other lines flow into a log panel.
+Spawned as a subprocess by `host_runner.py --viz`. Reads JSON events
+(one per line) from stdin and renders four live tables:
 
-Layout:
-    ┌──────────── header ────────────┐
-    │ Expected SRAM │ Expected SMEM  │
-    ├───────────────┼────────────────┤
-    │ Actual   SRAM │ Actual   SMEM  │
-    ├──────────────── log ───────────┤
-    │ host_runner output             │
-    └────────────────────────────────┘
+    Expected SRAM | Expected SMEM
+    Actual   SRAM | Actual   SMEM
 
-Usage:
-    python firmware/viz.py [--port COM5] [--stim path/to/stim.txt] [other host_runner args]
+Events:
+    {"type": "header",   "label": "..."}
+    {"type": "expected", "region": "sram"|"smem", "cells": [[addr, val], ...]}
+    {"type": "actual",   "region": "sram"|"smem", "addr": int, "value": int}
+    {"type": "match",    "region": "sram"|"smem", "addr": int}
+    {"type": "fail",     "region": "sram"|"smem", "addr": int}
 
 Requires: rich  (pip install rich)
 """
-import argparse
 import json
-import os
-import re
-import subprocess
 import sys
 import threading
 import time
@@ -37,11 +30,8 @@ from rich.table import Table
 from rich.text import Text
 
 
-EVENT_PREFIX = "<<EVENT>> "
-LOG_MAX = 14
-SWEEP_DELAY = 0.20  # seconds between match/fail renders
+SWEEP_DELAY = 0.20  # seconds between match/fail renders so the sweep is visible
 
-# ── State ────────────────────────────────────────────────────────────────────
 state = {
     ("expected", "sram"): [],
     ("expected", "smem"): [],
@@ -49,12 +39,7 @@ state = {
     ("actual",   "smem"): [],
 }
 header_text = "AXI DMA  ·  Live Validation"
-log_lines = []
 state_lock = threading.Lock()
-
-_ANSI_RE = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-def strip_ansi(s):
-    return _ANSI_RE.sub('', s)
 
 
 # ── Rendering ────────────────────────────────────────────────────────────────
@@ -99,25 +84,12 @@ def make_table(kind, region):
     return t
 
 
-def make_log_panel():
-    with state_lock:
-        recent = log_lines[-LOG_MAX:]
-        text = "\n".join(recent) if recent else "[dim]waiting for host_runner…[/dim]"
-    return Panel(Text.from_markup(text), title="host_runner log",
-                 border_style="dim", padding=(0, 1))
-
-
-def make_header_panel():
-    return Panel(Align.center(Text(header_text, style="bold cyan")),
-                 style="cyan", padding=0)
-
-
 def make_layout():
     layout = Layout()
     layout.split_column(
-        Layout(make_header_panel(), size=3, name="head"),
-        Layout(name="body", ratio=4),
-        Layout(make_log_panel(), size=LOG_MAX + 2, name="log"),
+        Layout(Panel(Align.center(Text(header_text, style="bold cyan")),
+                     style="cyan", padding=0), size=3, name="head"),
+        Layout(name="body"),
     )
     layout["body"].split_row(Layout(name="left"), Layout(name="right"))
     layout["body"]["left"].split_column(
@@ -136,6 +108,7 @@ def on_header(ev):
     global header_text
     header_text = ev.get("label", header_text)
 
+
 def on_expected(ev):
     region = ev["region"]
     cells_list = ev["cells"]
@@ -144,6 +117,7 @@ def on_expected(ev):
             {"addr": a, "value": v, "status": "shown"} for a, v in cells_list]
         state[("actual", region)] = [
             {"addr": a, "value": None, "status": "pending"} for a, _ in cells_list]
+
 
 def on_actual(ev):
     region, addr, value = ev["region"], ev["addr"], ev["value"]
@@ -156,6 +130,7 @@ def on_actual(ev):
         state[("actual", region)].append(
             {"addr": addr, "value": value, "status": "filled"})
 
+
 def on_terminal(ev, status):
     region, addr = ev["region"], ev["addr"]
     with state_lock:
@@ -163,6 +138,7 @@ def on_terminal(ev, status):
             if c["addr"] == addr:
                 c["status"] = status
                 return
+
 
 HANDLERS = {
     "header":   on_header,
@@ -173,78 +149,37 @@ HANDLERS = {
 }
 
 
-def add_log(line):
-    line = strip_ansi(line)
-    with state_lock:
-        log_lines.append(line)
-        if len(log_lines) > LOG_MAX * 6:
-            del log_lines[:len(log_lines) - LOG_MAX * 6]
-
-
-def output_reader(stream):
-    for raw in iter(stream.readline, ''):
-        line = raw.rstrip("\r\n")
+def stdin_reader():
+    """Read JSON events from stdin, update state, pace match/fail for sweep."""
+    for line in sys.stdin:
+        line = line.strip()
         if not line:
             continue
-        if line.startswith(EVENT_PREFIX):
-            payload = line[len(EVENT_PREFIX):]
+        try:
+            ev = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        h = HANDLERS.get(ev.get("type"))
+        if h:
             try:
-                ev = json.loads(payload)
-            except json.JSONDecodeError:
-                add_log(line)
-                continue
-            handler = HANDLERS.get(ev.get("type"))
-            if handler:
-                handler(ev)
-            if ev.get("type") in ("match", "fail"):
-                time.sleep(SWEEP_DELAY)
-        else:
-            add_log(line)
+                h(ev)
+            except Exception:
+                pass
+        if ev.get("type") in ("match", "fail"):
+            time.sleep(SWEEP_DELAY)
 
 
-# ── Entry point ──────────────────────────────────────────────────────────────
 def main():
-    here = os.path.dirname(os.path.abspath(__file__))
-    default_host_runner = os.path.join(here, "host_runner.py")
-
-    parser = argparse.ArgumentParser(
-        description="Rich live visualization for DMA host runner")
-    parser.add_argument("--host-runner", default=default_host_runner,
-                        help="Path to host_runner.py")
-    parser.add_argument("--no-color",    action="store_true",
-                        help="Disable colored output in host_runner log")
-    args, passthrough = parser.parse_known_args()
-
-    cmd = [sys.executable, args.host_runner, "--viz"]
-    if args.no_color:
-        cmd.append("--no-color")
-    cmd += passthrough
-
-    try:
-        proc = subprocess.Popen(
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True, bufsize=1,
-        )
-    except FileNotFoundError as e:
-        print(f"viz: cannot spawn host_runner: {e}", file=sys.stderr)
-        sys.exit(2)
-
-    threading.Thread(target=output_reader, args=(proc.stdout,), daemon=True).start()
-
+    threading.Thread(target=stdin_reader, daemon=True).start()
     console = Console()
     with Live(make_layout(), console=console, refresh_per_second=8,
               screen=True, transient=False) as live:
         try:
-            while proc.poll() is None:
+            while True:
                 live.update(make_layout())
                 time.sleep(0.12)
-            # one last refresh + linger so user sees the final state
-            live.update(make_layout())
-            time.sleep(2.0)
         except KeyboardInterrupt:
-            proc.terminate()
-
-    sys.exit(proc.returncode or 0)
+            pass
 
 
 if __name__ == "__main__":
