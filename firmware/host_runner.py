@@ -6,6 +6,20 @@ import sys
 import os
 import zlib
 
+# ── Output formatting ────────────────────────────────────────────────────────
+_USE_COLOR = sys.stdout.isatty()
+
+def _c(code, s):   return ("\033[%sm%s\033[0m" % (code, s)) if _USE_COLOR else s
+def _bold(s):      return _c("1",    s)
+def _green(s):     return _c("1;32", s)
+def _red(s):       return _c("1;31", s)
+def _yellow(s):    return _c("33",   s)
+def _cyan(s):      return _c("36",   s)
+def _dim(s):       return _c("2",    s)
+
+_W = 56
+def _sep(ch="━"): print(ch * _W)
+
 # Firmware Protocol Definitions matches protocol.h
 PACKET_SYNC_WORD  = 0xDEADBEEF
 CMD_WRITE_SRAM    = 0x01
@@ -47,19 +61,19 @@ def dump_csr_status(ser, label="CSR snapshot"):
     irq_status = csr_read(ser, CSR_OFF_IRQ_STATUS)
     head       = csr_read(ser, CSR_OFF_HEAD)
     tail       = csr_read(ser, CSR_OFF_TAIL)
-    print(f"\n--- {label} ---")
+    print(_dim(f"\n--- {label} ---"))
     if status is None:
-        print("  CSR read failed.")
+        print(_red("  CSR read failed."))
         return
     busy  = (status >> 0) & 1
     empty = (status >> 1) & 1
     err   = (status >> 2) & 1
     irq_e = (irq_status >> 0) & 1 if irq_status is not None else '?'
     irq_x = (irq_status >> 1) & 1 if irq_status is not None else '?'
-    print(f"  STATUS     = {hex(status)}  BUSY={busy} EMPTY={empty} ERROR={err}")
-    print(f"  IRQ_STATUS = {hex(irq_status)}  EMPTY={irq_e} ERROR={irq_x}")
-    print(f"  HEAD       = {head}")
-    print(f"  TAIL       = {tail}")
+    print(_dim(f"  STATUS     = {hex(status)}  BUSY={busy} EMPTY={empty} ERROR={err}"))
+    print(_dim(f"  IRQ_STATUS = {hex(irq_status)}  EMPTY={irq_e} ERROR={irq_x}"))
+    print(_dim(f"  HEAD       = {head}"))
+    print(_dim(f"  TAIL       = {tail}"))
 
 
 def wait_for_ack(ser):
@@ -135,11 +149,11 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                 csr_writes[offset] = value
 
                 payload = struct.pack('<I', value)
-                print(f"Sending CSR Write: Addr {hex(addr)}, Val {hex(value)}")
+                print(_dim(f"Sending CSR Write: Addr {hex(addr)}, Val {hex(value)}"))
                 ser.write(build_packet(CMD_WRITE_CSR, addr, payload))
                 if not wait_for_ack(ser):
-                    print("  -> FAILED"); sys.exit(1)
-                print("  -> ACK'd")
+                    print(_red("  -> FAILED")); sys.exit(1)
+                print(_dim("  -> ACK'd"))
 
             elif parts[0] in ('sysmem_write', 'sram_write'):
                 addr  = int(parts[1], 16)
@@ -152,20 +166,20 @@ def parse_stimulus(filename, ser, csr_base_addr=0x80000000):
                     opcode = CMD_WRITE_SRAM
 
                 payload = struct.pack('<I', value)
-                print(f"Sending {parts[0]}: Addr {hex(addr)}, Val {hex(value)}")
+                print(_dim(f"Sending {parts[0]}: Addr {hex(addr)}, Val {hex(value)}"))
                 ser.write(build_packet(opcode, addr, payload))
                 if not wait_for_ack(ser):
-                    print("  -> FAILED"); sys.exit(1)
-                print("  -> ACK'd")
+                    print(_red("  -> FAILED")); sys.exit(1)
+                print(_dim("  -> ACK'd"))
 
             elif parts[0] in ('sysmem_read', 'sram_read'):
                 addr = int(parts[1], 16)
                 opcode = CMD_READ_SYSMEM if parts[0] == 'sysmem_read' else CMD_READ_SRAM
-                print(f"Sending {parts[0]}: Addr {hex(addr)}")
+                print(_dim(f"Sending {parts[0]}: Addr {hex(addr)}"))
                 val = read_memory(ser, opcode, addr)
                 if val is None:
-                    print("  -> FAILED ACK"); sys.exit(1)
-                print(f"  -> SUCCESS: Read Value = {hex(val)}")
+                    print(_red("  -> FAILED ACK")); sys.exit(1)
+                print(_dim(f"  -> SUCCESS: Read Value = {hex(val)}"))
 
     # --- Walk the ring (BASEADDR ... BASEADDR + TAIL*16) for each descriptor ---
     # Descriptor layout (descriptor_struct.md):
@@ -204,7 +218,7 @@ def verify_one_transfer(ser, idx, params):
     expected_words = params['expected_words']
 
     if len_words == 0:
-        print(f"  [SKIP] Desc {idx}: LEN=0")
+        print(_yellow(f"  [SKIP] Desc {idx}: LEN=0"))
         return True
 
     expected_crc = compute_crc32(expected_words)
@@ -221,45 +235,49 @@ def verify_one_transfer(ser, idx, params):
         dst_label              = f"SYSMEM[{hex(dst_addr)}]"
         src_label              = f"SRAM[{hex(src_addr)}]"
 
-    print(f"\n  [Desc {idx}] {src_label} -> {dst_label}, {len_words} word(s), "
+    print(f"\n  {_bold(_cyan(f'[Desc {idx}]'))} {src_label} -> {dst_label}, {len_words} word(s), "
           f"DIR={direction}, expected_crc={hex(expected_crc)}")
 
     ok = True
+    PASS = _green("[PASS]")
+    FAIL = _red("[FAIL]")
 
     val = read_memory(ser, dst_read_op, dst_addr)
     if val is None:
-        print(f"    [FAIL] {dst_label}: read failed");                           ok = False
+        print(f"    {FAIL} {dst_label}: read failed");                           ok = False
     elif val == expected_words[0]:
-        print(f"    [PASS] {dst_label} = {hex(val)}")
+        print(f"    {PASS} {dst_label} = {hex(val)}")
     else:
-        print(f"    [FAIL] {dst_label} = {hex(val)}, expected {hex(expected_words[0])}"); ok = False
+        print(f"    {FAIL} {dst_label} = {hex(val)}, expected {hex(expected_words[0])}"); ok = False
 
     fw_crc_dst = request_crc(ser, dst_crc_op, dst_addr, byte_len)
     if fw_crc_dst is None:
-        print("    [FAIL] dst CRC: request failed"); ok = False
+        print(f"    {FAIL} dst CRC: request failed"); ok = False
     elif fw_crc_dst == expected_crc:
-        print(f"    [PASS] dst CRC = {hex(fw_crc_dst)}")
+        print(f"    {PASS} dst CRC = {hex(fw_crc_dst)}")
     else:
-        print(f"    [FAIL] dst CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}"); ok = False
+        print(f"    {FAIL} dst CRC = {hex(fw_crc_dst)}, expected {hex(expected_crc)}"); ok = False
 
     fw_crc_src = request_crc(ser, src_crc_op, src_addr, byte_len)
     if fw_crc_src is None:
-        print("    [FAIL] src CRC: request failed"); ok = False
+        print(f"    {FAIL} src CRC: request failed"); ok = False
     elif fw_crc_src == expected_crc:
-        print(f"    [PASS] src CRC = {hex(fw_crc_src)} (source intact)")
+        print(f"    {PASS} src CRC = {hex(fw_crc_src)} (source intact)")
     else:
-        print(f"    [FAIL] src CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}"); ok = False
+        print(f"    {FAIL} src CRC = {hex(fw_crc_src)}, expected {hex(expected_crc)}"); ok = False
 
     return ok
 
 
 def verify_dma_result(ser, transfers):
     """Verify each descriptor's transfer in order. Returns True only if all PASS."""
-    print("\n--- DMA Verification ---")
+    print()
+    print("  " + _bold(_cyan("DMA Verification")))
+    _sep()
     print(f"  Descriptors enqueued: {len(transfers)}")
 
     if not transfers:
-        print("  [SKIP] No descriptors to verify (TAIL=0).")
+        print(_yellow("  [SKIP] No descriptors to verify (TAIL=0)."))
         return False
 
     all_pass = True
@@ -268,7 +286,13 @@ def verify_dma_result(ser, transfers):
             all_pass = False
 
     print()
-    print("=== DMA TEST PASSED ===" if all_pass else "=== DMA TEST FAILED ===")
+    _sep()
+    if all_pass:
+        print("  " + _bold(_green("✓  DMA TEST PASSED")))
+    else:
+        print("  " + _bold(_red("✗  DMA TEST FAILED")))
+    _sep()
+    print()
     return all_pass
 
 
@@ -276,32 +300,50 @@ def main():
     _default_stim = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stim.txt')
 
     parser = argparse.ArgumentParser(description="Host runner for DMA FPGA validation")
-    parser.add_argument("--port",  default=PORT,           help="Serial port (default: %s)" % PORT)
-    parser.add_argument("--baud",  type=int, default=BAUD, help="Baud rate (default: %d)" % BAUD)
-    parser.add_argument("--stim",  default=_default_stim,  help="Path to stim.txt (default: firmware/stim.txt)")
+    parser.add_argument("--port",     default=PORT,           help="Serial port (default: %s)" % PORT)
+    parser.add_argument("--baud",     type=int, default=BAUD, help="Baud rate (default: %d)" % BAUD)
+    parser.add_argument("--stim",     default=_default_stim,  help="Path to stim.txt (default: firmware/stim.txt)")
+    parser.add_argument("--no-color", action="store_true",    help="Disable ANSI colour output")
     args = parser.parse_args()
+
+    global _USE_COLOR
+    if args.no_color:
+        _USE_COLOR = False
+
+    print()
+    print("  " + _bold(_cyan("AXI DMA Engine  ·  Host Runner")))
+    _sep()
+    print(f"  Port  {args.port}  @  {args.baud} baud")
+    print(f"  Stim  {os.path.relpath(args.stim)}")
+    print()
 
     try:
         ser = serial.Serial(args.port, args.baud, timeout=2)
-        print("Connected to FPGA.")
+        print(_green("  ✓  Connected to FPGA"))
     except Exception as e:
-        print(f"Error opening port: {e}")
+        print(_red(f"  ✗  Error opening port: {e}"))
         return
 
     time.sleep(1)
-    print(ser.read_all().decode(errors='ignore'))
+    boot_msg = ser.read_all().decode(errors='ignore')
+    if boot_msg.strip():
+        print(_dim(boot_msg.rstrip()))
 
     stim_path = os.path.abspath(args.stim)
-    print(f"Parsing and sending {stim_path}...")
+    print()
+    print("  " + _bold(_cyan(f"Parsing and sending {os.path.basename(stim_path)}")))
+    _sep()
     transfers = parse_stimulus(stim_path, ser)
 
-    print("\nSending RUN DMA Command...")
+    print()
+    print("  " + _bold(_cyan("Sending RUN DMA Command")))
+    _sep()
     ser.write(build_packet(CMD_RUN_DMA, 0x00000000))
     dma_ok = wait_for_ack(ser)
     if dma_ok:
-        print("  -> DMA Trigger ACK'd")
+        print(_green("  ✓  DMA Trigger ACK'd"))
     else:
-        print("  -> DMA failed (NACK or timeout)")
+        print(_red("  ✗  DMA failed (NACK or timeout)"))
 
     # Always read CSR after RUN_DMA so the user can see error bits even on NACK.
     dump_csr_status(ser, "Post-DMA CSR snapshot")
