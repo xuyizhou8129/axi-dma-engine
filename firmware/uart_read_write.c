@@ -198,19 +198,19 @@ int main(void) {
                         break;
 
                     case CMD_RUN_DMA: {
+                        /* Reset DMA state so HEAD returns to 0 regardless of previous runs. */
+                        Xil_Out32(CSR_ACCESS_BASE + CSR_REG_CTRL, CTRL_RESET);
+                        for (volatile u32 d = 0; d < 100; d++);
+                        Xil_Out32(CSR_ACCESS_BASE + CSR_REG_CTRL, 0);
+                        Xil_Out32(CSR_ACCESS_BASE + CSR_REG_IRQ_CLEAR, 0x3);
+
                         u32 head_pre = Xil_In32(CSR_ACCESS_BASE + CSR_REG_HEAD);
                         u32 tail_pre = Xil_In32(CSR_ACCESS_BASE + CSR_REG_TAIL);
                         xil_printf("Triggering DMA... HEAD=%d TAIL=%d\r\n", head_pre, tail_pre);
 
-                        if (head_pre == tail_pre) {
-                            u32 st = Xil_In32(CSR_ACCESS_BASE + CSR_REG_STATUS);
-                            if (tail_pre > 0 && !(st & STATUS_ERROR)) {
-                                xil_printf("DMA already done (HEAD==TAIL==%d, no error).\r\n", tail_pre);
-                                send_ack(CMD_ACK);
-                            } else {
-                                xil_printf("DMA ring empty before start (HEAD==TAIL==%d).\r\n", tail_pre);
-                                send_ack(CMD_NACK);
-                            }
+                        if (tail_pre == 0) {
+                            xil_printf("DMA ring empty (TAIL=0), nothing to do.\r\n");
+                            send_ack(CMD_NACK);
                             break;
                         }
 
