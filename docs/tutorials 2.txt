@@ -1,3 +1,0 @@
-Vivado: https://digilent.com/reference/programmable-logic/guides/getting-started-with-vivado
-Microblaze: https://digilent.com/reference/programmable-logic/guides/getting-started-with-ipi
-Vitis: 
