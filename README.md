@@ -58,6 +58,16 @@ The end-to-end flow proceeds in five stages:
 
 Full memory dumps are reserved for debug; CRC32 is the default comparison path to keep UART traffic minimal.
 
+## Performance Results
+
+| Metric | Value |
+|--------|-------|
+| Maximum frequency (Synplifier) | **115 MHz** |
+| Operating frequency (FPGA target) | 100 MHz |
+| Average throughput @ 100 MHz | **> 100 MB/s** |
+
+The design was synthesized with Synplifier achieving a maximum frequency of **115 MHz**, giving a timing margin above the 100 MHz FPGA operating clock. At 100 MHz, measured average throughput exceeds **100 MB/s** across the SRAM ↔ system memory data path.
+
 ## Documentation index
 
 | Document | Topic |
