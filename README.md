@@ -35,6 +35,30 @@ The diagram matches the main internal blocks:
 4. **Hardware runs** — Ring Manager → Descriptor Fetcher (handle + AXI read) → Data Mover → parallel SRAM + AXI payload activity → `HEAD` advances; on ring empty or error, relevant `STATUS` / `IRQ_STATUS` bits latch.
 5. **ISR** — Read `STATUS` / `IRQ_STATUS`, handle completion or error; write `IRQ_CLEAR` to clear sticky sources and drop `irq_o`.
 
+## Verification Methodology
+
+Verification is split across simulation and FPGA bring-up. The full workflow is documented in [`docs/fpga_workflow.md`](docs/fpga_workflow.md).
+
+### Overview
+
+![Verification architecture](pic/Verification2.drawio.png)
+
+The verification stack has three layers: a **local host script** that generates and checks stimulus, a **MicroBlaze soft core** on the FPGA that coordinates DMA operation and computes CRC32 results, and the **DMA hardware** under test. The host and firmware communicate over UART; simulation remains the golden reference.
+
+### Verification Flow
+
+![Verification flow](pic/VerificationFlowChart0.drawio.png)
+
+The end-to-end flow proceeds in five stages:
+
+1. **Stimulus generation** — Host PC generates or loads test vectors (`stim.txt`) from the software reference model.
+2. **Memory preload** — MicroBlaze receives packets over UART, parses them, and writes initial contents into SRAM and system memory via the `mem_access_ctrl` init port.
+3. **DMA execution** — MicroBlaze programs the CSR (`BASEADDR`, `RINGLEN`, `TAIL`, `CTRL`), starts the DMA, and waits for done/IRQ with timeout and error handling.
+4. **CRC32 check** — Firmware computes CRC32 over agreed SRAM and system-memory ranges and returns CRC32 + metadata (`test_id`, byte length, IRQ count, done/error flags) over UART.
+5. **Host validation** — Host recomputes expected CRC32 from simulation reference buffers (same polynomial, reflection, endianness, and byte range) and marks each case PASS/FAIL.
+
+Full memory dumps are reserved for debug; CRC32 is the default comparison path to keep UART traffic minimal.
+
 ## Documentation index
 
 | Document | Topic |
