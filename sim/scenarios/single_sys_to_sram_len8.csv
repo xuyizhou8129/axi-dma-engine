@@ -1,0 +1,24 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary (see sim/testcases_instruction.txt)
+#
+# Ring start in system memory: 0x00000000
+# Ring length: 4 descriptor slots
+# Number of descriptors: 1
+#
+# Descriptor 0: move 8 beats from system memory (0x00000140) to SRAM (0x00000180)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000140,00000180,00000008,00000001
+#   (DIR=1; smem,* preloads words 80..87)
+# =============================================================================
+smem,80,10000001,,
+smem,81,10000002,,
+smem,82,10000003,,
+smem,83,10000004,,
+smem,84,10000005,,
+smem,85,10000006,,
+smem,86,10000007,,
+smem,87,10000008,,
+csr_baseaddr,00000000,,
+csr_ringlen,4,,
+desc,00000140,00000180,00000008,00000001
+enable,,,,

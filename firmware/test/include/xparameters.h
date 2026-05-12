@@ -1,0 +1,6 @@
+#ifndef XPARAMETERS_H
+#define XPARAMETERS_H
+
+#define XPAR_AXI_UARTLITE_0_BASEADDR 0x40600000u
+
+#endif

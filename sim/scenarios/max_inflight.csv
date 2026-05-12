@@ -1,0 +1,49 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary (see sim/testcases_instruction.txt)
+#
+# Ring start in system memory: 0x00000000 (csr_baseaddr below)
+# Ring length: 5 descriptor slots (tail=4 after enqueue so ring is not “full” with 4 desc)
+#   Ring slots: 0x00-0x0F, 0x10-0x1F, 0x20-0x2F, 0x30-0x3F, 0x40-0x4F; payloads at 0x100+
+# Number of descriptors: 4 (all DIR=1)
+#
+# Descriptor 0: move 4 beats from system memory (0x00000100) to SRAM (0x00000100)
+# Descriptor 1: move 4 beats from system memory (0x00000200) to SRAM (0x00000200)
+# Descriptor 2: move 4 beats from system memory (0x00000300) to SRAM (0x00000300)
+# Descriptor 3: move 4 beats from system memory (0x00000400) to SRAM (0x00000400)
+#   desc rows: docs/descriptor_struct.md — LEN low 8 bits = beats
+# Intent: multiple descriptors queued (scheduling / ring depth).
+# =============================================================================
+
+# --- Source data in system memory ---
+smem,64,aabbccdd,,
+smem,65,11223344,,
+smem,66,deadbeef,,
+smem,67,cafecafe,,
+
+smem,128,12345678,,
+smem,129,9abcdef0,,
+smem,130,13579bdf,,
+smem,131,2468ace0,,
+
+smem,192,aaaaaaaa,,
+smem,193,bbbbbbbb,,
+smem,194,cccccccc,,
+smem,195,dddddddd,,
+
+smem,256,11111111,,
+smem,257,22222222,,
+smem,258,33333333,,
+smem,259,44444444,,
+
+# --- Configure ring: 5 slots to hold 4 descriptors (tail=4, ringlen=5) ---
+csr_baseaddr,00000000,,
+csr_ringlen,5,,
+
+# 4 descriptors, all sys -> SRAM
+desc,00000100,00000100,00000004,00000001
+desc,00000200,00000200,00000004,00000001
+desc,00000300,00000300,00000004,00000001
+desc,00000400,00000400,00000004,00000001
+
+enable,,,,

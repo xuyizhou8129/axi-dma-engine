@@ -1,7 +1,12 @@
 
 module fifo #(
+<<<<<<< HEAD
     parameter FIFO_DATA_WIDTH = 32,
     parameter FIFO_BUFFER_SIZE = 1024) 
+=======
+    parameter FIFO_DATA_WIDTH = dma_pkg::DATA_WIDTH,
+    parameter FIFO_BUFFER_SIZE = dma_pkg::BRAM_SIZE) 
+>>>>>>> firmware_test_Satviki
 (
     input  logic reset,
     input  logic wr_clk,

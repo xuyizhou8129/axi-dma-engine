@@ -1,0 +1,22 @@
+op,arg1,arg2,arg3,arg4
+# =============================================================================
+# Scenario summary (see sim/testcases_instruction.txt)
+#
+# Ring start in system memory: 0x00000000
+# Ring length: 3 descriptor slots (tail wraps modulo 3; room for 2 pending with waste-one-slot)
+# Number of descriptors: 2 (both DIR=1)
+#
+# Descriptor 0: move 2 beats from system memory (0x00000100) to SRAM (0x00000240)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000100,00000240,00000002,00000001
+# Descriptor 1: move 2 beats from system memory (0x00000120) to SRAM (0x00000260)
+#   desc,SRC,DST,LEN,FLAGS = desc,00000120,00000260,00000002,00000001
+# =============================================================================
+smem,64,aa000001,,
+smem,65,aa000002,,
+smem,72,bb000001,,
+smem,73,bb000002,,
+csr_baseaddr,00000000,,
+csr_ringlen,3,,
+desc,00000100,00000240,00000002,00000001
+desc,00000120,00000260,00000002,00000001
+enable,,,,

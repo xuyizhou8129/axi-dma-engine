@@ -1,0 +1,8 @@
+To specify a test case, use:
+make sim SCENARIO=scenarios/TESTNAME.csv
+For example, to test max flight:
+make sim SCENARIO=scenarios/max_inflight.csv
+
+Running sim-all will:
+Run all test cases and record what was passed and 
+what was not in out/sim-all-report.txt

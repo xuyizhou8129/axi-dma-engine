@@ -1,0 +1,5 @@
+The software model are supposed to be functionally the same as the hardware modules. They will
+be used for testbenching purposes. The code should be as simple as possible as long as they are functionally 
+equivalent. There is no need to be exactly the same as the hardware logic (eg. no need to include all handshaking)
+The descriptor_fetcher, axi_4_master, sram_controller, are good references for csr, axi_lite, irq, ringManager in terms
+of structure.

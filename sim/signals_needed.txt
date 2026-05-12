@@ -1,0 +1,38 @@
+This file specifies what signals to expose when debugging RTL.  The wave script
+sim/dma_wave.do is maintained to match this list (edit here, then update dma_wave.do).
+
+1. Internal signals for components:
+   CSR (u_csr), Ring Manager (u_ring_manager + ring_mgr_if), IRQ (u_irq),
+   Descriptor Fetcher (u_movement/u_df), Data mover path (dm_in_*, DM/MID FIFOs,
+   handshake), AXI4 master (u_movement/u_axi), SRAM controller (u_movement/u_sram),
+   BRAM (u_movement/u_bram), System memory model (u_sysmem).
+
+2. Interfaces:
+   AXI-Lite on the CSR side (tb soc_bus), AXI4 on the system memory port (axi_sys).
+
+Component names (used as Wave group labels with _instance suffix in dma_wave.do):
+
+  TB_instance
+  Ring_Manager_IF_instance       (csr_ring_manager_if on dma_top)
+  CSR_instance
+  Ring_Manager_instance            (u_ring_manager internals)
+  IRQ_instance
+  RM_to_movement_wires_instance    (dma_top rm_df_* / fetch / dm_done)
+  RM_DF_interface_instance         (u_movement/rm_df)
+  Descriptor_Fetcher_instance      (u_df)
+  Data_Mover_instance              (dm_in_*, handshake, dm_done)
+  Data_Mover_AXI_FIFO_instance
+  Data_Mover_SRAM_FIFO_instance
+  MID_FIFO_instance
+  DF_in_FIFO_instance
+  DF_out_FIFO_instance
+  AXI4_Master_instance
+  AXI4_Master_DF_path_instance
+  AXI4_Master_DM_path_instance
+  AXI4_Master_MID_path_instance
+  SRAM_Controller_instance
+  SRAM_instance                    (u_bram)
+  AXI4_System_Memory_{AW,W,B,AR,R}_instance
+  AXI_Lite_CSR_{AW,W,B,AR,R}_instance
+  AXI_Lite_IRQ_instance
+  System_memory_instance           (u_sysmem)
