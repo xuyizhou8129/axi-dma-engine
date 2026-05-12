@@ -41,13 +41,12 @@ Verification is split across simulation and FPGA bring-up. The full workflow is 
 
 ### Overview
 
-![Verification architecture](pic/Verification2.drawio.png)
-
 The verification stack has three layers: a **local host script** that generates and checks stimulus, a **MicroBlaze soft core** on the FPGA that coordinates DMA operation and computes CRC32 results, and the **DMA hardware** under test. The host and firmware communicate over UART; simulation remains the golden reference.
 
 ### Verification Flow
 
 ![Verification flow](pic/VerificationFlowChart0.drawio.png)
+![Verification architecture](pic/Verification2.drawio.png)
 
 The end-to-end flow proceeds in five stages:
 
